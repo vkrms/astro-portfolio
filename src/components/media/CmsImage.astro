@@ -1,0 +1,78 @@
+---
+/**
+ * Renders an image chosen in Tina's media manager.
+ *
+ * Tina stores repo media as "/uploads/<folder>/<file>", relative to
+ * src/assets (see media.tina in tina/config.ts). Those files live under src/,
+ * so we resolve the stored path to an imported asset and let astro:assets
+ * emit AVIF/WebP at several widths at build time.
+ *
+ * Anything that isn't a repo upload (a remote URL, or the assets.tina.io URL
+ * Tina Cloud returns inside the visual editor) falls back to a plain <img>,
+ * so live preview keeps working.
+ */
+import type { ImageMetadata } from 'astro';
+import { Picture } from 'astro:assets';
+
+interface Props {
+	src?: string | null;
+	alt: string;
+	/** Rendered width of the image box, used to pick srcset widths. */
+	width?: number;
+	sizes?: string;
+	class?: string;
+	loading?: 'lazy' | 'eager';
+	[key: `data-${string}`]: unknown;
+}
+
+const uploads = import.meta.glob<{ default: ImageMetadata }>(
+	'/src/assets/uploads/**/*.{jpg,jpeg,png,webp,avif,gif}',
+	{ eager: true },
+);
+
+const {
+	src,
+	alt,
+	width = 1200,
+	sizes = `(min-width: ${width}px) ${width}px, 100vw`,
+	class: className,
+	loading = 'lazy',
+	...rest
+} = Astro.props;
+
+const asset = src ? uploads[`/src/assets${src}`]?.default : undefined;
+// Public pages are prerendered, so optimization happens once at build time.
+// On-demand renders (the visual-editing island route) would otherwise use the
+// host's runtime image service (metered on Vercel Hobby); the editor preview
+// gets the original file instead.
+const optimize = asset && Astro.isPrerendered;
+const widths = asset
+	? [480, 800, 1200, 1600, 2400].filter((w) => w <= asset.width)
+	: [];
+---
+{optimize ? (
+	<Picture
+		src={asset}
+		alt={alt}
+		formats={['avif', 'webp']}
+		widths={widths.length ? widths : [asset.width]}
+		sizes={sizes}
+		loading={loading}
+		decoding="async"
+		class={className}
+		{...rest}
+	/>
+) : asset ? (
+	<img
+		src={asset.src}
+		width={asset.width}
+		height={asset.height}
+		alt={alt}
+		loading={loading}
+		decoding="async"
+		class={className}
+		{...rest}
+	/>
+) : src ? (
+	<img src={src} alt={alt} loading={loading} decoding="async" class={className} {...rest} />
+) : null}

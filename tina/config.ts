@@ -24,10 +24,14 @@ export default defineConfig({
     outputFolder: "admin",
     publicFolder: "public",
   },
+  // Uploads are committed to src/assets/uploads so astro:assets can optimize
+  // them at build time (files in public/ are served untouched). Stored paths
+  // look like "/uploads/<project>/<file>"; src/components/media/CmsImage.astro
+  // resolves them back to imported assets.
   media: {
     tina: {
-      mediaRoot: "",
-      publicFolder: "public",
+      mediaRoot: "uploads",
+      publicFolder: "src/assets",
     },
   },
   // See docs on content modeling for more info on how to setup new content models: https://tina.io/docs/schema/

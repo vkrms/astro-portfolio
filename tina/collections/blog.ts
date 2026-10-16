@@ -1,4 +1,5 @@
 import type { Collection } from "tinacms";
+import { carouselTemplate } from "../../src/components/mdx/Carousel.template";
 import { youTubeEmbedTemplate } from "../../src/components/mdx/YouTubeEmbed.template";
 
 export const BlogCollection: Collection = {
@@ -45,7 +46,7 @@ export const BlogCollection: Collection = {
       name: "body",
       label: "Body",
       isBody: true,
-      templates: [youTubeEmbedTemplate],
+      templates: [carouselTemplate, youTubeEmbedTemplate],
     },
   ],
 }

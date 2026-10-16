@@ -3,6 +3,7 @@ import TinaMarkdown from '@tinacms/astro/TinaMarkdown.astro';
 import { tinaField } from '@tinacms/astro/tina-field';
 import type { CmsBlog } from '../../lib/data';
 import FormattedDate from '../FormattedDate.astro';
+import CmsImage from '../media/CmsImage.astro';
 import { mdxComponents } from '../mdx/components';
 
 interface Props {
@@ -13,7 +14,7 @@ const { data } = Astro.props;
 ---
 {data?.heroImage && (
 	<div data-tina-field={tinaField(data, 'heroImage')} class="mx-auto max-w-4xl px-6">
-		<img width={1020} height={510} src={data.heroImage} alt="" class="w-full rounded-2xl border shadow-lg" />
+		<CmsImage src={data.heroImage} alt="" width={1020} loading="eager" class="w-full rounded-2xl border shadow-lg" />
 	</div>
 )}
 {data && (
