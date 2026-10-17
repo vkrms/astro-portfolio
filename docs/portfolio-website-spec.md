@@ -259,6 +259,8 @@ As of the TinaCMS removal (commit `b8bd753`), the repo is a clean Astro base for
 - Astro is pinned at 6.4.8.
 - The shell carries over: `Header`, `Footer`, `ThemeToggle`, `Base`, `BaseHead`, the `ui/` and `space/` primitives, `CmsImage.astro` and the `Carousel` renderer.
 - Phase 0b: BlockNote editor at `/admin/edit/[slug]` with a custom Carousel block (slash menu, media picker, add/reorder/remove, alt, caption, aspect ratio).
+- A custom Image block on the same media pipeline, with alt and caption fields; the save is refused while any image lacks alt text.
+- The slash menu exposes only blocks the renderer supports, so nothing can be saved and then dropped from the page.
 - Browser-side resize (long edge <= 3000 px, <= 3.5 MB) and local uploads under `src/assets/uploads/`.
 - `Blocks.astro` renders paragraphs, headings, grouped lists, code, links and carousels; `/api/preview` produces the same HTML as the static page.
 - React runs as a runtime dependency on `@astrojs/react` 5.x, which keeps the React plugin on Vite 7 (Astro 6.4.8).
@@ -276,7 +278,7 @@ As of the TinaCMS removal (commit `b8bd753`), the repo is a clean Astro base for
 - Deploy adapter: `astro.config.mjs` still auto-detects Vercel, Cloudflare, Netlify and Node; pinning `@astrojs/vercel` is deferred. Vercel Hobby remains the intended host.
 - Settings singletons and the Zod schema in `src/content.config.ts`. Until they exist, `src/lib/config.ts` holds a temporary `defaultSiteConfig`.
 - Auth, GitHub commits and stale-SHA handling: `src/lib/auth.ts`, `src/lib/github.ts`, `/admin/login`. Phase 0b is local and unauthenticated.
-- Remaining Phase 1 blocks (Image, Gallery, Embed, Quote, Media + text) and the `/about` and `/rss.xml` routes.
+- Remaining Phase 1 blocks (Gallery, Embed, Quote, Media + text) and the `/about` and `/rss.xml` routes.
 - Server env vars: `ADMIN_PASSWORD_HASH`, `SESSION_SECRET`, `GITHUB_TOKEN`, `GITHUB_REPO`, `GITHUB_BRANCH` (and `R2_*` in phase 2). `.env.example` currently defines only `SITE_URL` and the optional `DEPLOY_ADAPTER`.
 
 

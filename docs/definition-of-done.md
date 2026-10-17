@@ -41,7 +41,7 @@ Deferred to Phase 1: GitHub commit, stale-SHA refusal, Vercel preview.
 - [ ] The preview pane matches the production page.
 - [ ] Saving commits the post JSON and all new images in one commit.
 - [ ] Saving against a stale SHA is refused and offers a reload.
-- [ ] An image without alt text blocks the save.
+- [x] An image without alt text blocks the save.
 - [ ] `site`, `home` and `about` are editable at `/admin/settings`.
 
 ### Public site

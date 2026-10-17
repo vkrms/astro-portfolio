@@ -52,8 +52,9 @@ with `PROJECTS_DIR=tmp/e2e-projects`, so tests never touch 1892 or
 1. Admin empty post list (done): `/admin` reads `listPosts()` and shows an empty state.
 2. Create a draft post (done): the form writes `src/content/projects/<slug>.json`.
 3. Admin shell and posts table (done): sidebar, filters, table on desktop, cards on mobile, duplicate and delete.
-4. BlockNote body with the Carousel block.
-5. Media upload and browser resize.
-6. `/api/preview` renders the same HTML as the static page.
-7. Public `/projects` and `/projects/[slug]` (done; cover and body pending).
-8. Settings singletons.
+4. BlockNote body with the Carousel block (done).
+5. Media upload and browser resize (done).
+6. `/api/preview` renders the same HTML as the static page (done).
+7. Public `/projects` and `/projects/[slug]` (done; cover pending).
+8. Image block with required alt text (done).
+9. Settings singletons.
