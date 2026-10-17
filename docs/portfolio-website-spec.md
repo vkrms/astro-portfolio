@@ -258,7 +258,12 @@ As of the TinaCMS removal (commit `b8bd753`), the repo is a clean Astro base for
 - Package manager switched to npm; `package-lock.json` is committed and `allowScripts` covers `esbuild`, `workerd` and `sharp`.
 - Astro is pinned at 6.4.8.
 - The shell carries over: `Header`, `Footer`, `ThemeToggle`, `Base`, `BaseHead`, the `ui/` and `space/` primitives, `CmsImage.astro` and the `Carousel` renderer.
-- `npm run build` and `astro check` both pass.
+- Phase 0b: BlockNote editor at `/admin/edit/[slug]` with a custom Carousel block (slash menu, media picker, add/reorder/remove, alt, caption, aspect ratio).
+- Browser-side resize (long edge <= 3000 px, <= 3.5 MB) and local uploads under `src/assets/uploads/`.
+- `Blocks.astro` renders paragraphs, headings, grouped lists, code, links and carousels; `/api/preview` produces the same HTML as the static page.
+- React runs as a runtime dependency on `@astrojs/react` 5.x, which keeps the React plugin on Vite 7 (Astro 6.4.8).
+- Editing project JSON clears Astro's dev route cache, so a new post appears on `/projects/<slug>` without a server restart.
+- `npm run build`, `npx astro check`, the unit tests and the Phase 0b Playwright tests all pass.
 
 **Decisions locked**
 
@@ -270,10 +275,10 @@ As of the TinaCMS removal (commit `b8bd753`), the repo is a clean Astro base for
 
 - Deploy adapter: `astro.config.mjs` still auto-detects Vercel, Cloudflare, Netlify and Node; pinning `@astrojs/vercel` is deferred. Vercel Hobby remains the intended host.
 - Settings singletons and the Zod schema in `src/content.config.ts`. Until they exist, `src/lib/config.ts` holds a temporary `defaultSiteConfig`.
-- The Phase 0b/1 scaffold: `src/blocks/schema.ts`, `src/blocks/render/`, `src/admin/`, `src/pages/admin/`, `src/pages/api/`, `src/lib/auth.ts`, `src/lib/github.ts`, `src/lib/storage.ts`.
-- Public routes other than the placeholder `/` and `/404`: `/projects`, `/projects/[slug]`, `/about`, `/rss.xml`.
+- Auth, GitHub commits and stale-SHA handling: `src/lib/auth.ts`, `src/lib/github.ts`, `/admin/login`. Phase 0b is local and unauthenticated.
+- Remaining Phase 1 blocks (Image, Gallery, Embed, Quote, Media + text) and the `/about` and `/rss.xml` routes.
 - Server env vars: `ADMIN_PASSWORD_HASH`, `SESSION_SECRET`, `GITHUB_TOKEN`, `GITHUB_REPO`, `GITHUB_BRANCH` (and `R2_*` in phase 2). `.env.example` currently defines only `SITE_URL` and the optional `DEPLOY_ADAPTER`.
-- React: currently a `devDependency`; it moves to `dependencies` when the BlockNote admin island lands.
+
 
 ## Risks and open questions
 

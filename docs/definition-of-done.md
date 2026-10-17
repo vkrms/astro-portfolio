@@ -23,8 +23,8 @@ Phase 0b runs locally and unauthenticated.
 
 ## Phase 0b - BlockNote spike (localhost only)
 
-- [ ] A Carousel block (add, reorder, remove, alt, caption) with a ~3 MB image saves to JSON and reloads identically. The image uploads through the media picker, is written to disk, and the post renders it.
-- [ ] `Blocks.astro` renders that JSON, including grouped lists and inline links, to the same HTML on a static page and through `/api/preview`.
+- [x] A Carousel block (add, reorder, remove, alt, caption) with a ~3 MB image saves to JSON and reloads identically. The image uploads through the media picker, is written to disk, and the post renders it.
+- [x] `Blocks.astro` renders that JSON, including grouped lists and inline links, to the same HTML on a static page and through `/api/preview`.
 
 Deferred to Phase 1: GitHub commit, stale-SHA refusal, Vercel preview.
 
