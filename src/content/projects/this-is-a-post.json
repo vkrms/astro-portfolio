@@ -1,0 +1,58 @@
+{
+	"title": "This is a post",
+	"summary": "Lorem ipsum right?",
+	"date": "2026-10-17",
+	"draft": false,
+	"body": [
+		{
+			"id": "ffc25a02-6561-497e-a41a-6fcf2abc1ad4",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Wow wow this is the block note block, right?",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "50b3d89d-af4a-4ff4-817d-4940bf627dfd",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [],
+			"children": []
+		},
+		{
+			"id": "1062dd97-f4c7-4525-979b-c83cd9dbfb62",
+			"type": "image",
+			"props": {
+				"src": "https://images.unsplash.com/photo-1770306924697-6a7f2065d967?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
+				"alt": "Covered wooden porch with timber walls and ceiling, a pendant globe light, and a bench beside a dark-framed window.",
+				"caption": ""
+			},
+			"children": []
+		},
+		{
+			"id": "633f2e09-c9d9-446f-ba83-c065e13a1cc3",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [],
+			"children": []
+		}
+	],
+	"schemaVersion": 1
+}
