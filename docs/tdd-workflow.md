@@ -32,7 +32,7 @@ Two loops:
 | Pure logic | Vitest |
 | Thin route or glue | Playwright |
 | Build output (drafts, JS budget, file size) | Build or CI script |
-| Real GitHub commit, Vercel preview | Manual |
+| Vercel preview, domain | Manual |
 
 ## Commands
 
@@ -45,7 +45,8 @@ Two loops:
 
 The manual dev server runs on 1892. Playwright starts its own server on 1893
 with `PROJECTS_DIR=tmp/e2e-projects`, so tests never touch 1892 or
-`src/content/projects`.
+`src/content/projects`. The admin is local-only; Playwright tests against
+`astro dev`, where admin routes are allowed on localhost.
 
 ## Slices
 

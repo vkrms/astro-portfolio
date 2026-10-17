@@ -7,7 +7,7 @@ column. It is separate from the public site and never renders the public
 ## Scope
 
 This spec covers the admin shell and the Posts screen, including row actions.
-The editor, media picker, settings forms and auth are separate slices.
+The editor, media picker and settings forms are separate slices.
 
 ## Layout
 
@@ -52,7 +52,6 @@ The editor, media picker, settings forms and auth are separate slices.
 - Footer:
   - **View site** -> `/`.
   - Theme toggle.
-  - **Log out** once auth lands.
 
 Active item: `bg-accent text-foreground` and `aria-current="page"`.
 

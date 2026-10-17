@@ -14,33 +14,31 @@ How tests are written: [tdd-workflow.md](./tdd-workflow.md).
 
 | Method | Use |
 | --- | --- |
-| Playwright | Admin and public flows. Runs against a production-mode server for auth, and against `astro dev` where auth is skipped. |
-| Unit | GitHub client, stale-SHA check, browser resize, cookie signing. |
+| Playwright | Admin and public flows against `astro dev`. |
+| Unit | Storage, block rules, browser resize, admin access. |
 | Build check | Drafts excluded, JS budget, secrets in the client, file and repo size. |
-| Manual | Vercel preview, real GitHub commit, domain, design. |
+| Manual | Vercel preview, domain, design. |
 
-Phase 0b runs locally and unauthenticated.
+The admin is local-only; deployed builds have no admin.
 
 ## Phase 0b - BlockNote spike (localhost only)
 
 - [x] A Carousel block (add, reorder, remove, alt, caption) with a ~3 MB image saves to JSON and reloads identically. The image uploads through the media picker, is written to disk, and the post renders it.
 - [x] `Blocks.astro` renders that JSON, including grouped lists and inline links, to the same HTML on a static page and through `/api/preview`.
 
-Deferred to Phase 1: GitHub commit, stale-SHA refusal, Vercel preview.
+Deferred to Phase 1: Vercel preview.
 
 ## Phase 1 - MVP
 
 ### Admin
 
-- [ ] A wrong password is rejected and the admin password logs in.
-- [ ] The session survives a reload; the cookie is `HttpOnly`, `Secure`, `SameSite=Strict`, 30-day expiry.
+- [x] Admin routes work on localhost in dev, and in a locally-run build with `LOCAL_ADMIN=1`.
+- [x] `/admin`, `/api` and `/uploads` return 404 on any other host, even with `LOCAL_ADMIN=1`.
 - [ ] `/admin` lists posts with draft/published state.
 - [ ] Creating a post produces a `src/content/projects/<slug>.json` entry with every required field.
 - [ ] The body editor accepts every phase 1 block.
 - [ ] The media picker resizes an image to <= 3000 px and <= 3.5 MB before upload.
 - [ ] The preview pane matches the production page.
-- [ ] Saving commits the post JSON and all new images in one commit.
-- [ ] Saving against a stale SHA is refused and offers a reload.
 - [x] An image without alt text blocks the save.
 - [ ] `site`, `home` and `about` are editable at `/admin/settings`.
 
@@ -59,7 +57,7 @@ Deferred to Phase 1: GitHub commit, stale-SHA refusal, Vercel preview.
 
 ### Release
 
-- [ ] Three real projects are published from the browser.
+- [ ] Three real projects are edited in the local admin, committed and deployed.
 
 ## Phase 2 - video
 
@@ -76,7 +74,7 @@ Deferred to Phase 1: GitHub commit, stale-SHA refusal, Vercel preview.
 ## Project release gate
 
 - [ ] All phase gates pass.
-- [ ] Three real projects are published from the browser.
+- [ ] Three real projects are edited in the local admin, committed and deployed.
 - [ ] The site is deployed on Vercel Hobby at the production domain.
 - [ ] `npm run build` and `astro check` pass.
 - [ ] Public pages have no framework hydration and stay within the JS budget.
@@ -88,6 +86,6 @@ Deferred to Phase 1: GitHub commit, stale-SHA refusal, Vercel preview.
 
 ## Not automated
 
-- Vercel preview and the real GitHub commit path.
+- Vercel preview.
 - The 5 MB file cap and the 1 GB repo budget (CI, not Playwright).
 - Domain setup and design review.
