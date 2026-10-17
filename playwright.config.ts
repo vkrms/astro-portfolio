@@ -24,8 +24,9 @@ export default defineConfig({
 				reuseExistingServer: !process.env.CI,
 				timeout: 120_000,
 				env: {
-					// Tests reset this directory before each test.
+					// Tests reset these directories before each test.
 					PROJECTS_DIR: 'tmp/e2e-projects',
+					UPLOADS_DIR: 'tmp/e2e-uploads',
 				},
 			},
 });
