@@ -12,7 +12,7 @@ export default defineConfig({
 	retries: process.env.CI ? 1 : 0,
 	reporter: process.env.CI ? 'github' : 'list',
 	use: {
-		baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:4321',
+		baseURL: process.env.E2E_BASE_URL ?? 'http://localhost:1892',
 		trace: 'on-first-retry',
 	},
 	projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
@@ -21,7 +21,7 @@ export default defineConfig({
 		? undefined
 		: {
 				command: 'npm run dev',
-				url: 'http://localhost:4321',
+				url: 'http://localhost:1892',
 				reuseExistingServer: !process.env.CI,
 				timeout: 120_000,
 				env: {

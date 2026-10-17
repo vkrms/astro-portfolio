@@ -45,7 +45,7 @@ function getSiteUrl() {
 	if (process.env.CF_PAGES_URL) return process.env.CF_PAGES_URL;
 	if (process.env.NETLIFY && process.env.URL) return process.env.URL;
 
-	return 'http://localhost:4321';
+	return 'http://localhost:1892';
 }
 
 // https://astro.build/config
@@ -53,6 +53,7 @@ export default defineConfig({
 	site: getSiteUrl(),
 	output: 'static',
 	adapter: await getAdapter(),
+	server: { port: 1892 },
 	redirects: { '/home': '/' },
 	integrations: [mdx(), sitemap(), icon()],
 	build: {
