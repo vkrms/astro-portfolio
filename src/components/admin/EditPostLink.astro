@@ -6,10 +6,18 @@ interface Props {
 }
 
 const { slug } = Astro.props;
+const isDev = import.meta.env.DEV;
 ---
 
 <!--
-	Local admin shortcut on the public post page. Phase 1 replaces this with a
-	control that only renders for a signed-in admin.
+	Local admin shortcut on the public post page. Public pages are prerendered,
+	so this renders in dev only; production builds leave it out. Once auth lands,
+	signed-in admins can get an equivalent control from the admin instead.
 -->
-<Button href={`/admin/edit/${slug}`} variant="outline" size="sm">Edit post</Button>
+{
+	isDev && (
+		<Button href={`/admin/edit/${slug}`} variant="outline" size="sm">
+			Edit post
+		</Button>
+	)
+}
