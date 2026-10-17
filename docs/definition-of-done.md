@@ -8,6 +8,8 @@ Two levels:
 Cross-cutting checks (build, type check, secrets, JS budget) are written once in
 the release gate and referenced by the phases.
 
+How tests are written: [tdd-workflow.md](./tdd-workflow.md).
+
 ## Verification
 
 | Method | Use |
