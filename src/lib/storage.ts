@@ -2,7 +2,7 @@
  * Post storage for Phase 0b. Reads and writes the local repo directly.
  * Production adds a GitHub-backed implementation behind the same API.
  */
-import { mkdir, readdir, readFile, writeFile } from 'node:fs/promises';
+import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 
 export const PROJECTS_DIR = 'src/content/projects';
@@ -195,4 +195,50 @@ export async function writePost(
 	await writeFile(join(dir, `${slug}.json`), `${JSON.stringify(post, null, '\t')}\n`, 'utf8');
 
 	return { slug, title, summary, date, draft: post.draft, tags: post.tags };
+}
+
+export async function deletePost(slug: string, options: { dir?: string } = {}): Promise<boolean> {
+	const dir = projectsDir(options.dir);
+
+	try {
+		await rm(join(dir, `${slug}.json`));
+		return true;
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === 'ENOENT') return false;
+		throw error;
+	}
+}
+
+export async function duplicatePost(
+	slug: string,
+	options: { dir?: string } = {},
+): Promise<PostSummary | null> {
+	const source = await readPost(slug, { dir: options.dir });
+	if (!source) return null;
+
+	const dir = projectsDir(options.dir);
+	const base = `${source.slug}-copy`;
+	let candidate = base;
+	let suffix = 2;
+
+	while ((await readPost(candidate, { dir })) !== null) {
+		candidate = `${base}-${suffix}`;
+		suffix += 1;
+	}
+
+	const copy = {
+		title: source.title,
+		summary: source.summary,
+		date: source.date,
+		draft: true,
+		tags: source.tags,
+		links: source.links,
+		body: source.body,
+		schemaVersion: source.schemaVersion,
+	};
+
+	await mkdir(dir, { recursive: true });
+	await writeFile(join(dir, `${candidate}.json`), `${JSON.stringify(copy, null, '\t')}\n`, 'utf8');
+
+	return toSummary({ ...source, slug: candidate, draft: true });
 }

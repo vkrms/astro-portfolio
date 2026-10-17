@@ -43,13 +43,15 @@ Two loops:
 | `npm run test:e2e` | Playwright |
 | `npx playwright test --grep "<title>"` | One Playwright test |
 
-Keep `npm run dev` running in another terminal. Playwright reuses it locally.
+The manual dev server runs on 1892. Playwright starts its own server on 1893
+with `PROJECTS_DIR=tmp/e2e-projects`, so tests never touch 1892 or
+`src/content/projects`.
 
 ## Slices
 
 1. Admin empty post list (done): `/admin` reads `listPosts()` and shows an empty state.
 2. Create a draft post (done): the form writes `src/content/projects/<slug>.json`.
-3. Post list shows draft and published state (done).
+3. Admin shell and posts table (done): sidebar, filters, table on desktop, cards on mobile, duplicate and delete.
 4. BlockNote body with the Carousel block.
 5. Media upload and browser resize.
 6. `/api/preview` renders the same HTML as the static page.
