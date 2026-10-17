@@ -1,6 +1,6 @@
 /**
- * Post storage for Phase 0b. Reads and writes the local repo directly.
- * Production adds a GitHub-backed implementation behind the same API.
+ * Post storage. Reads and writes the local repo directly. The admin is a local
+ * tool; commit and push to publish the content. The deployed site is static.
  */
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';

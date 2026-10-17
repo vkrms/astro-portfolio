@@ -11,8 +11,8 @@ const isDev = import.meta.env.DEV;
 
 <!--
 	Local admin shortcut on the public post page. Public pages are prerendered,
-	so this renders in dev only; production builds leave it out. Once auth lands,
-	signed-in admins can get an equivalent control from the admin instead.
+	so this renders in dev only; production builds leave it out. The admin
+	itself is gated to localhost by middleware.
 -->
 {
 	isDev && (
