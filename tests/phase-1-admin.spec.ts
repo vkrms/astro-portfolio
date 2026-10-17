@@ -1,11 +1,16 @@
 import { expect, test } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
+import { join } from 'node:path';
+import { PROJECTS_DIR, resetProjects } from './helpers/projects';
 
 /**
  * Phase 1 admin gate. Auth tests need a production-mode server; the rest run
  * against `astro dev`. Remove .fixme as each feature lands.
  */
 test.describe('phase 1 - admin', () => {
-	// Walking skeleton: active.
+	test.describe.configure({ mode: 'serial' });
+	test.beforeEach(resetProjects);
+
 	test('shows an empty state when there are no posts', async ({ page }) => {
 		await page.goto('/admin');
 		await expect(page.getByRole('heading', { name: 'Posts' })).toBeVisible();
@@ -18,6 +23,51 @@ test.describe('phase 1 - admin', () => {
 		expect(await response.json()).toEqual({ posts: [] });
 	});
 
+	test('creates a draft post and writes JSON', async ({ page }) => {
+		await page.goto('/admin/edit/new');
+
+		await page.getByLabel('Title').fill('Hello World');
+		await page.getByLabel('Slug').fill('hello-world');
+		await page.getByLabel('Summary').fill('A short summary.');
+		await page.getByLabel('Date').fill('2026-06-01');
+		await page.getByLabel('Draft').check();
+		await page.getByRole('button', { name: 'Save' }).click();
+
+		await expect(page).toHaveURL('/admin');
+		await expect(page.getByRole('listitem').filter({ hasText: 'Hello World' })).toContainText('Draft');
+
+		const raw = await readFile(join(PROJECTS_DIR, 'hello-world.json'), 'utf8');
+		expect(JSON.parse(raw)).toMatchObject({
+			title: 'Hello World',
+			summary: 'A short summary.',
+			date: '2026-06-01',
+			draft: true,
+		});
+	});
+
+	test('lists posts with draft and published state', async ({ page }) => {
+		await page.goto('/admin/edit/new');
+		await page.getByLabel('Title').fill('Draft Post');
+		await page.getByLabel('Slug').fill('draft-post');
+		await page.getByLabel('Summary').fill('Draft summary.');
+		await page.getByLabel('Date').fill('2026-06-01');
+		await page.getByLabel('Draft').check();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(page).toHaveURL('/admin');
+
+		await page.goto('/admin/edit/new');
+		await page.getByLabel('Title').fill('Published Post');
+		await page.getByLabel('Slug').fill('published-post');
+		await page.getByLabel('Summary').fill('Published summary.');
+		await page.getByLabel('Date').fill('2026-06-02');
+		await page.getByLabel('Draft').uncheck();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(page).toHaveURL('/admin');
+
+		await expect(page.getByRole('listitem').filter({ hasText: 'Draft Post' })).toContainText('Draft');
+		await expect(page.getByRole('listitem').filter({ hasText: 'Published Post' })).toContainText('Published');
+	});
+
 	test.fixme('rejects a wrong password and accepts the admin password', async ({ page }) => {
 		await page.goto('/admin/login');
 		// A wrong password shows an error. The admin password lands on /admin.
@@ -26,11 +76,6 @@ test.describe('phase 1 - admin', () => {
 	test.fixme('session survives a reload and sets the required cookie flags', async ({ page }) => {
 		await page.goto('/admin');
 		// Reload stays logged in. Cookie: HttpOnly, Secure, SameSite=Strict, 30 days.
-	});
-
-	test.fixme('lists posts with draft and published state', async ({ page }) => {
-		await page.goto('/admin');
-		// Each row shows draft or published.
 	});
 
 	test.fixme('creates a post with every required field', async ({ page }) => {

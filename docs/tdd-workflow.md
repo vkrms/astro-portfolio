@@ -47,11 +47,11 @@ Keep `npm run dev` running in another terminal. Playwright reuses it locally.
 
 ## Slices
 
-1. Admin empty post list: `/admin` reads `listPosts()` and shows an empty state.
-2. Create a draft post and write `src/content/projects/<slug>.json`.
-3. Post list shows draft and published state.
+1. Admin empty post list (done): `/admin` reads `listPosts()` and shows an empty state.
+2. Create a draft post (done): the form writes `src/content/projects/<slug>.json`.
+3. Post list shows draft and published state (done).
 4. BlockNote body with the Carousel block.
 5. Media upload and browser resize.
 6. `/api/preview` renders the same HTML as the static page.
-7. Public `/projects` and `/projects/[slug]`.
+7. Public `/projects` (done) and `/projects/[slug]`.
 8. Settings singletons.
