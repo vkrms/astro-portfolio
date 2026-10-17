@@ -2,7 +2,7 @@ import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { listPosts, slugify, writePost } from '../../src/lib/storage';
+import { listPosts, parseLinks, readPost, slugify, writePost } from '../../src/lib/storage';
 
 let dir = '';
 
@@ -75,6 +75,64 @@ describe('slugify', () => {
 	});
 });
 
+describe('parseLinks', () => {
+	it('keeps valid links and drops invalid entries', () => {
+		expect(
+			parseLinks([
+				{ label: 'Live', url: 'https://example.com' },
+				{ label: 'Missing url' },
+				null,
+				'nope',
+			]),
+		).toEqual([{ label: 'Live', url: 'https://example.com' }]);
+	});
+
+	it('returns undefined for non-arrays', () => {
+		expect(parseLinks(undefined)).toBeUndefined();
+		expect(parseLinks('nope')).toBeUndefined();
+	});
+});
+
+describe('readPost', () => {
+	it('returns null when the file does not exist', async () => {
+		expect(await readPost('missing', { dir })).toBeNull();
+	});
+
+	it('returns the parsed post', async () => {
+		await writeFile(
+			join(dir, 'p.json'),
+			JSON.stringify({
+				title: 'P',
+				summary: 'S',
+				date: '2026-01-01',
+				draft: false,
+				links: [{ label: 'Live', url: 'https://example.com' }],
+				body: [{ type: 'paragraph' }],
+			}),
+		);
+
+		const post = await readPost('p', { dir });
+
+		expect(post).toMatchObject({
+			slug: 'p',
+			title: 'P',
+			summary: 'S',
+			draft: false,
+			links: [{ label: 'Live', url: 'https://example.com' }],
+			body: [{ type: 'paragraph' }],
+			schemaVersion: 1,
+		});
+	});
+
+	it('can hide drafts', async () => {
+		await writeFile(
+			join(dir, 'd.json'),
+			JSON.stringify({ title: 'D', summary: 'S', date: '2026-01-01', draft: true }),
+		);
+		expect(await readPost('d', { dir, publishedOnly: true })).toBeNull();
+	});
+});
+
 describe('writePost', () => {
 	it('writes a JSON file with defaults', async () => {
 		const post = await writePost(
@@ -107,6 +165,21 @@ describe('writePost', () => {
 			{ dir },
 		);
 		expect(post.slug).toBe('custom-slug');
+	});
+
+	it('writes optional links', async () => {
+		await writePost(
+			{
+				title: 'With Links',
+				summary: 'S',
+				date: '2026-06-01',
+				links: [{ label: 'Live', url: 'https://example.com' }],
+			},
+			{ dir },
+		);
+
+		const raw = JSON.parse(await readFile(join(dir, 'with-links.json'), 'utf8'));
+		expect(raw.links).toEqual([{ label: 'Live', url: 'https://example.com' }]);
 	});
 
 	it('requires a title, summary and date', async () => {

@@ -24,11 +24,47 @@ test.describe('phase 1 - public site', () => {
 		await expect(page.getByText('Draft Project')).toHaveCount(0);
 	});
 
+	test('project page shows title, summary, date, links and previous/next', async ({ page, request }) => {
+		await request.post('/api/save', {
+			data: { title: 'Older Project', summary: 'Older summary.', date: '2026-01-01', draft: false },
+		});
+		await request.post('/api/save', {
+			data: {
+				title: 'Newer Project',
+				summary: 'Newer summary.',
+				date: '2026-06-01',
+				draft: false,
+				links: [{ label: 'Live site', url: 'https://example.com' }],
+			},
+		});
+
+		await page.goto('/projects/newer-project');
+
+		await expect(page.getByRole('heading', { level: 1 })).toHaveText('Newer Project');
+		await expect(page.getByText('Newer summary.')).toBeVisible();
+		await expect(page.getByText('Jun 1, 2026')).toBeVisible();
+		await expect(page.getByRole('link', { name: 'Live site' })).toHaveAttribute(
+			'href',
+			'https://example.com',
+		);
+		await expect(page.getByRole('link', { name: /Older Project/ })).toBeVisible();
+	});
+
+	test('project page returns 404 for a draft or unknown slug', async ({ page, request }) => {
+		await request.post('/api/save', {
+			data: { title: 'Draft Only', summary: 'Draft summary.', date: '2026-01-01', draft: true },
+		});
+
+		const response = await page.goto('/projects/draft-only');
+		expect(response?.status()).toBe(404);
+		await expect(page.getByText('Lost in space')).toBeVisible();
+	});
+
 	test.fixme('home shows the intro and featured projects', async ({ page }) => {
 		await page.goto('/');
 	});
 
-	test.fixme('project page shows header, cover, body, links and previous/next', async ({ page }) => {
+	test.fixme('project page shows the cover and body', async ({ page }) => {
 		await page.goto('/projects/example');
 	});
 

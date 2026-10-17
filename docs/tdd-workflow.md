@@ -53,5 +53,5 @@ Keep `npm run dev` running in another terminal. Playwright reuses it locally.
 4. BlockNote body with the Carousel block.
 5. Media upload and browser resize.
 6. `/api/preview` renders the same HTML as the static page.
-7. Public `/projects` (done) and `/projects/[slug]`.
+7. Public `/projects` and `/projects/[slug]` (done; cover and body pending).
 8. Settings singletons.

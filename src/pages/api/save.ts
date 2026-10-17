@@ -1,5 +1,5 @@
 import type { APIRoute } from 'astro';
-import { writePost } from '../../lib/storage';
+import { parseLinks, writePost } from '../../lib/storage';
 
 export const prerender = false;
 
@@ -21,6 +21,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 			summary: String(input.summary ?? ''),
 			date: String(input.date ?? ''),
 			draft: input.draft === true || input.draft === 'on',
+			links: parseLinks(input.links),
 		});
 
 		if (isJson) {

@@ -7,6 +7,11 @@ import { join } from 'node:path';
 
 export const PROJECTS_DIR = 'src/content/projects';
 
+export interface PostLink {
+	label: string;
+	url: string;
+}
+
 export interface PostSummary {
 	slug: string;
 	title: string;
@@ -16,10 +21,29 @@ export interface PostSummary {
 	tags?: string[];
 }
 
+export interface PostRecord {
+	slug: string;
+	title: string;
+	summary: string;
+	date: string;
+	draft: boolean;
+	tags?: string[];
+	links?: PostLink[];
+	body: unknown[];
+	schemaVersion: number;
+}
+
 export interface ListPostsOptions {
 	/** Override the projects directory. Used by tests. */
 	dir?: string;
 	/** Exclude posts with `draft: true`. */
+	publishedOnly?: boolean;
+}
+
+export interface ReadPostOptions {
+	/** Override the projects directory. Used by tests. */
+	dir?: string;
+	/** Return null for a draft post. */
 	publishedOnly?: boolean;
 }
 
@@ -29,6 +53,8 @@ export interface PostInput {
 	summary: string;
 	date: string;
 	draft?: boolean;
+	tags?: string[];
+	links?: PostLink[];
 	body?: unknown[];
 	schemaVersion?: number;
 }
@@ -41,8 +67,54 @@ export function slugify(value: string): string {
 		.replace(/^-+|-+$/g, '');
 }
 
+export function parseLinks(value: unknown): PostLink[] | undefined {
+	if (!Array.isArray(value)) return undefined;
+
+	const links = value.filter(
+		(link): link is PostLink =>
+			typeof link === 'object' &&
+			link !== null &&
+			typeof (link as PostLink).label === 'string' &&
+			typeof (link as PostLink).url === 'string',
+	);
+
+	return links.length > 0 ? links : undefined;
+}
+
+function stringArray(value: unknown): string[] | undefined {
+	if (!Array.isArray(value)) return undefined;
+
+	const items = value.filter((item): item is string => typeof item === 'string');
+	return items.length > 0 ? items : undefined;
+}
+
 function projectsDir(override?: string): string {
 	return override ?? process.env.PROJECTS_DIR ?? PROJECTS_DIR;
+}
+
+function parsePost(slug: string, data: Record<string, unknown>): PostRecord {
+	return {
+		slug,
+		title: typeof data.title === 'string' ? data.title : '',
+		summary: typeof data.summary === 'string' ? data.summary : '',
+		date: typeof data.date === 'string' ? data.date : '',
+		draft: data.draft === true,
+		tags: stringArray(data.tags),
+		links: parseLinks(data.links),
+		body: Array.isArray(data.body) ? data.body : [],
+		schemaVersion: typeof data.schemaVersion === 'number' ? data.schemaVersion : 1,
+	};
+}
+
+function toSummary(post: PostRecord): PostSummary {
+	return {
+		slug: post.slug,
+		title: post.title,
+		summary: post.summary || undefined,
+		date: post.date || undefined,
+		draft: post.draft,
+		tags: post.tags,
+	};
 }
 
 export async function listPosts(options: ListPostsOptions = {}): Promise<PostSummary[]> {
@@ -62,21 +134,34 @@ export async function listPosts(options: ListPostsOptions = {}): Promise<PostSum
 
 		const raw = await readFile(join(dir, entry), 'utf8');
 		const data = JSON.parse(raw) as Record<string, unknown>;
-		if (options.publishedOnly && data.draft === true) continue;
+		const post = parsePost(entry.slice(0, -'.json'.length), data);
+		if (options.publishedOnly && post.draft) continue;
 
-		posts.push({
-			slug: entry.slice(0, -'.json'.length),
-			title: typeof data.title === 'string' ? data.title : '',
-			summary: typeof data.summary === 'string' ? data.summary : undefined,
-			date: typeof data.date === 'string' ? data.date : undefined,
-			draft: data.draft === true,
-			tags: Array.isArray(data.tags)
-				? data.tags.filter((tag): tag is string => typeof tag === 'string')
-				: undefined,
-		});
+		posts.push(toSummary(post));
 	}
 
 	return posts.sort((a, b) => (b.date ?? '').localeCompare(a.date ?? ''));
+}
+
+export async function readPost(
+	slug: string,
+	options: ReadPostOptions = {},
+): Promise<PostRecord | null> {
+	const dir = projectsDir(options.dir);
+	const file = join(dir, `${slug}.json`);
+
+	let raw: string;
+	try {
+		raw = await readFile(file, 'utf8');
+	} catch (error) {
+		if ((error as NodeJS.ErrnoException).code === 'ENOENT') return null;
+		throw error;
+	}
+
+	const post = parsePost(slug, JSON.parse(raw) as Record<string, unknown>);
+	if (options.publishedOnly && post.draft) return null;
+
+	return post;
 }
 
 export async function writePost(
@@ -100,6 +185,8 @@ export async function writePost(
 		summary,
 		date,
 		draft: input.draft ?? true,
+		tags: input.tags,
+		links: input.links,
 		body: input.body ?? [],
 		schemaVersion: input.schemaVersion ?? 1,
 	};
@@ -107,5 +194,5 @@ export async function writePost(
 	await mkdir(dir, { recursive: true });
 	await writeFile(join(dir, `${slug}.json`), `${JSON.stringify(post, null, '\t')}\n`, 'utf8');
 
-	return { slug, title, summary, date, draft: post.draft };
+	return { slug, title, summary, date, draft: post.draft, tags: post.tags };
 }
