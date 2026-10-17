@@ -58,6 +58,7 @@ export function CarouselBlock({ block, editor }: { block: any; editor: any }) {
 				<span className="text-sm font-medium">Carousel</span>
 				<select
 					aria-label="Aspect ratio"
+					name="aspect"
 					value={block.props.aspect}
 					onChange={(event) =>
 						editor.updateBlock(block, { props: { aspect: event.target.value } })
@@ -79,6 +80,7 @@ export function CarouselBlock({ block, editor }: { block: any; editor: any }) {
 					<label className="grid gap-1 text-xs">
 						<span>Alt text</span>
 						<input
+							name="alt"
 							value={item.alt}
 							onChange={(event) => updateItem(index, { alt: event.target.value })}
 							className="rounded border px-2 py-1"
@@ -88,6 +90,7 @@ export function CarouselBlock({ block, editor }: { block: any; editor: any }) {
 					<label className="grid gap-1 text-xs">
 						<span>Caption</span>
 						<input
+							name="caption"
 							value={item.caption}
 							onChange={(event) => updateItem(index, { caption: event.target.value })}
 							className="rounded border px-2 py-1"
@@ -124,6 +127,7 @@ export function CarouselBlock({ block, editor }: { block: any; editor: any }) {
 				<input
 					ref={fileRef}
 					type="file"
+					name="file"
 					accept="image/*"
 					multiple
 					onChange={(event) => addFiles(event.target.files)}

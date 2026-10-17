@@ -103,6 +103,8 @@ export default function PostEditor({ slug, post }: Props) {
 				<label className="grid gap-1.5">
 					<span className="text-sm font-medium">Title</span>
 					<input
+						id="title"
+						name="title"
 						value={title}
 						onChange={(event) => setTitle(event.target.value)}
 						required
@@ -114,6 +116,8 @@ export default function PostEditor({ slug, post }: Props) {
 				<label className="grid gap-1.5">
 					<span className="text-sm font-medium">Slug</span>
 					<input
+						id="slug"
+						name="slug"
 						value={pageSlug}
 						onChange={(event) => setPageSlug(event.target.value)}
 						placeholder="auto from title"
@@ -124,6 +128,8 @@ export default function PostEditor({ slug, post }: Props) {
 				<label className="grid gap-1.5">
 					<span className="text-sm font-medium">Summary</span>
 					<textarea
+						id="summary"
+						name="summary"
 						value={summary}
 						onChange={(event) => setSummary(event.target.value)}
 						required
@@ -136,6 +142,8 @@ export default function PostEditor({ slug, post }: Props) {
 				<label className="grid gap-1.5">
 					<span className="text-sm font-medium">Date</span>
 					<input
+						id="date"
+						name="date"
 						type="date"
 						value={date}
 						onChange={(event) => setDate(event.target.value)}
@@ -146,6 +154,8 @@ export default function PostEditor({ slug, post }: Props) {
 
 				<label className="flex items-center gap-2 text-sm">
 					<input
+						id="draft"
+						name="draft"
 						type="checkbox"
 						checked={draft}
 						onChange={(event) => setDraft(event.target.checked)}

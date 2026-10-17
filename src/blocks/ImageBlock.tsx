@@ -46,6 +46,7 @@ export function ImageBlock({ block, editor }: { block: any; editor: any }) {
 					<label className="grid gap-1 text-xs">
 						<span>Alt text</span>
 						<input
+							name="alt"
 							value={alt}
 							onChange={(event) => update({ alt: event.target.value })}
 							className="rounded border px-2 py-1"
@@ -55,6 +56,7 @@ export function ImageBlock({ block, editor }: { block: any; editor: any }) {
 					<label className="grid gap-1 text-xs">
 						<span>Caption</span>
 						<input
+							name="caption"
 							value={caption}
 							onChange={(event) => update({ caption: event.target.value })}
 							className="rounded border px-2 py-1"
@@ -92,6 +94,7 @@ export function ImageBlock({ block, editor }: { block: any; editor: any }) {
 			<input
 				ref={fileRef}
 				type="file"
+				name="file"
 				accept="image/*"
 				onChange={(event) => addFile(event.target.files)}
 				className="hidden"
