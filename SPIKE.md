@@ -57,7 +57,7 @@ send every field. The editor always does; scripts must too.
    `vkrms/astro-portfolio`, branch `main`. Copy the Client ID and create a
    read-only token.
 3. On Vercel, import the repo. Framework preset Astro, build command
-   `pnpm build`. Add env vars `PUBLIC_TINA_CLIENT_ID` and `TINA_TOKEN`.
+   `npm run build`. Add env vars `PUBLIC_TINA_CLIENT_ID` and `TINA_TOKEN`.
 4. Add the Vercel URL to the Tina Cloud project's site URLs.
 5. Open `https://<project>.vercel.app/admin`, log in, open
    "Spike: carousel round-trip", click the carousel, edit a caption.

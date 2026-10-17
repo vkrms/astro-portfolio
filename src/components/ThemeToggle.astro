@@ -12,7 +12,7 @@ import { Icon } from 'astro-icon/components';
 </button>
 <script is:inline>
 	// Delegate from document so the handler survives DOM swaps from
-	// Astro's ClientRouter and Tina's visual-editor re-renders.
+	// Astro's ClientRouter view transitions.
 	if (!window.__themeToggleBound) {
 		window.__themeToggleBound = true;
 		document.addEventListener('click', (e) => {

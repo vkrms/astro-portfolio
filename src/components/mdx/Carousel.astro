@@ -121,7 +121,7 @@ const ratio = aspect || '3/2';
 		});
 	}
 	initCarousels();
-	// Re-run after view transitions and after Tina's bridge swaps an island.
+	// Re-run after view transitions and whenever new carousel markup is inserted.
 	document.addEventListener('astro:page-load', initCarousels);
 	new MutationObserver(initCarousels).observe(document.body, { childList: true, subtree: true });
 </script>

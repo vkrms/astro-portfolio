@@ -1,12 +1,11 @@
 ---
 import { Icon } from 'astro-icon/components';
-import { tinaField } from "@tinacms/astro/tina-field";
-import type { CmsConfig } from '../lib/data';
+import type { SiteConfig } from '../lib/config';
 import IconLink from "./IconLink.astro";
 import ThemeToggle from './ThemeToggle.astro';
 
 interface Props {
-	config?: CmsConfig | null;
+	config?: SiteConfig | null;
 }
 
 const { config } = Astro.props;
@@ -18,18 +17,18 @@ const contactLinks = (config?.contactLinks ?? []).filter(item => item !== null);
 <header class="fixed top-0 z-20 w-full border-b bg-background/50 backdrop-blur-xl">
 	<nav class="mx-auto flex max-w-6xl items-center justify-between gap-6 px-6 py-4">
 		<a href="/" class="flex items-center gap-2 font-semibold">
-			{seo?.logo && <img src={seo.logo} alt="Logo" width="32" height="32" data-tina-field={tinaField(seo, "logo")} />}
-			<span data-tina-field={seo ? tinaField(seo, "title") : undefined}>{seo?.title}</span>
+			{seo?.logo && <img src={seo.logo} alt="Logo" width="32" height="32" />}
+			<span>{seo?.title}</span>
 		</a>
 		<div class="hidden items-center gap-8 text-sm lg:flex">
 			{nav.map((item) => (
-				<a href={item.link} class="text-muted-foreground transition-colors hover:text-foreground" data-tina-field={tinaField(item, "title")}>{item.title}</a>
+				<a href={item.link} class="text-muted-foreground transition-colors hover:text-foreground">{item.title}</a>
 			))}
 		</div>
 		<div class="flex items-center gap-3">
 			<div class="hidden items-center gap-3 lg:flex">
 				{contactLinks.map((link) => (
-					<IconLink title={link.title} link={link.link} icon={link.icon} data-tina-field={tinaField(link, "title")} />
+					<IconLink title={link.title} link={link.link} icon={link.icon} />
 				))}
 				<ThemeToggle />
 			</div>
@@ -56,7 +55,6 @@ const contactLinks = (config?.contactLinks ?? []).filter(item => item !== null);
 				<a
 					href={item.link}
 					class="border-b border-border/50 py-3 text-sm text-muted-foreground transition-colors last:border-b-0 hover:text-foreground"
-					data-tina-field={tinaField(item, "title")}
 				>
 					{item.title}
 				</a>
@@ -64,7 +62,7 @@ const contactLinks = (config?.contactLinks ?? []).filter(item => item !== null);
 			<div class="mt-4 flex items-center justify-between gap-3 pt-4">
 				<div class="flex items-center gap-2">
 					{contactLinks.map((link) => (
-						<IconLink title={link.title} link={link.link} icon={link.icon} data-tina-field={tinaField(link, "title")} />
+						<IconLink title={link.title} link={link.link} icon={link.icon} />
 					))}
 				</div>
 				<ThemeToggle />
