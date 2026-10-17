@@ -1,12 +1,31 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
+import { resetProjects } from './helpers/projects';
 
 test.describe('phase 1 - public site', () => {
-	test.fixme('home shows the intro and featured projects', async ({ page }) => {
-		await page.goto('/');
+	test.beforeEach(resetProjects);
+
+	test('projects lists published posts newest first', async ({ page, request }) => {
+		await request.post('/api/save', {
+			data: { title: 'Older Project', summary: 'Older summary.', date: '2026-01-01', draft: false },
+		});
+		await request.post('/api/save', {
+			data: { title: 'Newer Project', summary: 'Newer summary.', date: '2026-06-01', draft: false },
+		});
+		await request.post('/api/save', {
+			data: { title: 'Draft Project', summary: 'Draft summary.', date: '2026-07-01', draft: true },
+		});
+
+		await page.goto('/projects');
+
+		const items = page.getByRole('listitem');
+		await expect(items).toHaveCount(2);
+		await expect(items.nth(0)).toContainText('Newer Project');
+		await expect(items.nth(1)).toContainText('Older Project');
+		await expect(page.getByText('Draft Project')).toHaveCount(0);
 	});
 
-	test.fixme('projects lists newest first and filters by tag', async ({ page }) => {
-		await page.goto('/projects');
+	test.fixme('home shows the intro and featured projects', async ({ page }) => {
+		await page.goto('/');
 	});
 
 	test.fixme('project page shows header, cover, body, links and previous/next', async ({ page }) => {

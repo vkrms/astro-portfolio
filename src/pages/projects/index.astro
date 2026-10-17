@@ -1,0 +1,31 @@
+---
+import Base from '../../layouts/Base.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import { listPosts } from '../../lib/storage';
+
+const posts = await listPosts({ publishedOnly: true });
+---
+
+<Base title="Projects" description="Selected work.">
+	<main class="mx-auto max-w-5xl px-6 py-16">
+		<h1 class="text-4xl font-semibold tracking-tight">Projects</h1>
+
+		{posts.length === 0 ? (
+			<p class="mt-6 text-muted-foreground">No projects yet.</p>
+		) : (
+			<ul class="mt-10 grid list-none gap-6 p-0 sm:grid-cols-2">
+				{posts.map((post) => (
+					<li class="rounded-xl border bg-card p-6">
+						{post.date && (
+							<p class="text-sm text-muted-foreground">
+								<FormattedDate date={new Date(post.date)} />
+							</p>
+						)}
+						<h2 class="mt-2 text-xl font-semibold">{post.title}</h2>
+						{post.summary && <p class="mt-2 text-muted-foreground">{post.summary}</p>}
+					</li>
+				))}
+			</ul>
+		)}
+	</main>
+</Base>
