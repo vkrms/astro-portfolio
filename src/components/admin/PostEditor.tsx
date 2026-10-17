@@ -264,7 +264,7 @@ export default function PostEditor({ slug, post }: Props) {
 				onClick={(event) => {
 					if (event.target === dialogRef.current) closePreview();
 				}}
-				className="w-[min(48rem,92vw)] max-w-none rounded-xl border bg-background p-0 text-foreground shadow-xl backdrop:bg-black/50"
+				className="m-auto w-[min(48rem,92vw)] max-w-none rounded-xl border bg-background p-0 text-foreground shadow-xl backdrop:bg-black/50"
 			>
 				<div className="flex max-h-[85vh] flex-col">
 					<header className="flex items-center justify-between gap-4 border-b px-5 py-3">
