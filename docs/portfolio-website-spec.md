@@ -11,7 +11,7 @@ A personal portfolio on Astro where each project post is composed from media blo
 - Write, edit and publish posts from a browser on the live site, with no IDE involved.
 - Compose posts from blocks: rich text, image, gallery, carousel, embed, quote, media + text. Video arrives in phase 2.
 - Keep posts as JSON files and images as files in the repo. No database, no third-party CMS.
-- Ship static HTML with near-zero JavaScript on public pages; only the carousel needs a small script.
+- Ship static HTML with no framework hydration on public pages; only small inline scripts (theme, mobile menu, carousel).
 
 **Not in scope for phase 1:** video hosting, multiple editors, comments, i18n, anything commercial.
 
@@ -235,14 +235,16 @@ A portfolio used to find work is usually treated as personal use, but confirm ag
 
 Building the admin is now the largest piece of work, so a new spike proves the risky parts before anything is polished. The first spike's Astro setup, `CmsImage` and Carousel renderer carry over; TinaCMS is removed.
 
-1. **Phase 0b: BlockNote spike** (2–3 days). Pass all four checks:
-   - A custom Carousel block with its item editor (add, reorder, remove, alt, caption) saves to JSON and reloads identically.
+1. **Phase 0b: BlockNote spike** (2–3 days, localhost only). Pass these checks:
+   - A custom Carousel block with its item editor (add, reorder, remove, alt, caption), including a ~3 MB image, saves to JSON and reloads identically. The image uploads through the media picker, is written to disk, and the post renders it.
    - `Blocks.astro` renders that JSON, including grouped lists and inline links, to the same HTML on a static page and through `/api/preview`.
-   - On a Vercel preview deploy, `/api/save` commits post JSON plus a \~3 MB image in one commit through the GitHub API.
-   - A save made against an out-of-date file SHA is refused.
+
+   GitHub commits and stale-SHA handling are deferred to Phase 1; Phase 0b uses the local disk storage path.
 2. **Phase 1: MVP.** Login, post list, editor with all phase 1 blocks, media picker with resizing, preview, settings singletons, public pages and base design. Done when 3 real projects are published from the browser.
 3. **Phase 2: video.** R2 bucket and custom subdomain, presigned uploads, Video block.
 4. **Phase 3: polish.** Tag filter, RSS, view transitions, gallery lightbox, per-project OG images, autosave of unsaved drafts in the browser.
+
+Acceptance criteria for each phase and for the release are in [definition-of-done.md](./definition-of-done.md).
 
 ## Implementation status
 
