@@ -6,8 +6,8 @@ column. It is separate from the public site and never renders the public
 
 ## Scope
 
-This spec covers the admin shell and the Posts screen. The editor, media
-picker, settings forms and auth are separate slices.
+This spec covers the admin shell and the Posts screen, including row actions.
+The editor, media picker, settings forms and auth are separate slices.
 
 ## Layout
 
@@ -31,11 +31,11 @@ picker, settings forms and auth are separate slices.
 │ Portfolio        │  Posts                          [New post]   │
 │                  │                                              │
 │ Posts            │  All (3)   Published (2)   Drafts (1)        │
-│ Media    Soon    │  ┌─────────────────────────────────────────┐ │
-│ Settings Soon    │  │ Title             Status     Date       │ │
+│                  │  ┌─────────────────────────────────────────┐ │
+│                  │  │ Title            Status    Date     ... │ │
 │                  │  ├─────────────────────────────────────────┤ │
-│                  │  │ My project        Published  Jun 1 2026 │ │
-│                  │  │ another-project   Draft      May 3 2026 │ │
+│                  │  │ My project       Published Jun 1 2026   │ │
+│                  │  │ another-project  Draft     May 3 2026   │ │
 │                  │  └─────────────────────────────────────────┘ │
 │ View site        │                                              │
 │ Theme            │                                              │
@@ -48,9 +48,7 @@ picker, settings forms and auth are separate slices.
   until the settings slice). Links to `/admin`.
 - Nav (`<nav aria-label="Admin">`):
   - **Posts** -> `/admin`. Active on `/admin` and `/admin/edit/*`.
-  - **Media** -> `/admin/media`. Shown with a "Soon" badge and not a link until
-    the route exists.
-  - **Settings** -> `/admin/settings`. Same "Soon" treatment.
+  - Media and Settings are hidden until their routes exist.
 - Footer:
   - **View site** -> `/`.
   - Theme toggle.
@@ -79,10 +77,29 @@ Active item: `bg-accent text-foreground` and `aria-current="page"`.
   - **Status**: a badge with the text **Published** or **Draft**. Not color
     alone.
   - **Date**: `FormattedDate`, muted.
-  - Published rows include a **View** link to `/projects/<slug>`.
-  - Draft rows have no View link.
+  - **Actions**:
+    - **Edit** -> `/admin/edit/<slug>`.
+    - **View** -> `/projects/<slug>` (published only).
+    - **Duplicate** -> `POST /api/duplicate` with `slug`. Creates
+      `<slug>-copy` (then `-copy-2`, `-copy-3`, ...) as a draft, then redirects
+      to `/admin`. Media files are shared, not copied.
+    - **Delete** -> `POST /api/delete` with `slug`, after a confirmation.
+      Deletes the JSON file and redirects to `/admin`. Media cleanup is out of
+      scope.
 - Sort: newest first by `date`, same as `listPosts()`.
 - No pagination in phase 1.
+
+## Responsive rules
+
+| Width | Sidebar | Posts list |
+| --- | --- | --- |
+| >= 1024px | fixed 240px | table |
+| 768px to 1023px | drawer | table |
+| < 768px | drawer | stacked cards |
+
+Below 768px, each row renders as a card: title, slug, status, date, and the same
+actions. Both the table and the cards come from the same data; CSS shows one at
+a time.
 
 ## States
 
@@ -100,6 +117,7 @@ Active item: `bg-accent text-foreground` and `aria-current="page"`.
 - Table headers use `<th scope="col">`.
 - Status text is present, not only color.
 - Drawer: `aria-expanded`, `aria-controls`, Escape closes it, focus is managed.
+- Destructive actions are labelled **Delete** and ask for confirmation.
 - Focus rings use the `ring` token.
 
 ## Data and routes
@@ -109,6 +127,8 @@ Active item: `bg-accent text-foreground` and `aria-current="page"`.
 | `/admin` | `listPosts()` | All posts; `?status=` filters |
 | `/admin/edit/new` | none | Create form |
 | `/admin/edit/[slug]` | `readPost(slug)` | Editing a post; later slice |
+| `POST /api/duplicate` | `duplicatePost(slug)` | Copy as a draft |
+| `POST /api/delete` | `deletePost(slug)` | Remove the JSON file |
 | `/admin/media` | none | Later slice |
 | `/admin/settings` | settings singletons | Later slice |
 
@@ -120,32 +140,36 @@ Active item: `bg-accent text-foreground` and `aria-current="page"`.
 
 - [ ] `/admin` renders the admin shell: sidebar and main column, with no public
       header or footer.
-- [ ] The sidebar shows **Posts**, **Media** (Soon), **Settings** (Soon), and
-      **View site**.
-- [ ] The current page title is the only `h1`, and the matching sidebar item has
+- [ ] The sidebar shows **Posts** and **View site**. Media and Settings are not
+      rendered.
+- [ ] The current page title is the only `h1`, and Posts has
       `aria-current="page"`.
 - [ ] The Posts screen has a **New post** action linking to `/admin/edit/new`.
 - [ ] With no posts, the empty state shows "No posts yet" and a
       **Create your first post** link.
-- [ ] With posts, a table renders the columns Title, Status and Date.
+- [ ] With posts, a table renders the columns Title, Status, Date and Actions.
 - [ ] Rows are sorted by date, newest first.
 - [ ] Status reads "Draft" or "Published" as text.
 - [ ] The title links to `/admin/edit/<slug>`.
 - [ ] Published rows show a **View** link to `/projects/<slug>`; drafts do not.
+- [ ] Every row has **Edit**, **Duplicate** and **Delete** actions.
+- [ ] Duplicate creates a draft copy with a unique `<slug>-copy` slug.
+- [ ] Delete asks for confirmation, removes the post, and returns to `/admin`.
 - [ ] The All / Published / Drafts filters set `?status=` and show correct
       counts.
 - [ ] A filter with no matches shows the filtered-empty state with
       **Show all posts**.
 - [ ] Below 1024px the sidebar is hidden; the menu button opens it and Escape
       closes it.
+- [ ] Below 768px rows render as stacked cards with the same data and actions.
 - [ ] The menu button exposes `aria-expanded` and `aria-controls`.
 - [ ] A **Skip to content** link moves focus to the main content.
 - [ ] Light and dark themes use the design tokens.
 - [ ] The list, filters and navigation need no client-side framework.
 
-## Open questions
+## Decisions
 
-- Keep Media and Settings as "Soon" items, or hide them until built?
-- Add a Tags column?
-- Add Delete or Duplicate row actions? (Currently out of scope.)
-- Table on mobile: horizontal scroll (current proposal) or stacked rows?
+- Media and Settings are hidden until their routes exist.
+- The Tags column is deferred.
+- Duplicate and Delete are included.
+- Below 768px, table rows render as stacked cards.
