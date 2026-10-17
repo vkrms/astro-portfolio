@@ -1,0 +1,36 @@
+---
+import '../../styles/global.css';
+import { listPosts } from '../../lib/storage';
+
+export const prerender = false;
+
+const posts = await listPosts();
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width,initial-scale=1" />
+		<title>Posts</title>
+	</head>
+	<body class="min-h-screen bg-background text-foreground">
+		<main class="mx-auto max-w-4xl px-6 py-10">
+			<h1 class="text-2xl font-semibold">Posts</h1>
+			{posts.length === 0 ? (
+				<p class="mt-4 text-muted-foreground">No posts yet</p>
+			) : (
+				<ul class="mt-6 divide-y rounded-lg border">
+					{posts.map((post) => (
+						<li class="flex items-center justify-between px-4 py-3">
+							<span>{post.title || post.slug}</span>
+							<span class="text-xs text-muted-foreground">
+								{post.draft ? 'Draft' : 'Published'}
+							</span>
+						</li>
+					))}
+				</ul>
+			)}
+		</main>
+	</body>
+</html>

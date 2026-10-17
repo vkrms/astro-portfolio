@@ -1,10 +1,23 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
 /**
  * Phase 1 admin gate. Auth tests need a production-mode server; the rest run
  * against `astro dev`. Remove .fixme as each feature lands.
  */
 test.describe('phase 1 - admin', () => {
+	// Walking skeleton: active.
+	test('shows an empty state when there are no posts', async ({ page }) => {
+		await page.goto('/admin');
+		await expect(page.getByRole('heading', { name: 'Posts' })).toBeVisible();
+		await expect(page.getByText('No posts yet')).toBeVisible();
+	});
+
+	test('serves an empty post list from /api/posts', async ({ request }) => {
+		const response = await request.get('/api/posts');
+		expect(response.status()).toBe(200);
+		expect(await response.json()).toEqual({ posts: [] });
+	});
+
 	test.fixme('rejects a wrong password and accepts the admin password', async ({ page }) => {
 		await page.goto('/admin/login');
 		// A wrong password shows an error. The admin password lands on /admin.

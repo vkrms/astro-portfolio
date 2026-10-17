@@ -5,6 +5,7 @@ import { defineConfig, devices } from '@playwright/test';
 // that server yourself when those tests are enabled.
 export default defineConfig({
 	testDir: './tests',
+	testMatch: '**/*.spec.ts',
 	fullyParallel: true,
 	forbidOnly: !!process.env.CI,
 	retries: process.env.CI ? 1 : 0,
@@ -23,5 +24,9 @@ export default defineConfig({
 				url: 'http://localhost:4321',
 				reuseExistingServer: !process.env.CI,
 				timeout: 120_000,
+				env: {
+					// Keep tests independent of the repo's real content.
+					PROJECTS_DIR: 'tests/fixtures/projects-empty',
+				},
 			},
 });
