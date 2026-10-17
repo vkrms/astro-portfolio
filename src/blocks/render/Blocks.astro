@@ -1,5 +1,6 @@
 ---
 import Carousel from '../../components/mdx/Carousel.astro';
+import CmsImage from '../../components/media/CmsImage.astro';
 import { parseCarouselItems } from '../shared';
 
 interface Props {
@@ -120,6 +121,27 @@ function levelOf(value: unknown): number {
 				if (level === 1) return <h1 class={className} set:html={html} />;
 				if (level === 3) return <h3 class={className} set:html={html} />;
 				return <h2 class={className} set:html={html} />;
+			}
+
+			if (type === 'image') {
+				// `url` is the prop used by BlockNote's default image block, which
+				// posts created before the custom block may still contain.
+				const src = String(block.props?.src ?? block.props?.url ?? '');
+				if (!src) return null;
+
+				const alt = String(block.props?.alt ?? '');
+				const caption = String(block.props?.caption ?? '');
+
+				return (
+					<figure class="my-8">
+						<CmsImage src={src} alt={alt} width={1200} class="w-full rounded-xl" />
+						{caption && (
+							<figcaption class="mt-2 text-center text-sm text-muted-foreground">
+								{caption}
+							</figcaption>
+						)}
+					</figure>
+				);
 			}
 
 			if (type === 'carousel') {

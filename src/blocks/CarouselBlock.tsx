@@ -1,7 +1,7 @@
 import { useContext, useRef, useState } from 'react';
 import { SlugContext } from './context';
 import { ASPECT_RATIOS, parseCarouselItems, type CarouselItem } from './shared';
-import { resizeImage } from '../lib/resize';
+import { uploadImage } from '../lib/upload';
 
 /**
  * Carousel block. Items live in one JSON string prop because BlockNote props
@@ -41,16 +41,8 @@ export function CarouselBlock({ block, editor }: { block: any; editor: any }) {
 		try {
 			const added: CarouselItem[] = [];
 			for (const file of Array.from(files)) {
-				const resized = await resizeImage(file);
-				const form = new FormData();
-				form.append('file', resized, file.name);
-				form.append('slug', slug);
-
-				const response = await fetch('/api/media', { method: 'POST', body: form });
-				if (!response.ok) continue;
-
-				const data = (await response.json()) as { path: string };
-				added.push({ src: data.path, alt: '', caption: '' });
+				const path = await uploadImage(file, slug);
+				if (path) added.push({ src: path, alt: '', caption: '' });
 			}
 
 			if (added.length) update([...items, ...added]);

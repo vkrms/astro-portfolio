@@ -9,6 +9,7 @@ import { BlockNoteView } from '@blocknote/shadcn';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/shadcn/style.css';
 import { SlugContext } from '../../blocks/context';
+import { findImageWithoutAlt, normalizeBlocks } from '../../blocks/shared';
 import { schema } from '../../blocks/schema';
 import type { PostRecord } from '../../lib/storage';
 
@@ -16,6 +17,17 @@ interface Props {
 	slug: string;
 	post: PostRecord | null;
 }
+
+// BlockNote defaults that Blocks.astro can render. Everything else stays out
+// of the slash menu so it cannot be saved and then dropped from the page.
+const SLASH_BLOCK_KEYS = new Set([
+	'paragraph',
+	'heading_2',
+	'heading_3',
+	'bullet_list',
+	'numbered_list',
+	'code_block',
+]);
 
 export default function PostEditor({ slug, post }: Props) {
 	const [title, setTitle] = useState(post?.title ?? '');
@@ -25,9 +37,10 @@ export default function PostEditor({ slug, post }: Props) {
 	const [draft, setDraft] = useState(post?.draft ?? true);
 	const [saving, setSaving] = useState(false);
 	const [preview, setPreview] = useState<string | null>(null);
+	const [error, setError] = useState<string | null>(null);
 	const [dark, setDark] = useState(false);
 
-	const initialContent = post?.body?.length ? (post.body as any) : undefined;
+	const initialContent = post?.body?.length ? (normalizeBlocks(post.body) as any) : undefined;
 	const editor = useCreateBlockNote({ schema, initialContent });
 
 	useEffect(() => {
@@ -36,8 +49,14 @@ export default function PostEditor({ slug, post }: Props) {
 
 	async function save() {
 		setSaving(true);
+		setError(null);
 
 		try {
+			if (findImageWithoutAlt(editor.document)) {
+				setError('Add alt text to every image before saving.');
+				return;
+			}
+
 			const response = await fetch('/api/save', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },
@@ -142,7 +161,19 @@ export default function PostEditor({ slug, post }: Props) {
 							getItems={async (query) =>
 								filterSuggestionItems(
 									[
-										...getDefaultReactSlashMenuItems(editor),
+										...getDefaultReactSlashMenuItems(editor).filter((item) =>
+											SLASH_BLOCK_KEYS.has((item as { key?: string }).key ?? ''),
+										),
+										{
+											title: 'Image',
+											subtext: 'Single image with alt text',
+											aliases: ['image', 'photo', 'picture'],
+											group: 'Media',
+											icon: <span aria-hidden="true">▣</span>,
+											onItemClick: () => {
+												insertOrUpdateBlockForSlashMenu(editor, { type: 'image' });
+											},
+										},
 										{
 											title: 'Carousel',
 											subtext: 'Slideshow of images',
@@ -166,6 +197,12 @@ export default function PostEditor({ slug, post }: Props) {
 						className="prose max-w-none rounded-xl border bg-card p-6"
 						dangerouslySetInnerHTML={{ __html: preview }}
 					/>
+				)}
+
+				{error && (
+					<p role="alert" className="text-sm text-destructive">
+						{error}
+					</p>
 				)}
 
 				<div className="flex items-center gap-3">
