@@ -1,5 +1,6 @@
 @import 'tailwindcss';
 @import '@fontsource-variable/inter';
+@import './carousel.css';
 @plugin '@tailwindcss/typography';
 
 /* Drive the dark: variant from the .dark class (toggled by ThemeToggle),

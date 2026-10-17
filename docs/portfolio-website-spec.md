@@ -123,7 +123,7 @@ Text blocks come from BlockNote's defaults; media blocks are custom blocks defin
 
 **List-type blocks.** BlockNote props can only hold strings, numbers and booleans ([docs](https://www.blocknotejs.org/docs/custom-schemas/custom-blocks)). Gallery and Carousel therefore keep their items in one string prop, `items`, holding a JSON array of `{src, alt, caption}`. The block's own React UI edits that array, so you never see the JSON. The save API and the renderer parse it and validate it with Zod.
 
-**One renderer, two uses.** `Blocks.astro` walks the block tree, groups consecutive list items into `<ul>`/`<ol>`, and renders inline styles and links. Public pages use it at build time; the admin's preview pane uses the same component through an on-demand route, so preview matches production.
+**One renderer, two uses.** `Blocks.astro` walks the block tree, groups consecutive list items into `<ul>`/`<ol>`, and renders inline styles and links. Public pages use it at build time; the admin's preview modal uses the same component through an on-demand route, so preview matches production.
 
 **Accessibility rules:** alt text is required on every image (save is blocked without it); the carousel is keyboard operable and never autoplays; embeds get a title attribute.
 
@@ -168,7 +168,7 @@ All public pages are prerendered. The admin pages and API routes run on demand a
 | `/about` | About text and portrait | Static |
 | `/rss.xml`, `/sitemap-index.xml`, `/404` | Feed, sitemap, not-found page | Static |
 | `/admin` | Post list with draft/published state | Local only |
-| `/admin/edit/[slug]` | Fields panel, BlockNote body, preview pane | Local only |
+| `/admin/edit/[slug]` | Fields panel, BlockNote body, preview modal | Local only |
 | `/admin/settings` | Site, home and about singletons | Local only |
 | `GET /api/posts`, `GET /api/posts/[slug]` | Read posts from disk | Local only |
 | `POST /api/save` | Validate, then write post JSON + images | Local only |
@@ -186,7 +186,7 @@ Editing happens on your machine. Save writes the post JSON and images into the w
 2. Create or open a project. Metadata fields sit above the BlockNote body.
 3. Type `/` or use the side menu to insert blocks: Image, Carousel, and the text blocks. Drag the handle to reorder.
 4. Add images through the media picker. They are resized in the browser and written under `src/assets/uploads/`.
-5. Toggle the preview pane to see the post rendered by the site's own components.
+5. Open the preview modal to see the post rendered by the site's own components.
 6. Keep `draft` on while writing. Drafts are written but excluded from production builds.
 7. Turn `draft` off and save. Then commit and push; the host rebuilds and the post is live.
 

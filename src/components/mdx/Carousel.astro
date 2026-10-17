@@ -60,68 +60,14 @@ const ratio = aspect || '3/2';
 	</figure>
 )}
 
-<style>
-	.carousel-track {
-		display: grid;
-		grid-auto-flow: column;
-		grid-auto-columns: 100%;
-		overflow-x: auto;
-		scroll-snap-type: x mandatory;
-		scroll-behavior: smooth;
-		scrollbar-width: none;
-		border-radius: 1rem;
-	}
-	.carousel-track::-webkit-scrollbar { display: none; }
-	.carousel-track:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
-	.carousel-slide { scroll-snap-align: start; margin: 0; }
-	.carousel-frame { overflow: hidden; border-radius: 1rem; background: color-mix(in oklab, currentColor 6%, transparent); }
-	.carousel-frame :global(img) { width: 100%; height: 100%; object-fit: cover; display: block; }
-	.carousel-caption { margin-top: 0.75rem; font-size: 0.9rem; opacity: 0.75; text-align: center; }
-	.carousel-controls { display: flex; align-items: center; justify-content: center; gap: 1rem; margin-top: 0.75rem; }
-	.carousel-btn {
-		width: 2.5rem; height: 2.5rem; border-radius: 999px; border: 1px solid currentColor;
-		font-size: 1.4rem; line-height: 1; opacity: 0.7; background: transparent; cursor: pointer;
-	}
-	.carousel-btn:hover, .carousel-btn:focus-visible { opacity: 1; }
-	.carousel-count { font-variant-numeric: tabular-nums; font-size: 0.9rem; opacity: 0.75; }
-	@media (prefers-reduced-motion: reduce) { .carousel-track { scroll-behavior: auto; } }
-</style>
-
 <script>
-	function initCarousels() {
-		document.querySelectorAll<HTMLElement>('[data-carousel]:not([data-ready])').forEach((root) => {
-			root.dataset.ready = '';
-			const track = root.querySelector<HTMLElement>('.carousel-track');
-			const current = root.querySelector<HTMLElement>('[data-current]');
-			if (!track) return;
-			const count = track.children.length;
-			const index = () => Math.round(track.scrollLeft / track.clientWidth);
-			// Track the intended slide so rapid clicks don't read a mid-animation position.
-			let target = 0;
-			let settle: number | undefined;
-			const go = (delta: number) => {
-				target = (target + delta + count) % count;
-				if (current) current.textContent = String(target + 1);
-				track.scrollTo({ left: target * track.clientWidth });
-			};
-			root.querySelector('[data-prev]')?.addEventListener('click', () => go(-1));
-			root.querySelector('[data-next]')?.addEventListener('click', () => go(1));
-			track.addEventListener('keydown', (e) => {
-				if (e.key === 'ArrowLeft') { e.preventDefault(); go(-1); }
-				if (e.key === 'ArrowRight') { e.preventDefault(); go(1); }
-			});
-			// Swipes and trackpad scrolls: resync once scrolling settles.
-			track.addEventListener('scroll', () => {
-				clearTimeout(settle);
-				settle = window.setTimeout(() => {
-					target = index();
-					if (current) current.textContent = String(target + 1);
-				}, 120);
-			}, { passive: true });
-		});
-	}
+	import { initCarousels } from '../../scripts/carousel';
+
 	initCarousels();
 	// Re-run after view transitions and whenever new carousel markup is inserted.
-	document.addEventListener('astro:page-load', initCarousels);
-	new MutationObserver(initCarousels).observe(document.body, { childList: true, subtree: true });
+	document.addEventListener('astro:page-load', () => initCarousels());
+	new MutationObserver(() => initCarousels()).observe(document.body, {
+		childList: true,
+		subtree: true,
+	});
 </script>

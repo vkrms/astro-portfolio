@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { filterSuggestionItems, insertOrUpdateBlockForSlashMenu } from '@blocknote/core';
 import {
 	SuggestionMenuController,
@@ -11,6 +11,7 @@ import '@blocknote/shadcn/style.css';
 import { SlugContext } from '../../blocks/context';
 import { findImageWithoutAlt, normalizeBlocks } from '../../blocks/shared';
 import { schema } from '../../blocks/schema';
+import { initCarousels } from '../../scripts/carousel';
 import type { PostRecord } from '../../lib/storage';
 
 interface Props {
@@ -37,8 +38,12 @@ export default function PostEditor({ slug, post }: Props) {
 	const [draft, setDraft] = useState(post?.draft ?? true);
 	const [saving, setSaving] = useState(false);
 	const [preview, setPreview] = useState<string | null>(null);
+	const [previewOpen, setPreviewOpen] = useState(false);
+	const [previewLoading, setPreviewLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 	const [dark, setDark] = useState(false);
+	const dialogRef = useRef<HTMLDialogElement>(null);
+	const previewRef = useRef<HTMLDivElement>(null);
 
 	const initialContent = post?.body?.length ? (normalizeBlocks(post.body) as any) : undefined;
 	const editor = useCreateBlockNote({ schema, initialContent });
@@ -46,6 +51,18 @@ export default function PostEditor({ slug, post }: Props) {
 	useEffect(() => {
 		setDark(document.documentElement.classList.contains('dark'));
 	}, []);
+
+	useEffect(() => {
+		const dialog = dialogRef.current;
+		if (!dialog) return;
+
+		if (previewOpen && !dialog.open) dialog.showModal();
+		if (!previewOpen && dialog.open) dialog.close();
+	}, [previewOpen]);
+
+	useEffect(() => {
+		if (previewOpen && previewRef.current) initCarousels(previewRef.current);
+	}, [previewOpen, preview]);
 
 	async function save() {
 		setSaving(true);
@@ -81,14 +98,27 @@ export default function PostEditor({ slug, post }: Props) {
 		}
 	}
 
-	async function togglePreview() {
-		const response = await fetch('/api/preview', {
-			method: 'POST',
-			headers: { 'content-type': 'application/json' },
-			body: JSON.stringify({ blocks: editor.document }),
-		});
+	async function openPreview() {
+		setPreviewLoading(true);
 
-		setPreview(await response.text());
+		try {
+			const response = await fetch('/api/preview', {
+				method: 'POST',
+				headers: { 'content-type': 'application/json' },
+				body: JSON.stringify({ blocks: editor.document }),
+			});
+
+			// Scripts do not run when injected as HTML. The carousel is initialized
+			// explicitly below; drop Astro's script tag so it cannot 404.
+			setPreview((await response.text()).replace(/<script[\s\S]*?<\/script>/gi, ''));
+			setPreviewOpen(true);
+		} finally {
+			setPreviewLoading(false);
+		}
+	}
+
+	function closePreview() {
+		setPreviewOpen(false);
 	}
 
 	return (
@@ -202,13 +232,6 @@ export default function PostEditor({ slug, post }: Props) {
 					</BlockNoteView>
 				</div>
 
-				{preview && (
-					<div
-						className="prose max-w-none rounded-xl border bg-card p-6"
-						dangerouslySetInnerHTML={{ __html: preview }}
-					/>
-				)}
-
 				{error && (
 					<p role="alert" className="text-sm text-destructive">
 						{error}
@@ -225,13 +248,42 @@ export default function PostEditor({ slug, post }: Props) {
 					</button>
 					<button
 						type="button"
-						onClick={togglePreview}
-						className="inline-flex h-9 items-center justify-center rounded-md border px-4 text-sm font-medium"
+						onClick={openPreview}
+						disabled={previewLoading}
+						className="inline-flex h-9 items-center justify-center rounded-md border px-4 text-sm font-medium disabled:opacity-50"
 					>
-						Preview
+						{previewLoading ? 'Loading…' : 'Preview'}
 					</button>
 				</div>
 			</form>
+
+			<dialog
+				ref={dialogRef}
+				aria-label="Preview"
+				onClose={() => setPreviewOpen(false)}
+				onClick={(event) => {
+					if (event.target === dialogRef.current) closePreview();
+				}}
+				className="w-[min(48rem,92vw)] max-w-none rounded-xl border bg-background p-0 text-foreground shadow-xl backdrop:bg-black/50"
+			>
+				<div className="flex max-h-[85vh] flex-col">
+					<header className="flex items-center justify-between gap-4 border-b px-5 py-3">
+						<h2 className="text-sm font-semibold">Preview</h2>
+						<button
+							type="button"
+							onClick={closePreview}
+							className="rounded-md border px-3 py-1 text-sm"
+						>
+							Close
+						</button>
+					</header>
+					<div
+						ref={previewRef}
+						className="prose max-w-none overflow-y-auto p-6"
+						dangerouslySetInnerHTML={{ __html: preview ?? '' }}
+					/>
+				</div>
+			</dialog>
 		</SlugContext.Provider>
 	);
 }

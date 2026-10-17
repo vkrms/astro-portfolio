@@ -323,6 +323,40 @@ test.describe('phase 0b - BlockNote spike', () => {
 		await expect(figure.locator('figcaption')).toHaveText('Second caption');
 	});
 
+	test('preview modal renders a working carousel', async ({ page, request }) => {
+		const slug = 'preview-modal';
+		const firstPath = await upload(request, slug, large, 'first.jpg');
+		const secondPath = await upload(request, slug, second, 'second.jpg');
+
+		await createPost(request, {
+			slug,
+			title: 'Preview Modal',
+			summary: 'Preview summary.',
+			date: '2026-06-01',
+			draft: true,
+			body: [
+				carousel([
+					{ src: firstPath, alt: 'First slide', caption: 'First caption' },
+					{ src: secondPath, alt: 'Second slide', caption: 'Second caption' },
+				]),
+			],
+		});
+
+		await page.goto(`/admin/edit/${slug}`);
+		await page.getByRole('button', { name: 'Preview' }).click();
+
+		const dialog = page.getByRole('dialog');
+		await expect(dialog).toBeVisible();
+		await expect(dialog.locator('figure.carousel')).toBeVisible();
+		await expect(dialog.locator('[data-current]')).toHaveText('1');
+
+		await dialog.getByRole('button', { name: 'Next slide' }).click();
+		await expect(dialog.locator('[data-current]')).toHaveText('2');
+
+		await dialog.getByRole('button', { name: 'Close' }).click();
+		await expect(dialog).toBeHidden();
+	});
+
 	test('static page and /api/preview render the same HTML', async ({ page, request }) => {
 		const slug = 'parity';
 		const image = parityImage;

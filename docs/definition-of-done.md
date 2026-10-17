@@ -38,7 +38,7 @@ Deferred to Phase 1: Vercel preview.
 - [ ] Creating a post produces a `src/content/projects/<slug>.json` entry with every required field.
 - [ ] The body editor accepts every phase 1 block.
 - [ ] The media picker resizes an image to <= 3000 px and <= 3.5 MB before upload.
-- [ ] The preview pane matches the production page.
+- [ ] The preview modal matches the production page, including an operable carousel.
 - [x] An image without alt text blocks the save.
 - [ ] `site`, `home` and `about` are editable at `/admin/settings`.
 
