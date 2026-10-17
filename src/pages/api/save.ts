@@ -22,6 +22,7 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 			date: String(input.date ?? ''),
 			draft: input.draft === true || input.draft === 'on',
 			links: parseLinks(input.links),
+			body: Array.isArray(input.body) ? input.body : undefined,
 		});
 
 		if (isJson) {

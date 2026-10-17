@@ -1,65 +1,22 @@
 ---
 import Admin from '../../../layouts/Admin.astro';
+import PostEditor from '../../../components/admin/PostEditor';
+import { readPost } from '../../../lib/storage';
 
 export const prerender = false;
 
 const { slug } = Astro.params;
-if (slug !== 'new') return new Response('Not Found', { status: 404 });
+if (!slug) return new Response('Not Found', { status: 404 });
 
-const today = new Date().toISOString().slice(0, 10);
+const post = slug === 'new' ? null : await readPost(slug);
+if (slug !== 'new' && !post) return new Response('Not Found', { status: 404 });
+
+const title = slug === 'new' ? 'New post' : 'Edit post';
 ---
 
-<Admin title="New post">
-	<div class="mx-auto w-full max-w-2xl">
+<Admin title={title}>
+	<div class="mx-auto w-full max-w-3xl">
 		<a href="/admin" class="text-sm text-muted-foreground hover:text-foreground">← Back to posts</a>
-
-		<form method="post" action="/api/save" class="mt-6 grid gap-5">
-			<label class="grid gap-1.5">
-				<span class="text-sm font-medium">Title</span>
-				<input name="title" required maxlength="80" class="rounded-md border bg-card px-3 py-2" />
-			</label>
-
-			<label class="grid gap-1.5">
-				<span class="text-sm font-medium">Slug</span>
-				<input
-					name="slug"
-					placeholder="auto from title"
-					class="rounded-md border bg-card px-3 py-2"
-				/>
-			</label>
-
-			<label class="grid gap-1.5">
-				<span class="text-sm font-medium">Summary</span>
-				<textarea
-					name="summary"
-					required
-					maxlength="160"
-					rows="3"
-					class="rounded-md border bg-card px-3 py-2"></textarea>
-			</label>
-
-			<label class="grid gap-1.5">
-				<span class="text-sm font-medium">Date</span>
-				<input
-					type="date"
-					name="date"
-					required
-					value={today}
-					class="rounded-md border bg-card px-3 py-2"
-				/>
-			</label>
-
-			<label class="flex items-center gap-2 text-sm">
-				<input type="checkbox" name="draft" checked class="size-4" />
-				<span>Draft</span>
-			</label>
-
-			<button
-				type="submit"
-				class="mt-2 inline-flex h-9 w-fit items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-xs transition-colors hover:bg-primary/90"
-			>
-				Save
-			</button>
-		</form>
+		<PostEditor client:only="react" slug={slug} post={post} />
 	</div>
 </Admin>

@@ -1,0 +1,147 @@
+---
+import Carousel from '../../components/mdx/Carousel.astro';
+import { parseCarouselItems } from '../shared';
+
+interface Props {
+	blocks?: unknown[] | null;
+}
+
+const { blocks = [] } = Astro.props;
+
+type InlineNode = {
+	type?: string;
+	text?: string;
+	href?: string;
+	styles?: Record<string, boolean>;
+	content?: InlineNode[];
+};
+
+type Block = {
+	type?: string;
+	props?: Record<string, unknown>;
+	content?: InlineNode[];
+};
+
+const source = (blocks ?? []) as Block[];
+
+function escapeHtml(value: string): string {
+	return value
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;');
+}
+
+function renderInline(nodes: InlineNode[] | undefined): string {
+	if (!Array.isArray(nodes)) return '';
+
+	return nodes
+		.map((node) => {
+			if (node.type === 'text') {
+				let html = escapeHtml(node.text ?? '');
+				const styles = node.styles ?? {};
+				if (styles.bold) html = `<strong>${html}</strong>`;
+				if (styles.italic) html = `<em>${html}</em>`;
+				if (styles.code) html = `<code>${html}</code>`;
+				if (styles.strike) html = `<s>${html}</s>`;
+				if (styles.underline) html = `<u>${html}</u>`;
+				return html;
+			}
+
+			if (node.type === 'link') {
+				return `<a href="${escapeHtml(node.href ?? '')}">${renderInline(node.content)}</a>`;
+			}
+
+			return '';
+		})
+		.join('');
+}
+
+type Group = { kind: 'block'; block: Block } | { kind: 'list'; ordered: boolean; items: Block[] };
+
+const groups: Group[] = [];
+for (const block of source) {
+	const ordered = block.type === 'numberedListItem';
+	const bullet = block.type === 'bulletListItem';
+
+	if (ordered || bullet) {
+		const last = groups[groups.length - 1];
+		if (last && last.kind === 'list' && last.ordered === ordered) {
+			last.items.push(block);
+		} else {
+			groups.push({ kind: 'list', ordered, items: [block] });
+		}
+	} else {
+		groups.push({ kind: 'block', block });
+	}
+}
+
+function levelOf(value: unknown): number {
+	const level = Number(value);
+	return level === 1 || level === 3 ? level : 2;
+}
+---
+
+<div data-blocks>
+	{
+		groups.map((group) => {
+			if (group.kind === 'list') {
+				if (group.ordered) {
+					return (
+						<ol class="my-4 list-outside list-decimal pl-6">
+							{group.items.map((item) => (
+								<li set:html={renderInline(item.content)} />
+							))}
+						</ol>
+					);
+				}
+
+				return (
+					<ul class="my-4 list-outside list-disc pl-6">
+						{group.items.map((item) => (
+							<li set:html={renderInline(item.content)} />
+						))}
+					</ul>
+				);
+			}
+
+			const block = group.block;
+			const type = block.type ?? 'paragraph';
+
+			if (type === 'paragraph') {
+				return <p class="my-4 leading-7" set:html={renderInline(block.content)} />;
+			}
+
+			if (type === 'heading') {
+				const level = levelOf(block.props?.level);
+				const className = 'mt-8 mb-4 font-semibold tracking-tight';
+				const html = renderInline(block.content);
+
+				if (level === 1) return <h1 class={className} set:html={html} />;
+				if (level === 3) return <h3 class={className} set:html={html} />;
+				return <h2 class={className} set:html={html} />;
+			}
+
+			if (type === 'carousel') {
+				const slides = parseCarouselItems(block.props?.items).map((item) => ({
+					image: item.src,
+					alt: item.alt,
+					caption: item.caption,
+				}));
+
+				return <Carousel slides={slides} aspect={String(block.props?.aspect ?? '16/9')} />;
+			}
+
+			if (type === 'codeBlock') {
+				const text = (block.content ?? []).map((node) => node.text ?? '').join('');
+				return (
+					<pre class="my-4 overflow-x-auto rounded-lg border bg-card p-4 text-sm">
+						<code>{text}</code>
+					</pre>
+				);
+			}
+
+			return null;
+		})
+	}
+</div>

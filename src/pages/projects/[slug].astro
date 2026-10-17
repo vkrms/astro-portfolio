@@ -1,6 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
+import Blocks from '../../blocks/render/Blocks.astro';
 import { listPosts, readPost } from '../../lib/storage';
 
 export async function getStaticPaths() {
@@ -45,6 +46,8 @@ const older = index >= 0 && index < posts.length - 1 ? posts[index + 1] : undefi
 				</ul>
 			)}
 		</header>
+
+		<Blocks blocks={post.body} />
 
 		<nav
 			class="mt-16 flex items-center justify-between gap-4 border-t pt-6 text-sm"

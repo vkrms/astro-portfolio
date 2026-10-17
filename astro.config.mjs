@@ -3,7 +3,9 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 import icon from 'astro-icon';
+import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
+import { resolve } from 'node:path';
 
 // Host-neutral: every content page prerenders to static HTML, and the admin
 // routes (/admin, /api) run on demand, served by whichever host built the
@@ -48,6 +50,36 @@ function getSiteUrl() {
 	return 'http://localhost:1892';
 }
 
+// Astro caches getStaticPaths per route and only clears that cache for its own
+// content collections. Project JSON lives outside them, so a post created in
+// /admin would otherwise 404 until the dev server restarts.
+function projectContentRefresh() {
+	const dir = resolve(process.env.PROJECTS_DIR ?? 'src/content/projects');
+
+	/** @type {import('vite').Plugin} */
+	const plugin = {
+		name: 'project-content-refresh',
+		apply: 'serve',
+		/** @param {import('vite').ViteDevServer} server */
+		configureServer(server) {
+			server.watcher.add(dir);
+			/** @param {string} file */
+			const isProjectFile = (file) => file.startsWith(`${dir}/`) && file.endsWith('.json');
+			/** @param {string} file */
+			const refresh = (file) => {
+				if (!isProjectFile(file)) return;
+				server.environments.ssr.hot.send('astro:content-changed', {});
+			};
+
+			server.watcher.on('add', refresh);
+			server.watcher.on('change', refresh);
+			server.watcher.on('unlink', refresh);
+		},
+	};
+
+	return plugin;
+}
+
 // https://astro.build/config
 export default defineConfig({
 	site: getSiteUrl(),
@@ -55,7 +87,7 @@ export default defineConfig({
 	adapter: await getAdapter(),
 	server: { port: 1892 },
 	redirects: { '/home': '/' },
-	integrations: [mdx(), sitemap(), icon()],
+	integrations: [mdx(), sitemap(), icon(), react()],
 	build: {
 		// Inline the (~10 KiB) bundled CSS into a <style> in <head> instead of a
 		// separate render-blocking <link>. Astro's default ('auto') only inlines
@@ -68,6 +100,6 @@ export default defineConfig({
 		layout: 'constrained',
 	},
 	vite: {
-		plugins: [tailwindcss()],
+		plugins: [tailwindcss(), projectContentRefresh()],
 	}
 });
