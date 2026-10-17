@@ -36,6 +36,8 @@ The stack is Astro + a self-built admin using BlockNote + Vercel Hobby, with Clo
 
 The CMS is a small admin app inside the Astro project: a BlockNote editor in the browser plus a few API routes that log you in, save posts and upload images. TinaCMS was dropped after the phase 0 spike because its editing UI didn't fit.
 
+The admin shell and posts table are specified in [admin-ui-spec.md](./admin-ui-spec.md).
+
 |  | BlockNote (chosen) | Editor.js | Gutenberg standalone |
 | --- | --- | --- | --- |
 | Feel | Notion-style: slash menu, drag handles, side menu | Plain block list with a "+" toolbar | The WordPress editor itself |
