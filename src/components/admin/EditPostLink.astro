@@ -1,0 +1,15 @@
+---
+import Button from '../ui/Button.astro';
+
+interface Props {
+	slug: string;
+}
+
+const { slug } = Astro.props;
+---
+
+<!--
+	Local admin shortcut on the public post page. Phase 1 replaces this with a
+	control that only renders for a signed-in admin.
+-->
+<Button href={`/admin/edit/${slug}`} variant="outline" size="sm">Edit post</Button>

@@ -50,6 +50,24 @@ test.describe('phase 1 - public site', () => {
 		await expect(page.getByRole('link', { name: /Older Project/ })).toBeVisible();
 	});
 
+	test('shows an edit shortcut on the post page', async ({ page, request }) => {
+		await request.post('/api/save', {
+			data: {
+				title: 'Editable Project',
+				summary: 'Editable summary.',
+				date: '2026-06-01',
+				draft: false,
+			},
+		});
+
+		await page.goto('/projects/editable-project');
+
+		await expect(page.getByRole('link', { name: 'Edit post' })).toHaveAttribute(
+			'href',
+			'/admin/edit/editable-project',
+		);
+	});
+
 	test('project page returns 404 for a draft or unknown slug', async ({ page, request }) => {
 		await request.post('/api/save', {
 			data: { title: 'Draft Only', summary: 'Draft summary.', date: '2026-01-01', draft: true },
