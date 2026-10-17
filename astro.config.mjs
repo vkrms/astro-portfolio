@@ -101,5 +101,14 @@ export default defineConfig({
 	},
 	vite: {
 		plugins: [tailwindcss(), projectContentRefresh()],
+		server: {
+			watch: {
+				// The admin writes uploads at runtime. Watching them invalidates
+				// CmsImage's eager asset glob and forces a full page reload, which
+				// discards unsaved editor state. Dev serves new files through
+				// /uploads instead; the build still picks them up from disk.
+				ignored: ['**/src/assets/uploads/**'],
+			},
+		},
 	}
 });
