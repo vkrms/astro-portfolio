@@ -185,7 +185,13 @@ test.beforeAll(async () => {
 			summary: 'Picker summary.',
 			date: '2026-06-01',
 			draft: true,
-			body: [carousel([{ src: pickerImage, alt: '', caption: '' }])],
+			body: [
+				{
+					type: 'paragraph',
+					content: [{ type: 'text', text: 'Picker intro', styles: {} }],
+				},
+				carousel([{ src: pickerImage, alt: '', caption: '' }]),
+			],
 		});
 
 		firstSlide = await upload(api, 'carousel-round-trip', large, 'first.jpg');
@@ -216,6 +222,22 @@ test.beforeAll(async () => {
 
 test.describe('phase 0b - BlockNote spike', () => {
 	test.describe.configure({ mode: 'serial' });
+
+	test('inserts a carousel from the slash menu', async ({ page }) => {
+		await page.goto('/admin/edit/picker-test');
+		await expect(page.locator('img[src^="/uploads/"]')).toHaveCount(1);
+
+		await page.locator('.bn-block-content').filter({ hasText: 'Picker intro' }).click();
+		await page.keyboard.press('End');
+		await page.keyboard.type('/carousel');
+
+		const menu = page.locator('.bn-suggestion-menu');
+		await expect(menu).toBeVisible();
+		await menu.getByText('Carousel', { exact: true }).click();
+
+		await expect(page.getByRole('button', { name: 'Add image' })).toHaveCount(2);
+		await expect(page.locator('.bn-block-content').getByText('/carousel')).toHaveCount(0);
+	});
 
 	test('media picker uploads a ~3 MB image to disk', async ({ page }) => {
 		const slug = 'picker-test';

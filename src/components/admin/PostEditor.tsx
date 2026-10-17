@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
-import { useCreateBlockNote } from '@blocknote/react';
+import { filterSuggestionItems, insertOrUpdateBlockForSlashMenu } from '@blocknote/core';
+import {
+	SuggestionMenuController,
+	getDefaultReactSlashMenuItems,
+	useCreateBlockNote,
+} from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/shadcn/style.css';
@@ -131,7 +136,29 @@ export default function PostEditor({ slug, post }: Props) {
 				</label>
 
 				<div className="rounded-xl border bg-card p-2">
-					<BlockNoteView editor={editor} theme={dark ? 'dark' : 'light'} />
+					<BlockNoteView editor={editor} theme={dark ? 'dark' : 'light'} slashMenu={false}>
+						<SuggestionMenuController
+							triggerCharacter="/"
+							getItems={async (query) =>
+								filterSuggestionItems(
+									[
+										...getDefaultReactSlashMenuItems(editor),
+										{
+											title: 'Carousel',
+											subtext: 'Slideshow of images',
+											aliases: ['carousel', 'gallery', 'slideshow', 'images'],
+											group: 'Media',
+											icon: <span aria-hidden="true">▤</span>,
+											onItemClick: () => {
+												insertOrUpdateBlockForSlashMenu(editor, { type: 'carousel' });
+											},
+										},
+									],
+									query,
+								)
+							}
+						/>
+					</BlockNoteView>
 				</div>
 
 				{preview && (
