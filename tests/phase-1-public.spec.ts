@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { resetProjects } from './helpers/projects';
+import { resetProjects, waitForProject } from './helpers/projects';
 
 test.describe('phase 1 - public site', () => {
 	test.beforeEach(resetProjects);
@@ -38,6 +38,7 @@ test.describe('phase 1 - public site', () => {
 			},
 		});
 
+		await waitForProject(request, 'newer-project');
 		await page.goto('/projects/newer-project');
 
 		await expect(page.getByRole('heading', { level: 1 })).toHaveText('Newer Project');
@@ -60,6 +61,7 @@ test.describe('phase 1 - public site', () => {
 			},
 		});
 
+		await waitForProject(request, 'editable-project');
 		await page.goto('/projects/editable-project');
 
 		await expect(page.getByRole('link', { name: 'Edit post' })).toHaveAttribute(

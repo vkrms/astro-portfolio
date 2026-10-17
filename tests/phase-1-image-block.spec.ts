@@ -2,7 +2,7 @@ import { expect, test, type APIRequestContext, type Page } from '@playwright/tes
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import sharp from 'sharp';
-import { PROJECTS_DIR, resetProjects } from './helpers/projects';
+import { PROJECTS_DIR, resetProjects, waitForProject } from './helpers/projects';
 
 /**
  * Phase 1 image block. The block uses the same media pipeline as the carousel
@@ -81,6 +81,7 @@ test.describe('phase 1 - image block', () => {
 		await expect(page.getByLabel('Caption')).toHaveValue('A caption');
 		await expect(page.locator('img[src^="/uploads/"]')).toHaveCount(1);
 
+		await waitForProject(request, slug);
 		await page.goto(`/projects/${slug}`);
 		await expect(page.getByRole('img', { name: 'A test image' })).toBeVisible();
 		await expect(page.getByText('A caption')).toBeVisible();
