@@ -9,6 +9,21 @@ column. It is separate from the public site and never renders the public
 This spec covers the admin shell and the Posts screen, including row actions.
 The editor, media picker and settings forms are separate slices.
 
+## Post editor
+
+The editor follows the WordPress post screen: the title is a borderless heading
+above the body, the BlockNote body owns the main column, and post settings sit in
+a right sidebar.
+
+- **Title:** a borderless, auto-growing text field at the top of the main column.
+  Enter does not add a newline. Placeholder: **Add title**.
+- **Body:** BlockNote fills the main column and has a minimum height of about
+  60% of the viewport.
+- **Sidebar, Publish:** draft checkbox, Save, Preview.
+- **Sidebar, Post settings:** Excerpt (the stored `summary`), Slug and Date.
+- **Mobile:** the sidebar stacks below the body.
+- The preview opens in a centered modal and initializes the carousel script.
+
 ## Layout
 
 **Desktop (>= 1024px)**

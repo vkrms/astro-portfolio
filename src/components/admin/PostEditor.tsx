@@ -44,6 +44,7 @@ export default function PostEditor({ slug, post }: Props) {
 	const [dark, setDark] = useState(false);
 	const dialogRef = useRef<HTMLDialogElement>(null);
 	const previewRef = useRef<HTMLDivElement>(null);
+	const titleRef = useRef<HTMLTextAreaElement>(null);
 
 	const initialContent = post?.body?.length ? (normalizeBlocks(post.body) as any) : undefined;
 	const editor = useCreateBlockNote({ schema, initialContent });
@@ -51,6 +52,14 @@ export default function PostEditor({ slug, post }: Props) {
 	useEffect(() => {
 		setDark(document.documentElement.classList.contains('dark'));
 	}, []);
+
+	useEffect(() => {
+		const element = titleRef.current;
+		if (!element) return;
+
+		element.style.height = '0px';
+		element.style.height = `${element.scrollHeight}px`;
+	}, [title]);
 
 	useEffect(() => {
 		const dialog = dialogRef.current;
@@ -128,133 +137,155 @@ export default function PostEditor({ slug, post }: Props) {
 					event.preventDefault();
 					void save();
 				}}
-				className="mt-6 grid gap-5"
+				className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start"
 			>
-				<label className="grid gap-1.5">
-					<span className="text-sm font-medium">Title</span>
-					<input
+				<div className="grid min-w-0 content-start gap-4">
+					<label className="sr-only" htmlFor="title">
+						Title
+					</label>
+					<textarea
 						id="title"
 						name="title"
+						ref={titleRef}
+						rows={1}
 						value={title}
-						onChange={(event) => setTitle(event.target.value)}
+						onChange={(event) => setTitle(event.target.value.replace(/\n/g, ' '))}
+						onKeyDown={(event) => {
+							if (event.key === 'Enter') event.preventDefault();
+						}}
+						placeholder="Add title"
 						required
 						maxLength={80}
-						className="rounded-md border bg-card px-3 py-2"
+						className="w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/40 lg:text-4xl"
 					/>
-				</label>
 
-				<label className="grid gap-1.5">
-					<span className="text-sm font-medium">Slug</span>
-					<input
-						id="slug"
-						name="slug"
-						value={pageSlug}
-						onChange={(event) => setPageSlug(event.target.value)}
-						placeholder="auto from title"
-						className="rounded-md border bg-card px-3 py-2"
-					/>
-				</label>
-
-				<label className="grid gap-1.5">
-					<span className="text-sm font-medium">Summary</span>
-					<textarea
-						id="summary"
-						name="summary"
-						value={summary}
-						onChange={(event) => setSummary(event.target.value)}
-						required
-						maxLength={160}
-						rows={3}
-						className="rounded-md border bg-card px-3 py-2"
-					/>
-				</label>
-
-				<label className="grid gap-1.5">
-					<span className="text-sm font-medium">Date</span>
-					<input
-						id="date"
-						name="date"
-						type="date"
-						value={date}
-						onChange={(event) => setDate(event.target.value)}
-						required
-						className="rounded-md border bg-card px-3 py-2"
-					/>
-				</label>
-
-				<label className="flex items-center gap-2 text-sm">
-					<input
-						id="draft"
-						name="draft"
-						type="checkbox"
-						checked={draft}
-						onChange={(event) => setDraft(event.target.checked)}
-						className="size-4"
-					/>
-					<span>Draft</span>
-				</label>
-
-				<div className="rounded-xl border bg-card p-2">
-					<BlockNoteView editor={editor} theme={dark ? 'dark' : 'light'} slashMenu={false}>
-						<SuggestionMenuController
-							triggerCharacter="/"
-							getItems={async (query) =>
-								filterSuggestionItems(
-									[
-										...getDefaultReactSlashMenuItems(editor).filter((item) =>
-											SLASH_BLOCK_KEYS.has((item as { key?: string }).key ?? ''),
-										),
-										{
-											title: 'Image',
-											subtext: 'Single image with alt text',
-											aliases: ['image', 'photo', 'picture'],
-											group: 'Media',
-											icon: <span aria-hidden="true">▣</span>,
-											onItemClick: () => {
-												insertOrUpdateBlockForSlashMenu(editor, { type: 'image' });
+					<div className="min-h-[40vh] rounded-xl border bg-card p-2 lg:min-h-[60vh]">
+						<BlockNoteView editor={editor} theme={dark ? 'dark' : 'light'} slashMenu={false}>
+							<SuggestionMenuController
+								triggerCharacter="/"
+								getItems={async (query) =>
+									filterSuggestionItems(
+										[
+											...getDefaultReactSlashMenuItems(editor).filter((item) =>
+												SLASH_BLOCK_KEYS.has((item as { key?: string }).key ?? ''),
+											),
+											{
+												title: 'Image',
+												subtext: 'Single image with alt text',
+												aliases: ['image', 'photo', 'picture'],
+												group: 'Media',
+												icon: <span aria-hidden="true">▣</span>,
+												onItemClick: () => {
+													insertOrUpdateBlockForSlashMenu(editor, { type: 'image' });
+												},
 											},
-										},
-										{
-											title: 'Carousel',
-											subtext: 'Slideshow of images',
-											aliases: ['carousel', 'gallery', 'slideshow', 'images'],
-											group: 'Media',
-											icon: <span aria-hidden="true">▤</span>,
-											onItemClick: () => {
-												insertOrUpdateBlockForSlashMenu(editor, { type: 'carousel' });
+											{
+												title: 'Carousel',
+												subtext: 'Slideshow of images',
+												aliases: ['carousel', 'gallery', 'slideshow', 'images'],
+												group: 'Media',
+												icon: <span aria-hidden="true">▤</span>,
+												onItemClick: () => {
+													insertOrUpdateBlockForSlashMenu(editor, { type: 'carousel' });
+												},
 											},
-										},
-									],
-									query,
-								)
-							}
-						/>
-					</BlockNoteView>
+										],
+										query,
+									)
+								}
+							/>
+						</BlockNoteView>
+					</div>
 				</div>
 
-				{error && (
-					<p role="alert" className="text-sm text-destructive">
-						{error}
-					</p>
-				)}
+				<aside className="grid gap-4 lg:sticky lg:top-20">
+					<section className="grid gap-3 rounded-xl border bg-card p-4">
+						<h2 className="text-sm font-semibold">Publish</h2>
 
-				<div className="flex items-center gap-3">
-					<button
-						type="submit"
-						disabled={saving}
-						className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-50"
-					>
-						{saving ? 'Saving…' : 'Save'}
-					</button>
-					<button
-						type="button"
-						onClick={openPreview}
-						disabled={previewLoading}
-						className="inline-flex h-9 items-center justify-center rounded-md border px-4 text-sm font-medium disabled:opacity-50"
-					>
-						{previewLoading ? 'Loading…' : 'Preview'}
-					</button>
-				</div>
+						<label className="flex items-center gap-2 text-sm">
+							<input
+								id="draft"
+								name="draft"
+								type="checkbox"
+								checked={draft}
+								onChange={(event) => setDraft(event.target.checked)}
+								className="size-4"
+							/>
+							<span>Draft</span>
+						</label>
+						<p className="text-xs text-muted-foreground">Uncheck to publish.</p>
+
+						{error && (
+							<p role="alert" className="text-sm text-destructive">
+								{error}
+							</p>
+						)}
+
+						<button
+							type="submit"
+							disabled={saving}
+							className="inline-flex h-9 w-full items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-50"
+						>
+							{saving ? 'Saving…' : 'Save'}
+						</button>
+						<button
+							type="button"
+							onClick={openPreview}
+							disabled={previewLoading}
+							className="inline-flex h-9 w-full items-center justify-center rounded-md border px-4 text-sm font-medium disabled:opacity-50"
+						>
+							{previewLoading ? 'Loading…' : 'Preview'}
+						</button>
+					</section>
+
+					<section className="grid gap-4 rounded-xl border bg-card p-4">
+						<h2 className="text-sm font-semibold">Post settings</h2>
+
+						<div className="grid gap-1.5">
+							<label htmlFor="summary" className="text-sm font-medium">
+								Excerpt
+							</label>
+							<textarea
+								id="summary"
+								name="summary"
+								value={summary}
+								onChange={(event) => setSummary(event.target.value)}
+								required
+								maxLength={160}
+								rows={4}
+								className="rounded-md border bg-background px-3 py-2 text-sm"
+							/>
+							<span className="text-xs text-muted-foreground">
+								Used on cards and as the meta description.
+							</span>
+						</div>
+
+						<label className="grid gap-1.5">
+							<span className="text-sm font-medium">Slug</span>
+							<input
+								id="slug"
+								name="slug"
+								value={pageSlug}
+								onChange={(event) => setPageSlug(event.target.value)}
+								placeholder="auto from title"
+								className="rounded-md border bg-background px-3 py-2 text-sm"
+							/>
+						</label>
+
+						<label className="grid gap-1.5">
+							<span className="text-sm font-medium">Date</span>
+							<input
+								id="date"
+								name="date"
+								type="date"
+								value={date}
+								onChange={(event) => setDate(event.target.value)}
+								required
+								className="rounded-md border bg-background px-3 py-2 text-sm"
+							/>
+						</label>
+					</section>
+				</aside>
 			</form>
 
 			<dialog

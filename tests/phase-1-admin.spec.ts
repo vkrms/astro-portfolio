@@ -214,7 +214,7 @@ test.describe('phase 1 - admin', () => {
 
 		await page.getByLabel('Title').fill('Hello World');
 		await page.getByLabel('Slug').fill('hello-world');
-		await page.getByLabel('Summary').fill('A short summary.');
+		await page.getByLabel('Excerpt').fill('A short summary.');
 		await page.getByLabel('Date').fill('2026-06-01');
 		await page.getByLabel('Draft').check();
 		await page.getByRole('button', { name: 'Save' }).click();

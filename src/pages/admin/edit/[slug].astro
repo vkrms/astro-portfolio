@@ -15,7 +15,7 @@ const title = slug === 'new' ? 'New post' : 'Edit post';
 ---
 
 <Admin title={title}>
-	<div class="mx-auto w-full max-w-3xl">
+	<div class="mx-auto w-full max-w-6xl">
 		<a href="/admin" class="text-sm text-muted-foreground hover:text-foreground">← Back to posts</a>
 		<PostEditor client:only="react" slug={slug} post={post} />
 	</div>
