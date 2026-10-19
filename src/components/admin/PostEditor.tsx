@@ -140,26 +140,28 @@ export default function PostEditor({ slug, post }: Props) {
 				className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start"
 			>
 				<div className="grid min-w-0 content-start gap-4">
-					<label className="sr-only" htmlFor="title">
-						Title
-					</label>
-					<textarea
-						id="title"
-						name="title"
-						ref={titleRef}
-						rows={1}
-						value={title}
-						onChange={(event) => setTitle(event.target.value.replace(/\n/g, ' '))}
-						onKeyDown={(event) => {
-							if (event.key === 'Enter') event.preventDefault();
-						}}
-						placeholder="Add title"
-						required
-						maxLength={80}
-						className="w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/40 lg:text-4xl"
-					/>
+					<div className="rounded-xl border bg-card p-3 focus-within:ring-2 focus-within:ring-ring/40">
+						<label className="sr-only" htmlFor="title">
+							Title
+						</label>
+						<textarea
+							id="title"
+							name="title"
+							ref={titleRef}
+							rows={1}
+							value={title}
+							onChange={(event) => setTitle(event.target.value.replace(/\n/g, ' '))}
+							onKeyDown={(event) => {
+								if (event.key === 'Enter') event.preventDefault();
+							}}
+							placeholder="Add title"
+							required
+							maxLength={80}
+							className="w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/40 lg:text-4xl"
+						/>
+					</div>
 
-					<div className="min-h-[40vh] rounded-xl border bg-card p-2 lg:min-h-[60vh]">
+					<div className="min-h-[40vh] rounded-xl border bg-card p-3 focus-within:ring-2 focus-within:ring-ring/40 lg:min-h-[60vh]">
 						<BlockNoteView editor={editor} theme={dark ? 'dark' : 'light'} slashMenu={false}>
 							<SuggestionMenuController
 								triggerCharacter="/"
