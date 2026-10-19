@@ -139,7 +139,7 @@ export default function PostEditor({ slug, post }: Props) {
 				}}
 				className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start"
 			>
-				<div className="grid min-w-0 content-start gap-4">
+				<div className="min-w-0">
 					<div className="rounded-xl border bg-card p-3 focus-within:ring-2 focus-within:ring-ring/40">
 						<label className="sr-only" htmlFor="title">
 							Title
@@ -157,46 +157,46 @@ export default function PostEditor({ slug, post }: Props) {
 							placeholder="Add title"
 							required
 							maxLength={80}
-							className="w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/40 lg:text-4xl"
+							className="mb-2 w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/40 lg:text-4xl"
 						/>
-					</div>
 
-					<div className="min-h-[40vh] rounded-xl border bg-card p-3 focus-within:ring-2 focus-within:ring-ring/40 lg:min-h-[60vh]">
-						<BlockNoteView editor={editor} theme={dark ? 'dark' : 'light'} slashMenu={false}>
-							<SuggestionMenuController
-								triggerCharacter="/"
-								getItems={async (query) =>
-									filterSuggestionItems(
-										[
-											...getDefaultReactSlashMenuItems(editor).filter((item) =>
-												SLASH_BLOCK_KEYS.has((item as { key?: string }).key ?? ''),
-											),
-											{
-												title: 'Image',
-												subtext: 'Single image with alt text',
-												aliases: ['image', 'photo', 'picture'],
-												group: 'Media',
-												icon: <span aria-hidden="true">▣</span>,
-												onItemClick: () => {
-													insertOrUpdateBlockForSlashMenu(editor, { type: 'image' });
+						<div className="min-h-[40vh] lg:min-h-[60vh]">
+							<BlockNoteView editor={editor} theme={dark ? 'dark' : 'light'} slashMenu={false}>
+								<SuggestionMenuController
+									triggerCharacter="/"
+									getItems={async (query) =>
+										filterSuggestionItems(
+											[
+												...getDefaultReactSlashMenuItems(editor).filter((item) =>
+													SLASH_BLOCK_KEYS.has((item as { key?: string }).key ?? ''),
+												),
+												{
+													title: 'Image',
+													subtext: 'Single image with alt text',
+													aliases: ['image', 'photo', 'picture'],
+													group: 'Media',
+													icon: <span aria-hidden="true">▣</span>,
+													onItemClick: () => {
+														insertOrUpdateBlockForSlashMenu(editor, { type: 'image' });
+													},
 												},
-											},
-											{
-												title: 'Carousel',
-												subtext: 'Slideshow of images',
-												aliases: ['carousel', 'gallery', 'slideshow', 'images'],
-												group: 'Media',
-												icon: <span aria-hidden="true">▤</span>,
-												onItemClick: () => {
-													insertOrUpdateBlockForSlashMenu(editor, { type: 'carousel' });
+												{
+													title: 'Carousel',
+													subtext: 'Slideshow of images',
+													aliases: ['carousel', 'gallery', 'slideshow', 'images'],
+													group: 'Media',
+													icon: <span aria-hidden="true">▤</span>,
+													onItemClick: () => {
+														insertOrUpdateBlockForSlashMenu(editor, { type: 'carousel' });
+													},
 												},
-											},
-										],
-										query,
-									)
-								}
-							/>
-						</BlockNoteView>
+											],
+											query,
+										)
+									}
+								/>
+							</BlockNoteView>
+						</div>
 					</div>
 				</div>
 
