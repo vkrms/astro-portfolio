@@ -8,7 +8,7 @@ A personal portfolio on Astro where each project post is composed from media blo
 
 **Goals**
 
-- Write, edit and publish posts from a browser on the live site, with no IDE involved.
+- Write and edit posts in the browser on localhost; publish by committing and pushing.
 - Compose posts from blocks: rich text, image, gallery, carousel, embed, quote, media + text. Video arrives in phase 2.
 - Keep posts as JSON files and images as files in the repo. No database, no third-party CMS.
 - Ship static HTML with no framework hydration on public pages; only small inline scripts (theme, mobile menu, carousel).
@@ -57,7 +57,7 @@ The admin shell and posts table are specified in [admin-ui-spec.md](./admin-ui-s
 
 ## Content model
 
-One JSON file per post in an Astro content collection, `projects`, plus three singletons. A Zod schema in `src/content.config.ts` is the source of truth: the admin API validates every save against it, and the build fails on bad data.
+One JSON file per post in an Astro content collection, `projects`, plus three singletons. A Zod schema in `src/content.config.ts` is the source of truth: the admin API validates every save against it, and the build fails on bad data. The files are plain, versioned JSON: the admin is the normal way to edit them, but a person or an AI agent can also edit them directly when that is more convenient.
 
 **`projects`** (one JSON file per post, named by slug)
 
