@@ -34,7 +34,7 @@ The stack is Astro + a self-built admin using BlockNote + Vercel Hobby, with Clo
 
 ## Editor and admin
 
-The CMS is a local admin app inside the Astro project: a BlockNote editor in the browser plus a few API routes that save posts and upload images. It runs only on localhost; the deployed site is static. TinaCMS was dropped after the phase 0 spike because its editing UI didn't fit.
+The CMS is a local admin app inside the Astro project: a BlockNote editor in the browser plus a few API routes that save posts and upload images. It runs only on localhost; the deployed site is static.
 
 The admin shell and posts table are specified in [admin-ui-spec.md](./admin-ui-spec.md).
 
@@ -137,7 +137,7 @@ Images go through the admin API into the repo and are optimized at build time; v
 - `POST /api/media` writes the file under `src/assets/uploads/<project-slug>/` and returns `/uploads/<project-slug>/<file>`.
 - Saving the post writes the JSON that points at those paths. Uploads stay in the working tree until you commit; an abandoned upload can be deleted.
 - Until a post is saved, the editor and the preview show the browser's local copy of a new image.
-- Astro only optimizes images kept under `src/` ([Astro docs](https://docs.astro.build/en/guides/images/)). `CmsImage.astro` (built and tested in the spike) resolves stored paths to imported assets and renders `<Picture>` with AVIF and WebP at up to 5 widths.
+- Astro only optimizes images kept under `src/` ([Astro docs](https://docs.astro.build/en/guides/images/)). `CmsImage.astro` resolves stored paths to imported assets and renders `<Picture>` with AVIF and WebP at up to 5 widths.
 - On-demand renders, such as the admin preview, serve the original file, so editing never touches a hosted image service.
 - Repo budget: keep it under about 1 GB. A GitHub Action fails any commit that adds a file over 5 MB.
 
@@ -228,7 +228,7 @@ A portfolio used to find work is usually treated as personal use, but confirm ag
 
 ## Phases
 
-Building the admin is now the largest piece of work, so a new spike proves the risky parts before anything is polished. The first spike's Astro setup, `CmsImage` and Carousel renderer carry over; TinaCMS is removed.
+Building the admin is the largest piece of work, so Phase 0b proved the risky parts first.
 
 1. **Phase 0b: BlockNote spike** (2–3 days, localhost only). Pass these checks:
    - A custom Carousel block with its item editor (add, reorder, remove, alt, caption), including a ~3 MB image, saves to JSON and reloads identically. The image uploads through the media picker, is written to disk, and the post renders it.
@@ -247,7 +247,6 @@ The admin is local-only. Deployed builds serve static pages only.
 
 **Done**
 
-- TinaCMS removed: config, collections, generated admin, content, Tina pages and the Tina block library are gone.
 - Package manager switched to npm; `package-lock.json` is committed and `allowScripts` covers `esbuild`, `workerd` and `sharp`.
 - Astro is pinned at 6.4.8.
 - The shell carries over: `Header`, `Footer`, `ThemeToggle`, `Base`, `BaseHead`, the `ui/` and `space/` primitives, `CmsImage.astro` and the `Carousel` renderer.

@@ -7,7 +7,6 @@ whole stack runs on free tiers at $0/month.
 
 > The admin is a local-only [BlockNote](https://www.blocknotejs.org/) app. Content
 > is edited in the browser on localhost and published by committing and pushing.
-> `SPIKE.md` records the completed phase-0 TinaCMS spike.
 
 ## Getting started
 
