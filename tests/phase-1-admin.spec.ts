@@ -1,7 +1,7 @@
 import { expect, test, type APIRequestContext } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { PROJECTS_DIR, resetProjects } from './helpers/projects';
+import { PROJECTS_DIR, resetProjects, resetSettings, SETTINGS_DIR } from './helpers/projects';
 
 async function createPost(request: APIRequestContext, data: Record<string, unknown>) {
 	await request.post('/api/save', { data });
@@ -51,7 +51,10 @@ test.describe('phase 1 - admin', () => {
 		);
 		await expect(nav.getByRole('link', { name: 'View site' })).toBeVisible();
 		await expect(nav.getByRole('link', { name: 'Media' })).toHaveCount(0);
-		await expect(nav.getByRole('link', { name: 'Settings' })).toHaveCount(0);
+		await expect(nav.getByRole('link', { name: 'Settings' })).toHaveAttribute(
+			'href',
+			'/admin/settings',
+		);
 
 		const table = page.getByRole('table');
 		await expect(table).toBeVisible();
@@ -238,42 +241,193 @@ test.describe('phase 1 - admin', () => {
 	});
 
 	test.fixme('rejects a wrong password and accepts the admin password', async ({ page }) => {
-		await page.goto('/admin/login');
-	});
-
-	test.fixme('session survives a reload and sets the required cookie flags', async ({ page }) => {
+		// Auth is out of scope: the admin is local-only.
 		await page.goto('/admin');
 	});
 
-	test.fixme('creates a post with every required field', async ({ page }) => {
-		await page.goto('/admin/edit/new');
+	test.fixme('session survives a reload and sets the required cookie flags', async ({ page }) => {
+		// Auth is out of scope: the admin is local-only.
+		await page.goto('/admin');
 	});
 
-	test.fixme('accepts every phase 1 block', async ({ page }) => {
-		await page.goto('/admin/edit/new');
+	test('creates a post with every required field', async ({ request }) => {
+		const response = await request.post('/api/save', {
+			data: {
+				slug: 'every-field',
+				title: 'Every Field',
+				summary: 'A summary.',
+				date: '2026-06-01',
+				draft: false,
+				featured: true,
+				cover: '/uploads/every-field/cover.jpg',
+				coverAlt: 'Cover alt',
+				tags: ['design', 'astro'],
+				role: 'Design and front end',
+				client: 'Acme',
+				links: [{ label: 'Live', url: 'https://example.com' }],
+				body: [
+					{ type: 'paragraph', content: [{ type: 'text', text: 'Body', styles: {} }] },
+				],
+			},
+		});
+		expect(response.status()).toBe(201);
+
+		const saved = JSON.parse(await readFile(join(PROJECTS_DIR, 'every-field.json'), 'utf8'));
+		expect(saved).toMatchObject({
+			title: 'Every Field',
+			summary: 'A summary.',
+			date: '2026-06-01',
+			draft: false,
+			featured: true,
+			cover: '/uploads/every-field/cover.jpg',
+			coverAlt: 'Cover alt',
+			tags: ['design', 'astro'],
+			role: 'Design and front end',
+			client: 'Acme',
+			schemaVersion: 1,
+		});
+		expect(saved.links).toEqual([{ label: 'Live', url: 'https://example.com' }]);
+	});
+
+	test('accepts every phase 1 block', async ({ page, request }) => {
+		const body = [
+			{ type: 'paragraph', content: [{ type: 'text', text: 'Intro', styles: {} }] },
+			{
+				type: 'heading',
+				props: { level: 2 },
+				content: [{ type: 'text', text: 'Heading', styles: {} }],
+			},
+			{ type: 'bulletListItem', content: [{ type: 'text', text: 'Bullet', styles: {} }] },
+			{ type: 'numberedListItem', content: [{ type: 'text', text: 'Numbered', styles: {} }] },
+			{ type: 'codeBlock', content: [{ type: 'text', text: 'const x = 1;', styles: {} }] },
+			{
+				type: 'image',
+				props: { src: '/uploads/all-blocks/a.jpg', alt: 'Image alt', caption: '', width: 'wide' },
+			},
+			{
+				type: 'carousel',
+				props: {
+					items: JSON.stringify([{ src: '/uploads/all-blocks/a.jpg', alt: 'Carousel alt', caption: '' }]),
+					aspect: '16/9',
+				},
+			},
+			{
+				type: 'gallery',
+				props: {
+					items: JSON.stringify([{ src: '/uploads/all-blocks/a.jpg', alt: 'Gallery alt', caption: '' }]),
+					columns: '3',
+				},
+			},
+			{
+				type: 'embed',
+				props: {
+					url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+					title: 'Video title',
+					aspect: '16/9',
+				},
+			},
+			{
+				type: 'quote',
+				props: { attribution: 'Someone' },
+				content: [{ type: 'text', text: 'Quote', styles: {} }],
+			},
+			{
+				type: 'mediaText',
+				props: { src: '/uploads/all-blocks/a.jpg', alt: 'Media alt', side: 'left' },
+				content: [{ type: 'text', text: 'Side text', styles: {} }],
+			},
+		];
+
+		const response = await request.post('/api/save', {
+			data: {
+				slug: 'all-blocks',
+				title: 'All Blocks',
+				summary: 'Every phase 1 block.',
+				date: '2026-06-01',
+				draft: false,
+				body,
+			},
+		});
+		expect(response.status()).toBe(201);
+
+		await page.goto('/admin/edit/all-blocks');
+		await expect(page.locator('.bn-editor[contenteditable="true"]')).toBeVisible();
+
+		for (const type of [
+			'paragraph',
+			'heading',
+			'bulletListItem',
+			'numberedListItem',
+			'codeBlock',
+			'image',
+			'carousel',
+			'gallery',
+			'embed',
+			'quote',
+			'mediaText',
+		]) {
+			await expect(
+				page.locator(`.bn-block-content[data-content-type="${type}"]`).first(),
+			).toBeVisible();
+		}
+
+		const preview = await request.post('/api/preview', { data: { blocks: body } });
+		expect(preview.status()).toBe(200);
+		const html = await preview.text();
+		expect(html).toContain('<h2');
+		expect(html).toContain('<blockquote');
+		expect(html).toContain('data-embed');
+		expect(html).toContain('Carousel alt');
+		expect(html).toContain('Gallery alt');
+		expect(html).toContain('Side text');
 	});
 
 	test.fixme('resizes an image before upload', async ({ page }) => {
+		// Covered by the 3 MB upload assertions in phase-0b.spec.ts.
 		await page.goto('/admin/edit/new');
 	});
 
 	test.fixme('preview matches the production render', async ({ page }) => {
+		// Covered by the static/preview parity test in phase-0b.spec.ts.
 		await page.goto('/admin/edit/new');
 	});
 
 	test.fixme('saves the post JSON and images in one commit', async ({ page }) => {
+		// Publishing is a manual commit and push; the admin only writes files.
 		await page.goto('/admin/edit/new');
 	});
 
 	test.fixme('refuses a save against a stale SHA', async ({ page }) => {
+		// There is no remote write path.
 		await page.goto('/admin/edit/new');
 	});
 
 	test.fixme('blocks a save when an image has no alt text', async ({ page }) => {
+		// Covered by phase-1-image-block.spec.ts.
 		await page.goto('/admin/edit/new');
 	});
 
-	test.fixme('edits the site, home and about singletons', async ({ page }) => {
+	test('edits the site, home and about singletons', async ({ page }) => {
+		await resetSettings();
 		await page.goto('/admin/settings');
+		await expect(page.locator('.bn-editor[contenteditable="true"]')).toBeVisible();
+
+		await page.getByLabel('Site title').fill('Studio');
+		await page.getByLabel('Intro').fill('Custom intro.');
+
+		await page.locator('.bn-editor').click();
+		await page.keyboard.press('End');
+		await page.keyboard.type(' Updated.');
+
+		await page.getByRole('button', { name: 'Save settings' }).first().click();
+		await expect(page.getByText('Saved.')).toBeVisible();
+
+		const site = JSON.parse(await readFile(join(SETTINGS_DIR, 'site.json'), 'utf8'));
+		const home = JSON.parse(await readFile(join(SETTINGS_DIR, 'home.json'), 'utf8'));
+		const about = JSON.parse(await readFile(join(SETTINGS_DIR, 'about.json'), 'utf8'));
+
+		expect(site.seo.title).toBe('Studio');
+		expect(home.intro).toBe('Custom intro.');
+		expect(JSON.stringify(about.body)).toContain('Updated.');
 	});
 });

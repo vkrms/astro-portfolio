@@ -38,13 +38,18 @@ async function seedPost(request: APIRequestContext, slug: string) {
 }
 
 async function insertImage(page: Page) {
-	await page.locator('.bn-block-content').filter({ hasText: 'Intro' }).click();
+	await page.locator('.bn-editor[contenteditable="true"]').waitFor();
+
+	const intro = page.locator('.bn-block-content').filter({ hasText: 'Intro' });
+	await intro.click();
+	await expect(page.locator('.bn-editor')).toBeFocused();
+	await page.waitForTimeout(250);
 	await page.keyboard.press('End');
 	await page.keyboard.type('/image');
 
 	const menu = page.locator('.bn-suggestion-menu');
 	await expect(menu).toBeVisible();
-	await menu.getByText('Image', { exact: true }).click();
+	await page.keyboard.press('Enter');
 	await expect(page.getByRole('button', { name: 'Add image' })).toBeVisible();
 }
 
@@ -60,7 +65,7 @@ test.describe('phase 1 - image block', () => {
 		await insertImage(page);
 
 		await page
-			.locator('input[type="file"]')
+			.locator('.bn-block-content[data-content-type="image"] input[type="file"]')
 			.setInputFiles({ name: 'photo.png', mimeType: 'image/png', buffer: PNG });
 		await expect(page.locator('img[src^="/uploads/"]')).toHaveCount(1);
 
@@ -89,14 +94,25 @@ test.describe('phase 1 - image block', () => {
 
 	test('blocks the save when an image has no alt text', async ({ page, request }) => {
 		const slug = 'image-needs-alt';
-		await seedPost(request, slug);
+
+		await request.post('/api/save', {
+			data: {
+				slug,
+				title: 'Image Block',
+				summary: 'Image summary.',
+				date: '2026-06-01',
+				draft: false,
+				body: [
+					{
+						type: 'image',
+						props: { src: '/uploads/image-needs-alt/photo.png', alt: '', caption: '' },
+					},
+				],
+			},
+		});
 
 		await page.goto(`/admin/edit/${slug}`);
-		await insertImage(page);
-		await page
-			.locator('input[type="file"]')
-			.setInputFiles({ name: 'photo.png', mimeType: 'image/png', buffer: PNG });
-		await expect(page.locator('img[src^="/uploads/"]')).toHaveCount(1);
+		await expect(page.locator('.bn-editor[contenteditable="true"]')).toBeVisible();
 
 		await page.getByRole('button', { name: 'Save' }).click();
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { findImageWithoutAlt, normalizeBlocks } from '../../src/blocks/shared';
+import { findEmbedWithoutTitle, findImageWithoutAlt, normalizeBlocks } from '../../src/blocks/shared';
 
 describe('findImageWithoutAlt', () => {
 	it('finds an image block with empty alt text', () => {
@@ -31,6 +31,58 @@ describe('findImageWithoutAlt', () => {
 	it('ignores non-image blocks', () => {
 		const blocks = [{ type: 'paragraph', props: {}, content: [] }];
 		expect(findImageWithoutAlt(blocks)).toBe(false);
+	});
+
+	it('checks carousel slide alt text', () => {
+		const blocks = [
+			{
+				type: 'carousel',
+				props: { items: JSON.stringify([{ src: '/uploads/a.jpg', alt: '' }]) },
+			},
+		];
+		expect(findImageWithoutAlt(blocks)).toBe(true);
+	});
+
+	it('accepts carousel slides with alt text', () => {
+		const blocks = [
+			{
+				type: 'carousel',
+				props: { items: JSON.stringify([{ src: '/uploads/a.jpg', alt: 'A photo' }]) },
+			},
+		];
+		expect(findImageWithoutAlt(blocks)).toBe(false);
+	});
+
+	it('checks gallery image alt text', () => {
+		const blocks = [
+			{
+				type: 'gallery',
+				props: { items: JSON.stringify([{ src: '/uploads/a.jpg', alt: ' ' }]) },
+			},
+		];
+		expect(findImageWithoutAlt(blocks)).toBe(true);
+	});
+
+	it('checks media and text image alt text', () => {
+		const blocks = [{ type: 'mediaText', props: { src: '/uploads/a.jpg', alt: '' } }];
+		expect(findImageWithoutAlt(blocks)).toBe(true);
+	});
+});
+
+describe('findEmbedWithoutTitle', () => {
+	it('flags an embed with a URL and no title', () => {
+		const blocks = [{ type: 'embed', props: { url: 'https://example.com', title: '' } }];
+		expect(findEmbedWithoutTitle(blocks)).toBe(true);
+	});
+
+	it('accepts an embed with a title', () => {
+		const blocks = [{ type: 'embed', props: { url: 'https://example.com', title: 'Demo' } }];
+		expect(findEmbedWithoutTitle(blocks)).toBe(false);
+	});
+
+	it('ignores an empty embed', () => {
+		const blocks = [{ type: 'embed', props: { url: '', title: '' } }];
+		expect(findEmbedWithoutTitle(blocks)).toBe(false);
 	});
 });
 

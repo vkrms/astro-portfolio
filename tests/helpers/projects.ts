@@ -3,6 +3,7 @@ import { mkdir, rm } from 'node:fs/promises';
 
 export const PROJECTS_DIR = 'tmp/e2e-projects';
 export const UPLOADS_DIR = 'tmp/e2e-uploads';
+export const SETTINGS_DIR = 'tmp/e2e-settings';
 
 export async function resetProjects() {
 	await rm(PROJECTS_DIR, { recursive: true, force: true });
@@ -12,6 +13,28 @@ export async function resetProjects() {
 export async function resetUploads() {
 	await rm(UPLOADS_DIR, { recursive: true, force: true });
 	await mkdir(UPLOADS_DIR, { recursive: true });
+}
+
+export async function resetSettings() {
+	await rm(SETTINGS_DIR, { recursive: true, force: true });
+	await mkdir(SETTINGS_DIR, { recursive: true });
+}
+
+/** Updates one settings singleton, keeping the other two from the server. */
+export async function updateSettings(
+	request: APIRequestContext,
+	patch: { site?: unknown; home?: unknown; about?: unknown },
+) {
+	const current = (await (await request.get('/api/settings')).json()) as {
+		site: unknown;
+		home: unknown;
+		about: unknown;
+	};
+
+	const response = await request.post('/api/settings', {
+		data: { ...current, ...patch },
+	});
+	if (!response.ok()) throw new Error(await response.text());
 }
 
 /**

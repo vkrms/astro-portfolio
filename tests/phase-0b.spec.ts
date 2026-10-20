@@ -227,13 +227,16 @@ test.describe('phase 0b - BlockNote spike', () => {
 		await page.goto('/admin/edit/picker-test');
 		await expect(page.locator('img[src^="/uploads/"]')).toHaveCount(1);
 
-		await page.locator('.bn-block-content').filter({ hasText: 'Picker intro' }).click();
+		const intro = page.locator('.bn-block-content').filter({ hasText: 'Picker intro' });
+		await intro.click();
+		await expect(page.locator('.bn-editor')).toBeFocused();
+		await page.waitForTimeout(500);
 		await page.keyboard.press('End');
 		await page.keyboard.type('/carousel');
 
 		const menu = page.locator('.bn-suggestion-menu');
 		await expect(menu).toBeVisible();
-		await menu.getByText('Carousel', { exact: true }).click();
+		await page.keyboard.press('Enter');
 
 		await expect(page.getByRole('button', { name: 'Add image' })).toHaveCount(2);
 		await expect(page.locator('.bn-block-content').getByText('/carousel')).toHaveCount(0);
@@ -247,7 +250,9 @@ test.describe('phase 0b - BlockNote spike', () => {
 
 		const before = await readdir(join(UPLOADS_DIR, slug));
 
-		await page.locator('input[type="file"]').setInputFiles(second.path);
+		await page
+			.locator('.bn-block-content[data-content-type="carousel"] input[type="file"]')
+			.setInputFiles(second.path);
 		await expect(page.locator('img[src^="/uploads/"]')).toHaveCount(2);
 
 		const after = await readdir(join(UPLOADS_DIR, slug));
@@ -269,7 +274,9 @@ test.describe('phase 0b - BlockNote spike', () => {
 		await expect(page.locator('img[src^="/uploads/"]')).toHaveCount(1);
 
 		// Add a second slide through the media picker.
-		await page.locator('input[type="file"]').setInputFiles(second.path);
+		await page
+			.locator('.bn-block-content[data-content-type="carousel"] input[type="file"]')
+			.setInputFiles(second.path);
 		await expect(page.locator('img[src^="/uploads/"]')).toHaveCount(2);
 
 		await page.getByLabel('Alt text').nth(1).fill('Second slide');

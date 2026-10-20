@@ -131,6 +131,11 @@ describe('readPost', () => {
 		);
 		expect(await readPost('d', { dir, publishedOnly: true })).toBeNull();
 	});
+
+	it('rejects a post that fails validation', async () => {
+		await writeFile(join(dir, 'bad.json'), JSON.stringify({ title: '', date: '2026-01-01' }));
+		await expect(readPost('bad', { dir })).rejects.toThrow('Invalid post');
+	});
 });
 
 describe('writePost', () => {
@@ -180,6 +185,33 @@ describe('writePost', () => {
 
 		const raw = JSON.parse(await readFile(join(dir, 'with-links.json'), 'utf8'));
 		expect(raw.links).toEqual([{ label: 'Live', url: 'https://example.com' }]);
+	});
+
+	it('writes the cover, tags, role, client and featured fields', async () => {
+		await writePost(
+			{
+				title: 'Full Post',
+				summary: 'S',
+				date: '2026-06-01',
+				cover: '/uploads/full/cover.jpg',
+				coverAlt: 'Cover alt',
+				tags: ['design', 'astro'],
+				role: 'Design and front end',
+				client: 'Acme',
+				featured: true,
+			},
+			{ dir },
+		);
+
+		const raw = JSON.parse(await readFile(join(dir, 'full-post.json'), 'utf8'));
+		expect(raw).toMatchObject({
+			cover: '/uploads/full/cover.jpg',
+			coverAlt: 'Cover alt',
+			tags: ['design', 'astro'],
+			role: 'Design and front end',
+			client: 'Acme',
+			featured: true,
+		});
 	});
 
 	it('requires a title, summary and date', async () => {

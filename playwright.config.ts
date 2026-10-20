@@ -27,6 +27,9 @@ export default defineConfig({
 					// Tests reset these directories before each test.
 					PROJECTS_DIR: 'tmp/e2e-projects',
 					UPLOADS_DIR: 'tmp/e2e-uploads',
+					SETTINGS_DIR: 'tmp/e2e-settings',
+					// Keep canonical and OG URLs on the test server.
+					SITE_URL: 'http://localhost:1893',
 				},
 			},
 });
