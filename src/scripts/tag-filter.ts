@@ -7,10 +7,23 @@ function currentTag(): string {
 	return new URLSearchParams(window.location.search).get('tag') ?? '';
 }
 
+function cardTags(card: HTMLElement): string[] {
+	const raw = card.dataset.tags ?? '';
+
+	try {
+		const parsed: unknown = JSON.parse(raw);
+		return Array.isArray(parsed)
+			? parsed.filter((tag): tag is string => typeof tag === 'string')
+			: [];
+	} catch {
+		// Backward compatibility for the earlier space-separated attribute.
+		return raw.split(' ').filter(Boolean);
+	}
+}
+
 function applyTag(tag: string) {
 	document.querySelectorAll<HTMLElement>('[data-project-card]').forEach((card) => {
-		const tags = (card.dataset.tags ?? '').split(' ').filter(Boolean);
-		card.hidden = tag !== '' && !tags.includes(tag);
+		card.hidden = tag !== '' && !cardTags(card).includes(tag);
 	});
 
 	document.querySelectorAll<HTMLElement>('[data-tag-filter]').forEach((button) => {

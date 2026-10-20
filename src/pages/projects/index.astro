@@ -52,7 +52,7 @@ const chip = (active: boolean) =>
 							<li
 								class="overflow-hidden rounded-xl border bg-card"
 								data-project-card
-								data-tags={(post.tags ?? []).join(' ')}
+								data-tags={JSON.stringify(post.tags ?? [])}
 							>
 								{post.cover && (
 									<CmsImage

@@ -67,7 +67,7 @@ test.describe('phase 1 - public site', () => {
 				summary: 'Design summary.',
 				date: '2026-06-01',
 				draft: false,
-				tags: ['design'],
+				tags: ['real deal'],
 			},
 		});
 		await request.post('/api/save', {
@@ -81,9 +81,13 @@ test.describe('phase 1 - public site', () => {
 		});
 
 		await page.goto('/projects');
-		await page.getByRole('button', { name: 'design', exact: true }).click();
+		await page.getByRole('button', { name: 'real deal', exact: true }).click();
 
-		await expect(page).toHaveURL('/projects?tag=design');
+		await expect(page).toHaveURL(/tag=real[+%20]deal/);
+		await expect(page.getByRole('button', { name: 'real deal', exact: true })).toHaveAttribute(
+			'aria-pressed',
+			'true',
+		);
 		await expect(page.getByRole('link', { name: 'Design Project' })).toBeVisible();
 		await expect(page.getByRole('link', { name: 'Code Project' })).toBeHidden();
 
