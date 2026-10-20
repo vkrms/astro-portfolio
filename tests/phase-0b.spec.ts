@@ -225,6 +225,7 @@ test.describe('phase 0b - BlockNote spike', () => {
 
 	test('inserts a carousel from the slash menu', async ({ page }) => {
 		await page.goto('/admin/edit/picker-test');
+		await page.locator('.bn-editor[contenteditable="true"]').waitFor();
 		await expect(page.locator('img[src^="/uploads/"]')).toHaveCount(1);
 
 		const intro = page.locator('.bn-block-content').filter({ hasText: 'Picker intro' });
