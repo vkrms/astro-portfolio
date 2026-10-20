@@ -4,3 +4,19 @@
    live inside the package, which Tailwind does not scan by default. This file
    is imported only by the admin layout, so public pages keep their smaller CSS. */
 @source '../../node_modules/@blocknote/shadcn/dist';
+
+/* The title and the block body read as one editable surface: the editor is
+   transparent so the card's background shows through, and the title uses the
+   same inline gutter as BlockNote's side menu. */
+.editor-surface {
+	--editor-gutter: 54px;
+}
+
+.editor-surface .bn-editor {
+	padding-inline: var(--editor-gutter);
+	background-color: transparent;
+}
+
+.editor-surface .editor-title {
+	padding-inline: var(--editor-gutter);
+}

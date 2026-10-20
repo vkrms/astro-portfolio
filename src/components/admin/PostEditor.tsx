@@ -140,7 +140,7 @@ export default function PostEditor({ slug, post }: Props) {
 				className="mt-6 grid gap-6 lg:grid-cols-[minmax(0,1fr)_20rem] lg:items-start"
 			>
 				<div className="min-w-0">
-					<div className="rounded-xl border bg-card p-3 focus-within:ring-2 focus-within:ring-ring/40">
+					<div className="editor-surface rounded-xl border bg-card p-3 focus-within:ring-2 focus-within:ring-ring/40">
 						<label className="sr-only" htmlFor="title">
 							Title
 						</label>
@@ -157,7 +157,7 @@ export default function PostEditor({ slug, post }: Props) {
 							placeholder="Add title"
 							required
 							maxLength={80}
-							className="mb-2 w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/40 lg:text-4xl"
+							className="editor-title mb-2 w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/40 lg:text-4xl"
 						/>
 
 						<div className="min-h-[40vh] lg:min-h-[60vh]">
