@@ -69,7 +69,7 @@ One JSON file per post in `src/content/projects`, plus three settings singletons
 | `date` | ISO date | Required; sorts the list |
 | `cover` | image path | Optional; also the OG image when set |
 | `coverAlt` | string | Optional; used when `cover` is set |
-| `tags` | string\[\] | Optional; drives the filter on `/projects` |
+| `tags` | string\[\] | Optional; shown on cards and used by the `/projects` filter. The MVP publishes one post tagged `real deal`. |
 | `role` | string | Optional, e.g. "Design and front end" |
 | `client` | string | Optional |
 | `links` | {label, url}\[\] | Optional: live site, repo, case study |
@@ -235,9 +235,9 @@ Building the admin is the largest piece of work, so Phase 0b proved the risky pa
    - `Blocks.astro` renders that JSON, including grouped lists and inline links, to the same HTML on a static page and through `/api/preview`.
 
    The admin writes local files from the start; there is no remote write path.
-2. **Phase 1: MVP.** Post list, editor with all phase 1 blocks, media picker with resizing, preview, settings singletons, public pages and base design. Done when 3 real projects are edited locally, committed and deployed.
+2. **Phase 1: MVP.** Post list, editor with all phase 1 blocks, media picker with resizing, preview, settings singletons, public pages and base design. Posts carry tags and at least one published post uses `real deal`. Every visitor-facing page and modal is confirmed by the owner from [design-review.md](./design-review.md). Done when 3 real projects are edited locally, committed and deployed.
 3. **Phase 2: video.** R2 bucket and custom subdomain, presigned uploads, Video block.
-4. **Phase 3: polish.** Tag filter, RSS, view transitions, gallery lightbox, per-project OG images, autosave of unsaved drafts in the browser.
+4. **Phase 3: polish.** View transitions, gallery lightbox, autosave of unsaved drafts in the browser.
 
 Acceptance criteria for each phase and for the release are in [definition-of-done.md](./definition-of-done.md).
 
@@ -251,16 +251,17 @@ The admin is local-only. Deployed builds serve static pages only.
 - Astro is pinned at 6.4.8.
 - The shell carries over: `Header`, `Footer`, `ThemeToggle`, `Base`, `BaseHead`, the `ui/` and `space/` primitives, `CmsImage.astro` and the `Carousel` renderer.
 - Phase 0b: BlockNote editor at `/admin/edit/[slug]` with a custom Carousel block (slash menu, media picker, add/reorder/remove, alt, caption, aspect ratio).
-- A custom Image block on the same media pipeline, with alt and caption fields; the save is refused while any image lacks alt text.
+- A custom Image block on the same media pipeline, with alt and caption fields; alt text is optional and renders when provided.
 - Every Phase 1 block is implemented: paragraph, H2/H3, lists, code, image, gallery, carousel, embed, quote and media + text. The slash menu puts the media blocks first and hides anything the renderer cannot draw.
 - Gallery, quote, media + text and embed blocks share one item/image editor pattern; carousel slides, gallery images and media + text images expose alt fields, and embeds require a title.
 - `site`, `home` and `about` settings singletons are editable at `/admin/settings`, including the about BlockNote body and portrait.
-- Public home shows the configured intro and featured projects; `/projects` filters by tag client-side (static pages cannot read a query string at build time); `/about` renders the settings body and portrait; `/rss.xml` is generated.
+- Public home shows the configured intro and featured projects; `/about` renders the settings body and portrait; `/rss.xml` is generated.
+- Posts carry tags; `/projects` filters by them client-side (static pages cannot read a query string at build time), including multi-word tags. The published `this-is-a-post` is tagged `real deal`.
 - Post covers render on `/projects/[slug]` and produce a 1200x630 OG image; canonical and meta description come from the route and `summary`.
 - Storage validates posts on read and write with Zod, so a malformed JSON file fails the build with the field name.
 - The generated sitemap excludes `/admin`, `/api`, `/uploads` and the `/home` redirect.
 - Browser-side resize (long edge <= 3000 px, <= 3.5 MB) and local uploads under `src/assets/uploads/`.
-- `Blocks.astro` renders paragraphs, headings, grouped lists, code, links and carousels; `/api/preview` produces the same HTML as the static page.
+- `Blocks.astro` renders paragraphs, headings, grouped lists, code, images, galleries, carousels, embeds, quotes and media + text; `/api/preview` produces the same HTML as the static page.
 - React runs as a runtime dependency on `@astrojs/react` 5.x, which keeps the React plugin on Vite 7 (Astro 6.4.8).
 - Editing project JSON clears Astro's dev route cache, so a new post appears on `/projects/<slug>` without a server restart.
 - Admin and API routes are gated to localhost by `src/middleware.ts`: dev on localhost, or a locally-run build with `LOCAL_ADMIN=1`. Off localhost they return 404.
@@ -272,6 +273,10 @@ The admin is local-only. Deployed builds serve static pages only.
 - Package manager: npm.
 - Astro 6.4.8.
 - Admin: local-only, no auth. Publishing is a manual commit and push.
+
+**Awaiting owner sign-off**
+
+- Every visitor-facing page and modal: [design-review.md](./design-review.md).
 
 **Deferred or not built yet**
 

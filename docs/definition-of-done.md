@@ -35,12 +35,13 @@ Deferred to Phase 1: Vercel preview.
 - [x] Admin routes work on localhost in dev, and in a locally-run build with `LOCAL_ADMIN=1`.
 - [x] `/admin`, `/api` and `/uploads` return 404 on any other host, even with `LOCAL_ADMIN=1`.
 - [x] `/admin` lists posts with draft/published state.
-- [x] Creating a post produces a `src/content/projects/<slug>.json` entry with every required field (cover is optional; alt is required when a cover is set).
+- [x] Creating a post produces a `src/content/projects/<slug>.json` entry with every required field (cover and alt text are optional).
 - [x] The body editor accepts every phase 1 block: paragraph, H2/H3, lists, code, image, gallery, carousel, embed, quote, media + text.
 - [x] The media picker resizes an image to <= 3000 px and <= 3.5 MB before upload (phase 0b).
 - [x] The preview modal matches the production page, including an operable carousel.
 - [x] Images can be saved without alt text; the alt field stays available and renders when filled.
 - [x] `site`, `home` and `about` are editable at `/admin/settings`.
+- [x] Posts have tags; at least one published post is tagged `real deal`.
 
 ### Public site
 
@@ -55,6 +56,10 @@ Deferred to Phase 1: Vercel preview.
 - [x] The carousel is keyboard operable and never autoplays.
 - [x] Embeds require a title; image alt text renders when provided.
 
+### Design confirmation
+
+- [ ] Every visitor-facing page and modal is manually confirmed by the owner: [design-review.md](./design-review.md).
+
 ### Release
 
 - [ ] Three real projects are edited in the local admin, committed and deployed.
@@ -67,7 +72,7 @@ Deferred to Phase 1: Vercel preview.
 
 ## Phase 3 - polish
 
-- [ ] Tag filter, RSS, view transitions, gallery lightbox, per-project OG images and draft autosave work.
+- [ ] View transitions, gallery lightbox and draft autosave work.
 - [ ] axe reports no serious or critical issues on public pages.
 - [ ] LCP is within budget on a throttled mobile profile.
 
