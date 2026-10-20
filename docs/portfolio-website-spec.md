@@ -65,7 +65,7 @@ One JSON file per post in `src/content/projects`, plus three settings singletons
 | --- | --- | --- |
 | `title` | string | Required, ≤ 128 chars |
 | `slug` | from filename | Lowercase, hyphenated; renaming moves the file |
-| `summary` | string | Required, ≤ 160 chars; used for cards and meta description |
+| `summary` | string | Required, ≤ 280 chars; used for cards and meta description (search engines truncate longer text) |
 | `date` | ISO date | Required; sorts the list |
 | `cover` | image path | Optional; also the OG image when set |
 | `coverAlt` | string | Optional; used when `cover` is set |

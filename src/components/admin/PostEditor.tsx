@@ -333,7 +333,7 @@ export default function PostEditor({ slug, post }: Props) {
 								value={summary}
 								onChange={(event) => setSummary(event.target.value)}
 								required
-								maxLength={160}
+								maxLength={280}
 								rows={4}
 								className="rounded-md border bg-background px-3 py-2 text-sm"
 							/>
