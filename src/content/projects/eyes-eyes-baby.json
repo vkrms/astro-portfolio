@@ -1,0 +1,61 @@
+{
+	"title": "Eyes eyes baby",
+	"summary": "x",
+	"date": "2026-10-19",
+	"draft": true,
+	"body": [
+		{
+			"id": "845d3872-691f-4216-a824-19d2c7199bb4",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "I had to convince ",
+					"styles": {}
+				},
+				{
+					"type": "text",
+					"text": "Claude",
+					"styles": {
+						"bold": true
+					}
+				},
+				{
+					"type": "text",
+					"text": " a lot to ",
+					"styles": {}
+				},
+				{
+					"type": "text",
+					"text": "actually",
+					"styles": {
+						"italic": true
+					}
+				},
+				{
+					"type": "text",
+					"text": " get some good animation out of it. I had to use magic words like \"easing function\" and \"backface visibility\". Most of the code was made with Deepseek v4 pro, the schedule was very tight so there were no time to waste on beautiful code, but the whole thing is covered with tests (Vitest, Playwright) and Sentry. It's a good approach for such a short campaing. I'm pretty happy with the animations, I want to flex with them, so I'm attaching a staging version. Please take a look, click around. The data will not be submitted anywhere. ",
+					"styles": {}
+				},
+				{
+					"type": "link",
+					"href": "https://tp-challenge.onrender.com/",
+					"content": [
+						{
+							"type": "text",
+							"text": "The link",
+							"styles": {}
+						}
+					]
+				}
+			],
+			"children": []
+		}
+	],
+	"schemaVersion": 1
+}

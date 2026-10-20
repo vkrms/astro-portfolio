@@ -1,5 +1,5 @@
 {
-	"title": "This is a post",
+	"title": "Why would someone want a post title this long. Isn't it werid? But I've seen wei",
 	"summary": "Lorem ipsum right?",
 	"date": "2026-10-17",
 	"draft": false,
@@ -44,6 +44,15 @@
 		},
 		{
 			"id": "633f2e09-c9d9-446f-ba83-c065e13a1cc3",
+			"type": "carousel",
+			"props": {
+				"items": "[{\"src\":\"/uploads/this-is-a-post/1792214935859-z7rh3c.jpg\",\"alt\":\"\",\"caption\":\"\"},{\"src\":\"/uploads/this-is-a-post/1792214936020-3yyg1t.jpg\",\"alt\":\"\",\"caption\":\"\"}]",
+				"aspect": "16/9"
+			},
+			"children": []
+		},
+		{
+			"id": "1ab3b34a-dced-43a7-9586-927d16caa5b2",
 			"type": "paragraph",
 			"props": {
 				"backgroundColor": "default",
