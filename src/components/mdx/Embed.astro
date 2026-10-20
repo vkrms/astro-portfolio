@@ -1,0 +1,51 @@
+---
+import { parseEmbedUrl } from '../../blocks/embed';
+
+interface Props {
+	url: string;
+	title: string;
+	aspect?: string;
+}
+
+const { url, title, aspect = '16/9' } = Astro.props;
+const info = parseEmbedUrl(url);
+const label = title || info?.label || 'Embedded content';
+---
+
+{
+	info && info.provider === 'link' ? (
+		<p class="my-6">
+			<a href={info.embedUrl} class="text-primary hover:underline" rel="noopener" target="_blank">
+				{label}
+			</a>
+		</p>
+	) : (
+		info && (
+			<figure class="my-8 overflow-hidden rounded-xl border bg-card" style={`aspect-ratio: ${aspect}`}>
+				<button
+					type="button"
+					data-embed
+					data-embed-url={info.embedUrl}
+					data-embed-title={label}
+					aria-label={`Play ${label}`}
+					class="group relative grid h-full w-full place-items-center"
+				>
+					{info.thumbnail ? (
+						<img
+							src={info.thumbnail}
+							alt=""
+							loading="lazy"
+							class="absolute inset-0 h-full w-full object-cover"
+						/>
+					) : (
+						<span class="text-sm font-medium text-muted-foreground">{info.label}</span>
+					)}
+
+					<span class="relative grid size-14 place-items-center rounded-full bg-background/90 text-lg shadow-lg transition-transform group-hover:scale-105">
+						▶
+					</span>
+				</button>
+			</figure>
+		)
+	)
+}

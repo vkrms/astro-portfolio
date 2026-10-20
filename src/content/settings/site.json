@@ -1,0 +1,13 @@
+{
+	"seo": {
+		"title": "Portfolio",
+		"description": "A personal portfolio built with Astro."
+	},
+	"nav": [
+		{ "title": "Home", "link": "/" },
+		{ "title": "Projects", "link": "/projects" },
+		{ "title": "About", "link": "/about" }
+	],
+	"contactLinks": [],
+	"footerStarfield": true
+}

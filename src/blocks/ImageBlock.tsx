@@ -16,6 +16,7 @@ export function ImageBlock({ block, editor }: { block: any; editor: any }) {
 	const src = String(block.props.src ?? '');
 	const alt = String(block.props.alt ?? '');
 	const caption = String(block.props.caption ?? '');
+	const width = String(block.props.width ?? 'wide');
 
 	const update = (props: Record<string, string>) => editor.updateBlock(block, { props });
 
@@ -63,7 +64,20 @@ export function ImageBlock({ block, editor }: { block: any; editor: any }) {
 						/>
 					</label>
 
-					<div className="flex gap-2 text-xs">
+					<div className="flex flex-wrap items-center gap-2 text-xs">
+						<label className="grid gap-1">
+							<span>Width</span>
+							<select
+								name="width"
+								value={width}
+								onChange={(event) => update({ width: event.target.value })}
+								className="rounded-md border bg-card px-2 py-1"
+							>
+								<option value="inline">Inline</option>
+								<option value="wide">Wide</option>
+								<option value="full">Full</option>
+							</select>
+						</label>
 						<button
 							type="button"
 							onClick={() => fileRef.current?.click()}

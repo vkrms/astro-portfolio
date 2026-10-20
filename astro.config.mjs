@@ -88,7 +88,19 @@ export default defineConfig({
 	adapter: await getAdapter(),
 	server: { port: 1892 },
 	redirects: { '/home': '/' },
-	integrations: [mdx(), sitemap(), icon(), react()],
+	integrations: [
+		mdx(),
+		// The admin is local-only. Never advertise it (or its APIs/uploads) in
+		// the generated sitemap.
+		sitemap({
+			filter: (page) => {
+				const path = new URL(page).pathname;
+				return !/^\/(admin|api|uploads)(\/|$)/.test(path) && path !== '/home';
+			},
+		}),
+		icon(),
+		react(),
+	],
 	build: {
 		// Inline the (~10 KiB) bundled CSS into a <style> in <head> instead of a
 		// separate render-blocking <link>. Astro's default ('auto') only inlines

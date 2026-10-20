@@ -1,0 +1,23 @@
+{
+	"body": [
+		{
+			"id": "about-intro",
+			"type": "paragraph",
+			"props": {
+				"textColor": "default",
+				"backgroundColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Edit this page in the admin settings.",
+					"styles": {}
+				}
+			],
+			"children": []
+		}
+	],
+	"portrait": "",
+	"portraitAlt": ""
+}

@@ -1,17 +1,82 @@
 ---
 import Base from '../layouts/Base.astro';
 import Starfield from '../components/space/Starfield.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import CmsImage from '../components/media/CmsImage.astro';
+import { readHomeSettings, readSiteSettings } from '../lib/settings';
+import { listPosts } from '../lib/storage';
+
+const [site, home, posts] = await Promise.all([
+	readSiteSettings(),
+	readHomeSettings(),
+	listPosts({ publishedOnly: true }),
+]);
+
+const bySlug = new Map(posts.map((post) => [post.slug, post]));
+const chosen = home.featured
+	.map((slug) => bySlug.get(slug))
+	.filter((post): post is NonNullable<typeof post> => Boolean(post));
+const featured = chosen.length > 0 ? chosen : posts.filter((post) => post.featured);
+const projects = (featured.length > 0 ? featured : posts).slice(0, 3);
+const heading = featured.length > 0 ? 'Featured projects' : 'Recent projects';
 ---
 
-<Base title="Portfolio" description="A personal portfolio built with Astro.">
+<Base title={site.seo.title} description={site.seo.description}>
 	<section class="relative flex min-h-[70vh] items-center justify-center overflow-hidden px-6 text-center">
 		<Starfield count={90} class="text-foreground/20" />
 		<div class="relative flex max-w-xl flex-col items-center">
-			<p class="text-sm font-medium tracking-widest text-primary uppercase">Coming soon</p>
-			<h1 class="mt-2 text-4xl font-semibold tracking-tight lg:text-5xl">Portfolio</h1>
-			<p class="mx-auto mt-4 max-w-md text-muted-foreground">
-				The site is being rebuilt. The admin and project pages land in phase 1.
-			</p>
+			<p class="text-sm font-medium tracking-widest text-primary uppercase">Portfolio</p>
+			<h1 class="mt-2 text-4xl font-semibold tracking-tight lg:text-5xl">{site.seo.title}</h1>
+			{home.intro && <p class="mx-auto mt-4 max-w-md text-muted-foreground">{home.intro}</p>}
+			<a
+				href="/projects"
+				class="mt-8 inline-flex h-10 items-center justify-center rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground"
+			>
+				View projects
+			</a>
 		</div>
 	</section>
+
+	{
+		projects.length > 0 && (
+			<section class="mx-auto max-w-5xl px-6 pb-20">
+				<div class="flex items-end justify-between gap-4">
+					<h2 class="text-2xl font-semibold tracking-tight">{heading}</h2>
+					<a href="/projects" class="text-sm text-muted-foreground hover:text-foreground">
+						All projects →
+					</a>
+				</div>
+
+				<ul class="mt-8 grid list-none gap-6 p-0 sm:grid-cols-2 lg:grid-cols-3">
+					{projects.map((post) => (
+						<li class="overflow-hidden rounded-xl border bg-card">
+							{post.cover && (
+								<CmsImage
+									src={post.cover}
+									alt={post.coverAlt ?? ''}
+									width={800}
+									class="aspect-[16/9] w-full object-cover"
+								/>
+							)}
+							<div class="p-5">
+								{post.date && (
+									<p class="text-sm text-muted-foreground">
+										<FormattedDate date={new Date(post.date)} />
+									</p>
+								)}
+								<h3 class="mt-2 text-lg font-semibold">
+									<a href={`/projects/${post.slug}`} class="hover:underline">
+										{post.title}
+									</a>
+								</h3>
+								{post.summary && (
+									<p class="mt-2 text-sm text-muted-foreground">{post.summary}</p>
+								)}
+							</div>
+						</li>
+					))}
+				</ul>
+			</section>
+		)
+	}
 </Base>

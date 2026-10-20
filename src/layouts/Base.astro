@@ -3,7 +3,8 @@ import BaseHead from '../components/BaseHead.astro';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import DevInspector from '../components/DevInspector.astro';
-import { defaultSiteConfig, type SiteConfig } from '../lib/config';
+import { readSiteSettings } from '../lib/settings';
+import type { SiteConfig } from '../lib/config';
 
 interface Props {
 	title: string;
@@ -12,7 +13,8 @@ interface Props {
 	config?: SiteConfig;
 }
 
-const { title, description, image, config = defaultSiteConfig } = Astro.props;
+const { title, description, image, config: configProp } = Astro.props;
+const config = configProp ?? (await readSiteSettings());
 ---
 
 <!doctype html>

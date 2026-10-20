@@ -2,8 +2,10 @@
 import Base from '../../layouts/Base.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
 import EditPostLink from '../../components/admin/EditPostLink.astro';
+import CmsImage from '../../components/media/CmsImage.astro';
 import Blocks from '../../blocks/render/Blocks.astro';
 import { listPosts, readPost } from '../../lib/storage';
+import { ogImageUrl } from '../../lib/og';
 
 export async function getStaticPaths() {
 	const posts = await listPosts({ publishedOnly: true });
@@ -18,9 +20,11 @@ const posts = await listPosts({ publishedOnly: true });
 const index = posts.findIndex((item) => item.slug === post.slug);
 const newer = index > 0 ? posts[index - 1] : undefined;
 const older = index >= 0 && index < posts.length - 1 ? posts[index + 1] : undefined;
+const byline = [post.role, post.client].filter(Boolean).join(' · ');
+const ogImage = await ogImageUrl(post.cover);
 ---
 
-<Base title={post.title} description={post.summary}>
+<Base title={post.title} description={post.summary} image={ogImage}>
 	<article class="mx-auto max-w-3xl px-6 py-16">
 		<header>
 			<div class="flex items-start justify-between gap-4">
@@ -30,6 +34,7 @@ const older = index >= 0 && index < posts.length - 1 ? posts[index + 1] : undefi
 				<EditPostLink slug={post.slug} />
 			</div>
 			<h1 class="mt-2 text-4xl font-semibold tracking-tight lg:text-5xl">{post.title}</h1>
+			{byline && <p class="mt-3 text-sm text-muted-foreground">{byline}</p>}
 			{post.summary && <p class="mt-4 text-lg text-muted-foreground">{post.summary}</p>}
 			{post.links && post.links.length > 0 && (
 				<ul class="mt-6 flex list-none flex-wrap gap-4 p-0">
@@ -49,7 +54,21 @@ const older = index >= 0 && index < posts.length - 1 ? posts[index + 1] : undefi
 			)}
 		</header>
 
-		<Blocks blocks={post.body} />
+		{post.cover && (
+			<figure class="mt-10">
+				<CmsImage
+					src={post.cover}
+					alt={post.coverAlt ?? ''}
+					width={1400}
+					class="w-full rounded-xl"
+					loading="eager"
+				/>
+			</figure>
+		)}
+
+		<div class="mt-10">
+			<Blocks blocks={post.body} />
+		</div>
 
 		<nav
 			class="mt-16 flex items-center justify-between gap-4 border-t pt-6 text-sm"

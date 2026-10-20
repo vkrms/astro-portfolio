@@ -4,6 +4,7 @@
  */
 import { mkdir, readdir, readFile, rm, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
+import { formatZodError, postFileSchema, type PostFile } from './schema';
 
 export const PROJECTS_DIR = 'src/content/projects';
 
@@ -18,19 +19,14 @@ export interface PostSummary {
 	summary?: string;
 	date?: string;
 	draft: boolean;
+	cover?: string;
+	coverAlt?: string;
 	tags?: string[];
+	featured: boolean;
 }
 
-export interface PostRecord {
+export interface PostRecord extends PostFile {
 	slug: string;
-	title: string;
-	summary: string;
-	date: string;
-	draft: boolean;
-	tags?: string[];
-	links?: PostLink[];
-	body: unknown[];
-	schemaVersion: number;
 }
 
 export interface ListPostsOptions {
@@ -53,8 +49,13 @@ export interface PostInput {
 	summary: string;
 	date: string;
 	draft?: boolean;
+	cover?: string;
+	coverAlt?: string;
 	tags?: string[];
+	role?: string;
+	client?: string;
 	links?: PostLink[];
+	featured?: boolean;
 	body?: unknown[];
 	schemaVersion?: number;
 }
@@ -81,29 +82,23 @@ export function parseLinks(value: unknown): PostLink[] | undefined {
 	return links.length > 0 ? links : undefined;
 }
 
-function stringArray(value: unknown): string[] | undefined {
-	if (!Array.isArray(value)) return undefined;
-
-	const items = value.filter((item): item is string => typeof item === 'string');
-	return items.length > 0 ? items : undefined;
-}
-
 function projectsDir(override?: string): string {
 	return override ?? process.env.PROJECTS_DIR ?? PROJECTS_DIR;
 }
 
 function parsePost(slug: string, data: Record<string, unknown>): PostRecord {
-	return {
-		slug,
-		title: typeof data.title === 'string' ? data.title : '',
-		summary: typeof data.summary === 'string' ? data.summary : '',
-		date: typeof data.date === 'string' ? data.date : '',
+	const result = postFileSchema.safeParse({
+		...data,
+		// A missing draft flag means published, matching the files written by
+		// earlier versions of the admin.
 		draft: data.draft === true,
-		tags: stringArray(data.tags),
-		links: parseLinks(data.links),
-		body: Array.isArray(data.body) ? data.body : [],
-		schemaVersion: typeof data.schemaVersion === 'number' ? data.schemaVersion : 1,
-	};
+	});
+
+	if (!result.success) {
+		throw new Error(`Invalid post "${slug}": ${formatZodError(result.error)}`);
+	}
+
+	return { slug, ...result.data };
 }
 
 function toSummary(post: PostRecord): PostSummary {
@@ -113,7 +108,10 @@ function toSummary(post: PostRecord): PostSummary {
 		summary: post.summary || undefined,
 		date: post.date || undefined,
 		draft: post.draft,
+		cover: post.cover || undefined,
+		coverAlt: post.coverAlt || undefined,
 		tags: post.tags,
+		featured: post.featured,
 	};
 }
 
@@ -180,21 +178,42 @@ export async function writePost(
 	if (!slug) throw new Error('A valid slug is required');
 
 	const dir = projectsDir(options.dir);
-	const post = {
+	const result = postFileSchema.safeParse({
 		title,
 		summary,
 		date,
 		draft: input.draft ?? true,
+		cover: input.cover,
+		coverAlt: input.coverAlt,
 		tags: input.tags,
+		role: input.role,
+		client: input.client,
 		links: input.links,
+		featured: input.featured ?? false,
 		body: input.body ?? [],
 		schemaVersion: input.schemaVersion ?? 1,
-	};
+	});
+
+	if (!result.success) {
+		throw new Error(formatZodError(result.error));
+	}
+
+	const post = result.data;
 
 	await mkdir(dir, { recursive: true });
 	await writeFile(join(dir, `${slug}.json`), `${JSON.stringify(post, null, '\t')}\n`, 'utf8');
 
-	return { slug, title, summary, date, draft: post.draft, tags: post.tags };
+	return {
+		slug,
+		title,
+		summary,
+		date,
+		draft: post.draft,
+		cover: post.cover,
+		coverAlt: post.coverAlt,
+		tags: post.tags,
+		featured: post.featured,
+	};
 }
 
 export async function deletePost(slug: string, options: { dir?: string } = {}): Promise<boolean> {
@@ -231,8 +250,13 @@ export async function duplicatePost(
 		summary: source.summary,
 		date: source.date,
 		draft: true,
+		cover: source.cover,
+		coverAlt: source.coverAlt,
 		tags: source.tags,
+		role: source.role,
+		client: source.client,
 		links: source.links,
+		featured: false,
 		body: source.body,
 		schemaVersion: source.schemaVersion,
 	};

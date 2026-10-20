@@ -9,10 +9,12 @@ import { BlockNoteView } from '@blocknote/shadcn';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/shadcn/style.css';
 import { SlugContext } from '../../blocks/context';
-import { findImageWithoutAlt, normalizeBlocks } from '../../blocks/shared';
+import { findEmbedWithoutTitle, findImageWithoutAlt, normalizeBlocks } from '../../blocks/shared';
 import { schema } from '../../blocks/schema';
 import { initCarousels } from '../../scripts/carousel';
-import type { PostRecord } from '../../lib/storage';
+import { initEmbeds } from '../../scripts/embeds';
+import { uploadImage } from '../../lib/upload';
+import type { PostLink, PostRecord } from '../../lib/storage';
 
 interface Props {
 	slug: string;
@@ -28,6 +30,7 @@ const SLASH_BLOCK_KEYS = new Set([
 	'bullet_list',
 	'numbered_list',
 	'code_block',
+	'quote',
 ]);
 
 export default function PostEditor({ slug, post }: Props) {
@@ -36,6 +39,13 @@ export default function PostEditor({ slug, post }: Props) {
 	const [summary, setSummary] = useState(post?.summary ?? '');
 	const [date, setDate] = useState(post?.date ?? new Date().toISOString().slice(0, 10));
 	const [draft, setDraft] = useState(post?.draft ?? true);
+	const [featured, setFeatured] = useState(post?.featured ?? false);
+	const [cover, setCover] = useState(post?.cover ?? '');
+	const [coverAlt, setCoverAlt] = useState(post?.coverAlt ?? '');
+	const [tags, setTags] = useState((post?.tags ?? []).join(', '));
+	const [role, setRole] = useState(post?.role ?? '');
+	const [client, setClient] = useState(post?.client ?? '');
+	const [links, setLinks] = useState<PostLink[]>(post?.links ?? []);
 	const [saving, setSaving] = useState(false);
 	const [preview, setPreview] = useState<string | null>(null);
 	const [previewOpen, setPreviewOpen] = useState(false);
@@ -45,6 +55,7 @@ export default function PostEditor({ slug, post }: Props) {
 	const dialogRef = useRef<HTMLDialogElement>(null);
 	const previewRef = useRef<HTMLDivElement>(null);
 	const titleRef = useRef<HTMLTextAreaElement>(null);
+	const coverRef = useRef<HTMLInputElement>(null);
 
 	const initialContent = post?.body?.length ? (normalizeBlocks(post.body) as any) : undefined;
 	const editor = useCreateBlockNote({ schema, initialContent });
@@ -70,16 +81,42 @@ export default function PostEditor({ slug, post }: Props) {
 	}, [previewOpen]);
 
 	useEffect(() => {
-		if (previewOpen && previewRef.current) initCarousels(previewRef.current);
+		if (previewOpen && previewRef.current) {
+			initCarousels(previewRef.current);
+			initEmbeds(previewRef.current);
+		}
 	}, [previewOpen, preview]);
+
+	async function addCover(files: FileList | null) {
+		const file = files?.[0];
+		if (!file) return;
+
+		const path = await uploadImage(file, pageSlug || 'draft');
+		if (path) setCover(path);
+		if (coverRef.current) coverRef.current.value = '';
+	}
+
+	function updateLink(index: number, patch: Partial<PostLink>) {
+		setLinks(links.map((link, i) => (i === index ? { ...link, ...patch } : link)));
+	}
 
 	async function save() {
 		setSaving(true);
 		setError(null);
 
 		try {
+			if (cover && !coverAlt.trim()) {
+				setError('Add alt text to the cover image before saving.');
+				return;
+			}
+
 			if (findImageWithoutAlt(editor.document)) {
 				setError('Add alt text to every image before saving.');
+				return;
+			}
+
+			if (findEmbedWithoutTitle(editor.document)) {
+				setError('Add a title to every embed before saving.');
 				return;
 			}
 
@@ -92,6 +129,16 @@ export default function PostEditor({ slug, post }: Props) {
 					summary,
 					date,
 					draft,
+					featured,
+					cover: cover || undefined,
+					coverAlt: coverAlt || undefined,
+					tags: tags
+						.split(',')
+						.map((tag) => tag.trim())
+						.filter(Boolean),
+					role: role || undefined,
+					client: client || undefined,
+					links: links.filter((link) => link.label.trim() && link.url.trim()),
 					body: editor.document,
 				}),
 			});
@@ -167,9 +214,6 @@ export default function PostEditor({ slug, post }: Props) {
 									getItems={async (query) =>
 										filterSuggestionItems(
 											[
-												...getDefaultReactSlashMenuItems(editor).filter((item) =>
-													SLASH_BLOCK_KEYS.has((item as { key?: string }).key ?? ''),
-												),
 												{
 													title: 'Image',
 													subtext: 'Single image with alt text',
@@ -190,6 +234,39 @@ export default function PostEditor({ slug, post }: Props) {
 														insertOrUpdateBlockForSlashMenu(editor, { type: 'carousel' });
 													},
 												},
+												{
+													title: 'Gallery',
+													subtext: 'Grid of images',
+													aliases: ['gallery', 'grid', 'photos'],
+													group: 'Media',
+													icon: <span aria-hidden="true">▦</span>,
+													onItemClick: () => {
+														insertOrUpdateBlockForSlashMenu(editor, { type: 'gallery' });
+													},
+												},
+												{
+													title: 'Embed',
+													subtext: 'YouTube, Vimeo, Figma or CodePen',
+													aliases: ['embed', 'video', 'youtube', 'vimeo', 'figma'],
+													group: 'Media',
+													icon: <span aria-hidden="true">▶</span>,
+													onItemClick: () => {
+														insertOrUpdateBlockForSlashMenu(editor, { type: 'embed' });
+													},
+												},
+												{
+													title: 'Media and text',
+													subtext: 'Image beside text',
+													aliases: ['media', 'image text', 'columns'],
+													group: 'Media',
+													icon: <span aria-hidden="true">▥</span>,
+													onItemClick: () => {
+														insertOrUpdateBlockForSlashMenu(editor, { type: 'mediaText' });
+													},
+												},
+												...getDefaultReactSlashMenuItems(editor).filter((item) =>
+													SLASH_BLOCK_KEYS.has((item as { key?: string }).key ?? ''),
+												),
 											],
 											query,
 										)
@@ -216,6 +293,19 @@ export default function PostEditor({ slug, post }: Props) {
 							<span>Draft</span>
 						</label>
 						<p className="text-xs text-muted-foreground">Uncheck to publish.</p>
+
+						<label className="flex items-center gap-2 text-sm">
+							<input
+								id="featured"
+								name="featured"
+								type="checkbox"
+								checked={featured}
+								onChange={(event) => setFeatured(event.target.checked)}
+								className="size-4"
+							/>
+							<span>Featured</span>
+						</label>
+						<p className="text-xs text-muted-foreground">Show on the home page.</p>
 
 						{error && (
 							<p role="alert" className="text-sm text-destructive">
@@ -286,6 +376,137 @@ export default function PostEditor({ slug, post }: Props) {
 								className="rounded-md border bg-background px-3 py-2 text-sm"
 							/>
 						</label>
+
+						<label className="grid gap-1.5">
+							<span className="text-sm font-medium">Tags</span>
+							<input
+								id="tags"
+								name="tags"
+								value={tags}
+								onChange={(event) => setTags(event.target.value)}
+								placeholder="design, astro"
+								className="rounded-md border bg-background px-3 py-2 text-sm"
+							/>
+							<span className="text-xs text-muted-foreground">
+								Comma separated. Drives the /projects filter.
+							</span>
+						</label>
+
+						<label className="grid gap-1.5">
+							<span className="text-sm font-medium">Role</span>
+							<input
+								id="role"
+								name="role"
+								value={role}
+								onChange={(event) => setRole(event.target.value)}
+								placeholder="Design and front end"
+								className="rounded-md border bg-background px-3 py-2 text-sm"
+							/>
+						</label>
+
+						<label className="grid gap-1.5">
+							<span className="text-sm font-medium">Client</span>
+							<input
+								id="client"
+								name="client"
+								value={client}
+								onChange={(event) => setClient(event.target.value)}
+								className="rounded-md border bg-background px-3 py-2 text-sm"
+							/>
+						</label>
+
+						<div className="grid gap-2">
+							<span className="text-sm font-medium">Cover</span>
+							{cover ? (
+								<>
+									<img
+										src={cover}
+										alt={coverAlt}
+										className="aspect-[16/9] w-full rounded-md border object-cover"
+									/>
+									<input
+										aria-label="Cover alt text"
+										value={coverAlt}
+										onChange={(event) => setCoverAlt(event.target.value)}
+										placeholder="Cover alt text"
+										className="rounded-md border bg-background px-3 py-2 text-sm"
+									/>
+									<div className="flex gap-2 text-xs">
+										<button
+											type="button"
+											onClick={() => coverRef.current?.click()}
+											className="rounded border px-2 py-1"
+										>
+											Replace
+										</button>
+										<button
+											type="button"
+											onClick={() => {
+												setCover('');
+												setCoverAlt('');
+											}}
+											className="rounded border px-2 py-1 text-destructive"
+										>
+											Remove
+										</button>
+									</div>
+								</>
+							) : (
+								<button
+									type="button"
+									onClick={() => coverRef.current?.click()}
+									className="w-fit rounded-md border px-3 py-1.5 text-sm"
+								>
+									Add cover image
+								</button>
+							)}
+							<input
+								ref={coverRef}
+								type="file"
+								accept="image/*"
+								onChange={(event) => addCover(event.target.files)}
+								className="hidden"
+							/>
+							<span className="text-xs text-muted-foreground">
+								Used at the top of the post and as the OG image.
+							</span>
+						</div>
+
+						<div className="grid gap-2">
+							<span className="text-sm font-medium">Links</span>
+							{links.map((link, index) => (
+								<div key={index} className="grid gap-2 rounded-md border p-2">
+									<input
+										aria-label={`Link ${index + 1} label`}
+										value={link.label}
+										onChange={(event) => updateLink(index, { label: event.target.value })}
+										placeholder="Label"
+										className="rounded border px-2 py-1 text-sm"
+									/>
+									<input
+										aria-label={`Link ${index + 1} URL`}
+										value={link.url}
+										onChange={(event) => updateLink(index, { url: event.target.value })}
+										placeholder="https://…"
+										className="rounded border px-2 py-1 text-sm"
+									/>
+									<button
+										type="button"
+										onClick={() => setLinks(links.filter((_, i) => i !== index))}
+										className="w-fit text-xs text-destructive"
+									>
+										Remove
+									</button>
+								</div>
+							))}
+							<button
+								type="button"
+								onClick={() => setLinks([...links, { label: '', url: '' }])}
+								className="w-fit rounded-md border px-3 py-1 text-sm"
+							>
+								Add link
+							</button>
+						</div>
 					</section>
 				</aside>
 			</form>

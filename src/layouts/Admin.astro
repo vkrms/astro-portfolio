@@ -3,7 +3,7 @@ import '../styles/admin.css';
 import { Icon } from 'astro-icon/components';
 import ThemeToggle from '../components/ThemeToggle.astro';
 import DevInspector from '../components/DevInspector.astro';
-import { defaultSiteConfig } from '../lib/config';
+import { readSiteSettings } from '../lib/settings';
 
 interface Props {
 	title: string;
@@ -11,9 +11,10 @@ interface Props {
 }
 
 const { title, action } = Astro.props;
-const siteTitle = defaultSiteConfig.seo.title;
+const siteTitle = (await readSiteSettings()).seo.title;
 const pathname = Astro.url.pathname;
 const postsActive = pathname === '/admin' || pathname.startsWith('/admin/edit');
+const settingsActive = pathname === '/admin/settings';
 ---
 
 <!doctype html>
@@ -57,6 +58,20 @@ const postsActive = pathname === '/admin' || pathname.startsWith('/admin/edit');
 									]}
 								>
 									Posts
+								</a>
+							</li>
+							<li>
+								<a
+									href="/admin/settings"
+									aria-current={settingsActive ? 'page' : undefined}
+									class:list={[
+										'block rounded-md px-3 py-2 text-sm transition-colors',
+										settingsActive
+											? 'bg-accent text-foreground'
+											: 'text-muted-foreground hover:bg-accent hover:text-foreground',
+									]}
+								>
+									Settings
 								</a>
 							</li>
 						</ul>

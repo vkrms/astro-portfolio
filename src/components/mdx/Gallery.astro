@@ -1,0 +1,38 @@
+---
+import CmsImage from '../media/CmsImage.astro';
+import { parseCarouselItems } from '../../blocks/shared';
+
+interface Props {
+	items?: unknown;
+	columns?: string;
+}
+
+const { items = '[]', columns = '3' } = Astro.props;
+const slides = parseCarouselItems(items);
+const columnsClass =
+	columns === '2' ? 'sm:grid-cols-2' : columns === '4' ? 'sm:grid-cols-4' : 'sm:grid-cols-3';
+---
+
+{
+	slides.length > 0 && (
+		<ul class:list={['my-8 grid list-none grid-cols-2 gap-2 p-0', columnsClass]}>
+			{slides.map((slide) => (
+				<li class="m-0">
+					<figure class="m-0">
+						<CmsImage
+							src={slide.src}
+							alt={slide.alt}
+							width={800}
+							class="aspect-square w-full rounded-lg object-cover"
+						/>
+						{slide.caption && (
+							<figcaption class="mt-1 text-center text-xs text-muted-foreground">
+								{slide.caption}
+							</figcaption>
+						)}
+					</figure>
+				</li>
+			))}
+		</ul>
+	)
+}

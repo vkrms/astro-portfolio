@@ -5,6 +5,7 @@ export interface CarouselItem {
 }
 
 export const ASPECT_RATIOS = ['16/9', '3/2', '4/3', '1/1'];
+export const GALLERY_COLUMNS = ['2', '3', '4'];
 
 interface BlockLike {
 	type?: string;
@@ -17,7 +18,24 @@ export function findImageWithoutAlt(blocks: unknown[]): boolean {
 	return blocks.some((block) => {
 		const current = block as BlockLike;
 		if (current.type === 'image' && !String(current.props?.alt ?? '').trim()) return true;
+		if (
+			(current.type === 'carousel' || current.type === 'gallery') &&
+			parseCarouselItems(current.props?.items).some((item) => !item.alt.trim())
+		) {
+			return true;
+		}
+		if (current.type === 'mediaText' && !String(current.props?.alt ?? '').trim()) return true;
 		return Array.isArray(current.children) && findImageWithoutAlt(current.children);
+	});
+}
+
+/** True when an embed has a URL but no accessible title. */
+export function findEmbedWithoutTitle(blocks: unknown[]): boolean {
+	return blocks.some((block) => {
+		const current = block as BlockLike;
+		const url = String(current.props?.url ?? '').trim();
+		if (current.type === 'embed' && url && !String(current.props?.title ?? '').trim()) return true;
+		return Array.isArray(current.children) && findEmbedWithoutTitle(current.children);
 	});
 }
 

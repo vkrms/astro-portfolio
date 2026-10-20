@@ -3,6 +3,32 @@ import { parseLinks, writePost } from '../../lib/storage';
 
 export const prerender = false;
 
+function parseTags(value: unknown): string[] | undefined {
+	if (Array.isArray(value)) {
+		const tags = value.filter((tag): tag is string => typeof tag === 'string').map((tag) => tag.trim());
+		return tags.filter(Boolean).length > 0 ? tags.filter(Boolean) : undefined;
+	}
+
+	if (typeof value === 'string') {
+		const tags = value.split(',').map((tag) => tag.trim()).filter(Boolean);
+		return tags.length > 0 ? tags : undefined;
+	}
+
+	return undefined;
+}
+
+function parseLinksInput(value: unknown) {
+	if (typeof value === 'string') {
+		try {
+			return parseLinks(JSON.parse(value));
+		} catch {
+			return undefined;
+		}
+	}
+
+	return parseLinks(value);
+}
+
 export const POST: APIRoute = async ({ request, redirect }) => {
 	const contentType = request.headers.get('content-type') ?? '';
 	const isJson = contentType.includes('application/json');
@@ -21,7 +47,13 @@ export const POST: APIRoute = async ({ request, redirect }) => {
 			summary: String(input.summary ?? ''),
 			date: String(input.date ?? ''),
 			draft: input.draft === true || input.draft === 'on',
-			links: parseLinks(input.links),
+			featured: input.featured === true || input.featured === 'on',
+			cover: typeof input.cover === 'string' && input.cover ? input.cover : undefined,
+			coverAlt: typeof input.coverAlt === 'string' ? input.coverAlt : undefined,
+			tags: parseTags(input.tags),
+			role: typeof input.role === 'string' ? input.role : undefined,
+			client: typeof input.client === 'string' ? input.client : undefined,
+			links: parseLinksInput(input.links),
 			body: Array.isArray(input.body) ? input.body : undefined,
 		});
 

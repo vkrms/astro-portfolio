@@ -1,0 +1,27 @@
+---
+import Admin from '../../layouts/Admin.astro';
+import SettingsEditor from '../../components/admin/SettingsEditor';
+import { readAboutSettings, readHomeSettings, readSiteSettings } from '../../lib/settings';
+import { listPosts } from '../../lib/storage';
+
+export const prerender = false;
+
+const [site, home, about, posts] = await Promise.all([
+	readSiteSettings(),
+	readHomeSettings(),
+	readAboutSettings(),
+	listPosts(),
+]);
+---
+
+<Admin title="Settings">
+	<div class="mx-auto w-full max-w-4xl">
+		<SettingsEditor
+			client:only="react"
+			site={site}
+			home={home}
+			about={about}
+			posts={posts.map((post) => ({ slug: post.slug, title: post.title, draft: post.draft }))}
+		/>
+	</div>
+</Admin>

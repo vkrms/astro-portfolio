@@ -1,5 +1,7 @@
 ---
 import Carousel from '../../components/mdx/Carousel.astro';
+import Embed from '../../components/mdx/Embed.astro';
+import Gallery from '../../components/mdx/Gallery.astro';
 import CmsImage from '../../components/media/CmsImage.astro';
 import { parseCarouselItems } from '../shared';
 
@@ -131,9 +133,12 @@ function levelOf(value: unknown): number {
 
 				const alt = String(block.props?.alt ?? '');
 				const caption = String(block.props?.caption ?? '');
+				const width = String(block.props?.width ?? 'wide');
+				const widthClass =
+					width === 'inline' ? 'mx-auto max-w-xl' : width === 'full' ? 'w-full' : 'mx-auto max-w-3xl';
 
 				return (
-					<figure class="my-8">
+					<figure class:list={['my-8', widthClass]}>
 						<CmsImage src={src} alt={alt} width={1200} class="w-full rounded-xl" />
 						{caption && (
 							<figcaption class="mt-2 text-center text-sm text-muted-foreground">
@@ -154,6 +159,58 @@ function levelOf(value: unknown): number {
 				return <Carousel slides={slides} aspect={String(block.props?.aspect ?? '16/9')} />;
 			}
 
+			if (type === 'gallery') {
+				return (
+					<Gallery
+						items={block.props?.items}
+						columns={String(block.props?.columns ?? '3')}
+					/>
+				);
+			}
+
+			if (type === 'quote') {
+				const attribution = String(block.props?.attribution ?? '');
+
+				return (
+					<blockquote class="my-6 border-l-2 pl-4 text-lg italic">
+						<p class="m-0" set:html={renderInline(block.content)} />
+						{attribution && (
+							<cite class="mt-2 block text-sm not-italic text-muted-foreground">— {attribution}</cite>
+						)}
+					</blockquote>
+				);
+			}
+
+			if (type === 'mediaText') {
+				const src = String(block.props?.src ?? '');
+				if (!src) return null;
+
+				const alt = String(block.props?.alt ?? '');
+				const side = String(block.props?.side ?? 'left');
+
+				return (
+					<div class="my-8 grid items-center gap-6 sm:grid-cols-2">
+						<CmsImage
+							src={src}
+							alt={alt}
+							width={800}
+							class={side === 'right' ? 'w-full rounded-xl sm:order-2' : 'w-full rounded-xl'}
+						/>
+						<div class="prose max-w-none" set:html={renderInline(block.content)} />
+					</div>
+				);
+			}
+
+			if (type === 'embed') {
+				return (
+					<Embed
+						url={String(block.props?.url ?? '')}
+						title={String(block.props?.title ?? '')}
+						aspect={String(block.props?.aspect ?? '16/9')}
+					/>
+				);
+			}
+
 			if (type === 'codeBlock') {
 				const text = (block.content ?? []).map((node) => node.text ?? '').join('');
 				return (
@@ -167,3 +224,7 @@ function levelOf(value: unknown): number {
 		})
 	}
 </div>
+
+<script>
+	import '../../scripts/embeds';
+</script>
