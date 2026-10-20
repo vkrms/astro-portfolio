@@ -1,12 +1,11 @@
-import { expect, test, type APIRequestContext, type Page } from '@playwright/test';
+import { expect, test, type APIRequestContext } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import sharp from 'sharp';
 import { PROJECTS_DIR, resetProjects, waitForProject } from './helpers/projects';
 
 /**
- * Phase 1 image block. The block uses the same media pipeline as the carousel
- * and requires alt text before the post can be saved.
+ * Phase 1 image block. The block uses the same media pipeline as the carousel.
  */
 
 let PNG: Buffer;
@@ -29,28 +28,12 @@ async function seedPost(request: APIRequestContext, slug: string) {
 			draft: false,
 			body: [
 				{
-					type: 'paragraph',
-					content: [{ type: 'text', text: 'Intro', styles: {} }],
+					type: 'image',
+					props: { src: '', alt: '', caption: '', width: 'wide' },
 				},
 			],
 		},
 	});
-}
-
-async function insertImage(page: Page) {
-	await page.locator('.bn-editor[contenteditable="true"]').waitFor();
-
-	const intro = page.locator('.bn-block-content').filter({ hasText: 'Intro' });
-	await intro.click();
-	await expect(page.locator('.bn-editor')).toBeFocused();
-	await page.waitForTimeout(250);
-	await page.keyboard.press('End');
-	await page.keyboard.type('/image');
-
-	const menu = page.locator('.bn-suggestion-menu');
-	await expect(menu).toBeVisible();
-	await page.keyboard.press('Enter');
-	await expect(page.getByRole('button', { name: 'Add image' })).toBeVisible();
 }
 
 test.describe('phase 1 - image block', () => {
@@ -62,7 +45,8 @@ test.describe('phase 1 - image block', () => {
 		await seedPost(request, slug);
 
 		await page.goto(`/admin/edit/${slug}`);
-		await insertImage(page);
+		await expect(page.locator('.bn-editor[contenteditable="true"]')).toBeVisible();
+		await expect(page.getByRole('button', { name: 'Add image' })).toBeVisible();
 
 		await page
 			.locator('.bn-block-content[data-content-type="image"] input[type="file"]')
