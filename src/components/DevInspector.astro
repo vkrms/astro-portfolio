@@ -1,0 +1,12 @@
+---
+// Dev-only: loads code-inspector-plugin's client. Astro does not run Vite's
+// transformIndexHtml, so the plugin's `injectTo` entry is imported explicitly
+// here. Both layouts include this; production renders nothing.
+---
+{
+	import.meta.env.DEV && (
+		<script is:inline>
+			import('/src/scripts/inspector.ts');
+		</script>
+	)
+}

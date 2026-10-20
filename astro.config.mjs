@@ -5,6 +5,7 @@ import sitemap from '@astrojs/sitemap';
 import icon from 'astro-icon';
 import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
+import { codeInspectorPlugin } from 'code-inspector-plugin';
 import { resolve } from 'node:path';
 
 // Host-neutral: every content page prerenders to static HTML, and the admin
@@ -100,7 +101,19 @@ export default defineConfig({
 		layout: 'constrained',
 	},
 	vite: {
-		plugins: [tailwindcss(), projectContentRefresh()],
+		plugins: [
+			tailwindcss(),
+			projectContentRefresh(),
+			// Dev only: Option + Shift + click a DOM node to open its source in Zed.
+			// Astro compiles <script> tags into `.astro?astro&type=script` modules,
+			// which the plugin does not treat as JS. injectTo forces the client into
+			// the dedicated module that DevInspector imports in dev.
+			codeInspectorPlugin({
+				bundler: 'vite',
+				editor: 'zed',
+				injectTo: resolve('src/scripts/inspector.ts'),
+			}),
+		],
 		server: {
 			watch: {
 				// The admin writes uploads at runtime. Watching them invalidates

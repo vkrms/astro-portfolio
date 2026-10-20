@@ -2,6 +2,7 @@
 import '../styles/admin.css';
 import { Icon } from 'astro-icon/components';
 import ThemeToggle from '../components/ThemeToggle.astro';
+import DevInspector from '../components/DevInspector.astro';
 import { defaultSiteConfig } from '../lib/config';
 
 interface Props {
@@ -147,5 +148,6 @@ const postsActive = pathname === '/admin' || pathname.startsWith('/admin/edit');
 				});
 			}
 		</script>
+		<DevInspector />
 	</body>
 </html>
