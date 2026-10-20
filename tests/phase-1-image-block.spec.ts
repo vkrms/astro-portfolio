@@ -92,8 +92,8 @@ test.describe('phase 1 - image block', () => {
 		await expect(page.getByText('A caption')).toBeVisible();
 	});
 
-	test('blocks the save when an image has no alt text', async ({ page, request }) => {
-		const slug = 'image-needs-alt';
+	test('saves an image without alt text', async ({ page, request }) => {
+		const slug = 'image-without-alt';
 
 		await request.post('/api/save', {
 			data: {
@@ -105,7 +105,7 @@ test.describe('phase 1 - image block', () => {
 				body: [
 					{
 						type: 'image',
-						props: { src: '/uploads/image-needs-alt/photo.png', alt: '', caption: '' },
+						props: { src: '/uploads/image-without-alt/photo.png', alt: '', caption: '' },
 					},
 				],
 			},
@@ -115,14 +115,9 @@ test.describe('phase 1 - image block', () => {
 		await expect(page.locator('.bn-editor[contenteditable="true"]')).toBeVisible();
 
 		await page.getByRole('button', { name: 'Save' }).click();
-
-		await expect(page.getByRole('alert')).toHaveText(
-			'Add alt text to every image before saving.',
-		);
-		await expect(page).toHaveURL(`/admin/edit/${slug}`);
-
-		await page.getByLabel('Alt text').fill('Described image');
-		await page.getByRole('button', { name: 'Save' }).click();
 		await expect(page).toHaveURL('/admin');
+
+		const saved = JSON.parse(await readFile(join(PROJECTS_DIR, `${slug}.json`), 'utf8'));
+		expect(saved.body[0].props.alt).toBe('');
 	});
 });

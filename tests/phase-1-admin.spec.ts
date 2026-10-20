@@ -402,11 +402,6 @@ test.describe('phase 1 - admin', () => {
 		await page.goto('/admin/edit/new');
 	});
 
-	test.fixme('blocks a save when an image has no alt text', async ({ page }) => {
-		// Covered by phase-1-image-block.spec.ts.
-		await page.goto('/admin/edit/new');
-	});
-
 	test('edits the site, home and about singletons', async ({ page }) => {
 		await resetSettings();
 		await page.goto('/admin/settings');

@@ -3,7 +3,7 @@ import { useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/shadcn/style.css';
-import { findImageWithoutAlt, normalizeBlocks } from '../../blocks/shared';
+import { normalizeBlocks } from '../../blocks/shared';
 import { schema } from '../../blocks/schema';
 import { uploadImage } from '../../lib/upload';
 import type { AboutSettings, HomeSettings, SiteSettings } from '../../lib/schema';
@@ -90,11 +90,6 @@ export default function SettingsEditor({ site: initialSite, home: initialHome, a
 		setSaved(false);
 
 		try {
-			if (findImageWithoutAlt(editor.document)) {
-				setError('Add alt text to every image in the about page before saving.');
-				return;
-			}
-
 			const response = await fetch('/api/settings', {
 				method: 'POST',
 				headers: { 'content-type': 'application/json' },

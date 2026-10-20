@@ -331,7 +331,7 @@ test.describe('phase 1 - public site', () => {
 		await expect(current).toHaveText('1');
 	});
 
-	test('every content image has alt text and every embed has a title', async ({ page, request }) => {
+	test('renders image alt text and embed titles', async ({ page, request }) => {
 		await request.post('/api/save', {
 			data: {
 				slug: 'alt-embed',

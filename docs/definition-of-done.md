@@ -39,7 +39,7 @@ Deferred to Phase 1: Vercel preview.
 - [x] The body editor accepts every phase 1 block: paragraph, H2/H3, lists, code, image, gallery, carousel, embed, quote, media + text.
 - [x] The media picker resizes an image to <= 3000 px and <= 3.5 MB before upload (phase 0b).
 - [x] The preview modal matches the production page, including an operable carousel.
-- [x] An image without alt text blocks the save.
+- [x] Images can be saved without alt text; the alt field stays available and renders when filled.
 - [x] `site`, `home` and `about` are editable at `/admin/settings`.
 
 ### Public site
@@ -53,7 +53,7 @@ Deferred to Phase 1: Vercel preview.
 - [x] Drafts are excluded from the production build.
 - [x] Public pages have no framework hydration; total JS stays under 40 KB gzipped per page (measured ~6.6 KB on a project page).
 - [x] The carousel is keyboard operable and never autoplays.
-- [x] Every content image has alt text; every embed has a `title`.
+- [x] Embeds require a title; image alt text renders when provided.
 
 ### Release
 
@@ -78,7 +78,7 @@ Deferred to Phase 1: Vercel preview.
 - [ ] The site is deployed on Vercel Hobby at the production domain.
 - [x] `npm run build` and `astro check` pass.
 - [x] Public pages have no framework hydration and stay within the JS budget.
-- [x] Alt text on every content image; every embed has a `title`; the carousel is keyboard operable and never autoplays.
+- [x] Embeds have a `title`; image alt text renders when provided; the carousel is keyboard operable and never autoplays.
 - [x] Every project page sets canonical, title, `summary` as meta description and, when a cover exists, `cover` as OG image.
 - [x] Drafts are excluded from the production build.
 - [x] No secrets in the client bundle or git.

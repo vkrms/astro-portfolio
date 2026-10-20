@@ -68,7 +68,7 @@ One JSON file per post in `src/content/projects`, plus three settings singletons
 | `summary` | string | Required, ≤ 160 chars; used for cards and meta description |
 | `date` | ISO date | Required; sorts the list |
 | `cover` | image path | Optional; also the OG image when set |
-| `coverAlt` | string | Required when `cover` is set |
+| `coverAlt` | string | Optional; used when `cover` is set |
 | `tags` | string\[\] | Optional; drives the filter on `/projects` |
 | `role` | string | Optional, e.g. "Design and front end" |
 | `client` | string | Optional |
@@ -113,7 +113,7 @@ Text blocks come from BlockNote's defaults; media blocks are custom blocks defin
 | Block | Source | Editor UI | Renders as | Client JS | Phase |
 | --- | --- | --- | --- | --- | --- |
 | Paragraph, H2–H3, bullet/numbered list, code | BlockNote default | Inline text with bold, italic, code, links | Native HTML | None | 1 |
-| Image | Custom | Media picker, alt (required), caption, width: inline / wide / full | `<Picture>` with AVIF + WebP and srcset | None | 1 |
+| Image | Custom | Media picker, alt, caption, width: inline / wide / full | `<Picture>` with AVIF + WebP and srcset | None | 1 |
 | Gallery | Custom | Thumbnail grid: add, drag to reorder, remove; alt + caption per image; columns 2–4 | CSS grid | None | 1 |
 | Carousel | Custom | Same item editor as Gallery, plus aspect ratio | CSS scroll-snap track with prev/next | Small inline script | 1 |
 | Embed | Custom | URL field (YouTube, Vimeo, Figma, CodePen), aspect ratio | Thumbnail facade; iframe loads on click | Tiny click handler | 1 |
@@ -125,7 +125,7 @@ Text blocks come from BlockNote's defaults; media blocks are custom blocks defin
 
 **One renderer, two uses.** `Blocks.astro` walks the block tree, groups consecutive list items into `<ul>`/`<ol>`, and renders inline styles and links. Public pages use it at build time; the admin's preview modal uses the same component through an on-demand route, so preview matches production.
 
-**Accessibility rules:** alt text is required on every image (save is blocked without it); the carousel is keyboard operable and never autoplays; embeds get a title attribute.
+**Accessibility rules:** image alt text is optional (the save is not blocked) and renders when provided; the carousel is keyboard operable and never autoplays; embeds get a title attribute.
 
 ## Media pipeline
 
@@ -253,7 +253,7 @@ The admin is local-only. Deployed builds serve static pages only.
 - Phase 0b: BlockNote editor at `/admin/edit/[slug]` with a custom Carousel block (slash menu, media picker, add/reorder/remove, alt, caption, aspect ratio).
 - A custom Image block on the same media pipeline, with alt and caption fields; the save is refused while any image lacks alt text.
 - Every Phase 1 block is implemented: paragraph, H2/H3, lists, code, image, gallery, carousel, embed, quote and media + text. The slash menu puts the media blocks first and hides anything the renderer cannot draw.
-- Gallery, quote, media + text and embed blocks share one item/image editor pattern; carousel slides, gallery images and media + text images all require alt text, and embeds require a title.
+- Gallery, quote, media + text and embed blocks share one item/image editor pattern; carousel slides, gallery images and media + text images expose alt fields, and embeds require a title.
 - `site`, `home` and `about` settings singletons are editable at `/admin/settings`, including the about BlockNote body and portrait.
 - Public home shows the configured intro and featured projects; `/projects` filters by tag client-side (static pages cannot read a query string at build time); `/about` renders the settings body and portrait; `/rss.xml` is generated.
 - Post covers render on `/projects/[slug]` and produce a 1200x630 OG image; canonical and meta description come from the route and `summary`.

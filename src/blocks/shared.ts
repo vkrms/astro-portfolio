@@ -13,22 +13,6 @@ interface BlockLike {
 	children?: unknown[];
 }
 
-/** True when any image block, including nested ones, has no alt text. */
-export function findImageWithoutAlt(blocks: unknown[]): boolean {
-	return blocks.some((block) => {
-		const current = block as BlockLike;
-		if (current.type === 'image' && !String(current.props?.alt ?? '').trim()) return true;
-		if (
-			(current.type === 'carousel' || current.type === 'gallery') &&
-			parseCarouselItems(current.props?.items).some((item) => !item.alt.trim())
-		) {
-			return true;
-		}
-		if (current.type === 'mediaText' && !String(current.props?.alt ?? '').trim()) return true;
-		return Array.isArray(current.children) && findImageWithoutAlt(current.children);
-	});
-}
-
 /** True when an embed has a URL but no accessible title. */
 export function findEmbedWithoutTitle(blocks: unknown[]): boolean {
 	return blocks.some((block) => {

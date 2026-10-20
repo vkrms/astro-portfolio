@@ -9,7 +9,7 @@ import { BlockNoteView } from '@blocknote/shadcn';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/shadcn/style.css';
 import { SlugContext } from '../../blocks/context';
-import { findEmbedWithoutTitle, findImageWithoutAlt, normalizeBlocks } from '../../blocks/shared';
+import { findEmbedWithoutTitle, normalizeBlocks } from '../../blocks/shared';
 import { schema } from '../../blocks/schema';
 import { initCarousels } from '../../scripts/carousel';
 import { initEmbeds } from '../../scripts/embeds';
@@ -105,16 +105,6 @@ export default function PostEditor({ slug, post }: Props) {
 		setError(null);
 
 		try {
-			if (cover && !coverAlt.trim()) {
-				setError('Add alt text to the cover image before saving.');
-				return;
-			}
-
-			if (findImageWithoutAlt(editor.document)) {
-				setError('Add alt text to every image before saving.');
-				return;
-			}
-
 			if (findEmbedWithoutTitle(editor.document)) {
 				setError('Add a title to every embed before saving.');
 				return;
