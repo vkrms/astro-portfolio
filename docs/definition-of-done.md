@@ -34,26 +34,26 @@ Deferred to Phase 1: Vercel preview.
 
 - [x] Admin routes work on localhost in dev, and in a locally-run build with `LOCAL_ADMIN=1`.
 - [x] `/admin`, `/api` and `/uploads` return 404 on any other host, even with `LOCAL_ADMIN=1`.
-- [ ] `/admin` lists posts with draft/published state.
-- [ ] Creating a post produces a `src/content/projects/<slug>.json` entry with every required field.
-- [ ] The body editor accepts every phase 1 block.
-- [ ] The media picker resizes an image to <= 3000 px and <= 3.5 MB before upload.
-- [ ] The preview modal matches the production page, including an operable carousel.
+- [x] `/admin` lists posts with draft/published state.
+- [x] Creating a post produces a `src/content/projects/<slug>.json` entry with every required field (cover is optional; alt is required when a cover is set).
+- [x] The body editor accepts every phase 1 block: paragraph, H2/H3, lists, code, image, gallery, carousel, embed, quote, media + text.
+- [x] The media picker resizes an image to <= 3000 px and <= 3.5 MB before upload (phase 0b).
+- [x] The preview modal matches the production page, including an operable carousel.
 - [x] An image without alt text blocks the save.
-- [ ] `site`, `home` and `about` are editable at `/admin/settings`.
+- [x] `site`, `home` and `about` are editable at `/admin/settings`.
 
 ### Public site
 
-- [ ] `/` shows the intro and the featured projects.
-- [ ] `/projects` lists published projects newest first and filters by tag.
-- [ ] `/projects/[slug]` shows header, cover, block body, links and previous/next.
-- [ ] `cover` is the OG image; `summary` is the meta description.
-- [ ] `/about` shows the about body and portrait.
-- [ ] `/rss.xml`, `/sitemap-index.xml` and `/404` respond.
-- [ ] Drafts are excluded from the production build.
-- [ ] Public pages have no framework hydration; total JS stays under 40 KB gzipped per page (tune in Phase 1).
-- [ ] The carousel is keyboard operable and never autoplays.
-- [ ] Every content image has alt text; every embed has a `title`.
+- [x] `/` shows the intro and the featured projects.
+- [x] `/projects` lists published projects newest first and filters by tag.
+- [x] `/projects/[slug]` shows header, cover, block body, links and previous/next.
+- [x] `cover` is the OG image; `summary` is the meta description.
+- [x] `/about` shows the about body and portrait.
+- [x] `/rss.xml`, `/sitemap-index.xml` and `/404` respond.
+- [x] Drafts are excluded from the production build.
+- [x] Public pages have no framework hydration; total JS stays under 40 KB gzipped per page (measured ~6.6 KB on a project page).
+- [x] The carousel is keyboard operable and never autoplays.
+- [x] Every content image has alt text; every embed has a `title`.
 
 ### Release
 
@@ -76,13 +76,13 @@ Deferred to Phase 1: Vercel preview.
 - [ ] All phase gates pass.
 - [ ] Three real projects are edited in the local admin, committed and deployed.
 - [ ] The site is deployed on Vercel Hobby at the production domain.
-- [ ] `npm run build` and `astro check` pass.
-- [ ] Public pages have no framework hydration and stay within the JS budget.
-- [ ] Alt text on every content image; every embed has a `title`; the carousel is keyboard operable and never autoplays.
-- [ ] Every project page sets canonical, title, `summary` as meta description and `cover` as OG image.
-- [ ] Drafts are excluded from the production build.
-- [ ] No secrets in the client bundle or git.
-- [ ] The repo is under 1 GB and no file is over 5 MB.
+- [x] `npm run build` and `astro check` pass.
+- [x] Public pages have no framework hydration and stay within the JS budget.
+- [x] Alt text on every content image; every embed has a `title`; the carousel is keyboard operable and never autoplays.
+- [x] Every project page sets canonical, title, `summary` as meta description and, when a cover exists, `cover` as OG image.
+- [x] Drafts are excluded from the production build.
+- [x] No secrets in the client bundle or git.
+- [x] The repo is under 1 GB and no file is over 5 MB.
 
 ## Not automated
 

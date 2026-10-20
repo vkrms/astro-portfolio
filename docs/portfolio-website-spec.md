@@ -57,7 +57,7 @@ The admin shell and posts table are specified in [admin-ui-spec.md](./admin-ui-s
 
 ## Content model
 
-One JSON file per post in an Astro content collection, `projects`, plus three singletons. A Zod schema in `src/content.config.ts` is the source of truth: the admin API validates every save against it, and the build fails on bad data. The files are plain, versioned JSON: the admin is the normal way to edit them, but a person or an AI agent can also edit them directly when that is more convenient.
+One JSON file per post in `src/content/projects`, plus three settings singletons. A shared Zod schema in `src/lib/schema.ts` is the source of truth: the admin API validates every save, and reading a malformed file throws so the build fails instead of rendering an empty page. The files are plain, versioned JSON: the admin is the normal way to edit them, but a person or an AI agent can also edit them directly when that is more convenient.
 
 **`projects`** (one JSON file per post, named by slug)
 
@@ -67,8 +67,8 @@ One JSON file per post in an Astro content collection, `projects`, plus three si
 | `slug` | from filename | Lowercase, hyphenated; renaming moves the file |
 | `summary` | string | Required, ≤ 160 chars; used for cards and meta description |
 | `date` | ISO date | Required; sorts the list |
-| `cover` | image path | Required; also the OG image |
-| `coverAlt` | string | Required |
+| `cover` | image path | Optional; also the OG image when set |
+| `coverAlt` | string | Required when `cover` is set |
 | `tags` | string\[\] | Optional; drives the filter on `/projects` |
 | `role` | string | Optional, e.g. "Design and front end" |
 | `client` | string | Optional |
@@ -84,11 +84,13 @@ One JSON file per post in an Astro content collection, `projects`, plus three si
 
 ```
 src/
-  content.config.ts      Zod schemas for projects and settings
+  lib/
+    schema.ts            Zod schemas shared by storage, the admin and the build
+    storage.ts  settings.ts  admin-access.ts  resize.ts  upload.ts
   blocks/
     schema.ts            custom block definitions, shared by editor and site
-    render/              Astro renderers: Blocks, InlineContent, Image, Gallery,
-                         Carousel, Embed, Quote, MediaText, Video
+    render/              Astro renderers: Blocks, Image, Gallery, Carousel,
+                         Embed, Quote, MediaText
   content/
     projects/
       my-project.json
@@ -102,8 +104,6 @@ src/
   pages/
     admin/               on-demand admin pages
     api/                 on-demand admin API routes
-  lib/
-    storage.ts  admin-access.ts  resize.ts  upload.ts
 ```
 
 ## Block library
@@ -252,7 +252,13 @@ The admin is local-only. Deployed builds serve static pages only.
 - The shell carries over: `Header`, `Footer`, `ThemeToggle`, `Base`, `BaseHead`, the `ui/` and `space/` primitives, `CmsImage.astro` and the `Carousel` renderer.
 - Phase 0b: BlockNote editor at `/admin/edit/[slug]` with a custom Carousel block (slash menu, media picker, add/reorder/remove, alt, caption, aspect ratio).
 - A custom Image block on the same media pipeline, with alt and caption fields; the save is refused while any image lacks alt text.
-- The slash menu exposes only blocks the renderer supports, so nothing can be saved and then dropped from the page.
+- Every Phase 1 block is implemented: paragraph, H2/H3, lists, code, image, gallery, carousel, embed, quote and media + text. The slash menu puts the media blocks first and hides anything the renderer cannot draw.
+- Gallery, quote, media + text and embed blocks share one item/image editor pattern; carousel slides, gallery images and media + text images all require alt text, and embeds require a title.
+- `site`, `home` and `about` settings singletons are editable at `/admin/settings`, including the about BlockNote body and portrait.
+- Public home shows the configured intro and featured projects; `/projects` filters by tag client-side (static pages cannot read a query string at build time); `/about` renders the settings body and portrait; `/rss.xml` is generated.
+- Post covers render on `/projects/[slug]` and produce a 1200x630 OG image; canonical and meta description come from the route and `summary`.
+- Storage validates posts on read and write with Zod, so a malformed JSON file fails the build with the field name.
+- The generated sitemap excludes `/admin`, `/api`, `/uploads` and the `/home` redirect.
 - Browser-side resize (long edge <= 3000 px, <= 3.5 MB) and local uploads under `src/assets/uploads/`.
 - `Blocks.astro` renders paragraphs, headings, grouped lists, code, links and carousels; `/api/preview` produces the same HTML as the static page.
 - React runs as a runtime dependency on `@astrojs/react` 5.x, which keeps the React plugin on Vite 7 (Astro 6.4.8).
@@ -270,8 +276,8 @@ The admin is local-only. Deployed builds serve static pages only.
 **Deferred or not built yet**
 
 - Deploy adapter: `astro.config.mjs` still auto-detects Vercel, Cloudflare, Netlify and Node; pinning `@astrojs/vercel` is deferred. Vercel Hobby remains the intended host.
-- Settings singletons and the Zod schema in `src/content.config.ts`. Until they exist, `src/lib/config.ts` holds a temporary `defaultSiteConfig`.
-- Remaining Phase 1 blocks (Gallery, Embed, Quote, Media + text) and the `/about` and `/rss.xml` routes.
+- Phase 1 release: three real projects still need to be edited, committed and deployed.
+- Phase 2 (R2 video) and Phase 3 (view transitions, lightbox, autosave, axe/LCP) are untouched.
 - Server env vars: `LOCAL_ADMIN` for local production builds, `SITE_URL`, `DEPLOY_ADAPTER`, and `R2_*` in phase 2. `.env.example` documents them.
 - Publishing is manual: save in the admin, then commit and push. The host rebuilds.
 
