@@ -225,4 +225,10 @@ describe('writePost', () => {
 			writePost({ title: 'T', summary: 'S', date: '' }, { dir }),
 		).rejects.toThrow('Date');
 	});
+
+	it('rejects a title over 128 characters', async () => {
+		await expect(
+			writePost({ title: 'a'.repeat(129), summary: 'S', date: '2026-06-01' }, { dir }),
+		).rejects.toThrow();
+	});
 });

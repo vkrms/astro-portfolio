@@ -11,7 +11,7 @@ export const postLinkSchema = z.object({
 });
 
 export const postFileSchema = z.object({
-	title: z.string().min(1).max(80),
+	title: z.string().min(1).max(128),
 	// Reads tolerate a legacy file without a summary; the admin still refuses
 	// to save one.
 	summary: z.string().max(160).default(''),

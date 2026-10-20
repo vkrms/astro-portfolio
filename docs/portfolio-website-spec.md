@@ -63,7 +63,7 @@ One JSON file per post in `src/content/projects`, plus three settings singletons
 
 | Field | Type | Rules |
 | --- | --- | --- |
-| `title` | string | Required, ≤ 80 chars |
+| `title` | string | Required, ≤ 128 chars |
 | `slug` | from filename | Lowercase, hyphenated; renaming moves the file |
 | `summary` | string | Required, ≤ 160 chars; used for cards and meta description |
 | `date` | ISO date | Required; sorts the list |

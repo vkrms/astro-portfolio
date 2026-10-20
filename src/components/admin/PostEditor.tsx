@@ -203,7 +203,7 @@ export default function PostEditor({ slug, post }: Props) {
 							}}
 							placeholder="Add title"
 							required
-							maxLength={80}
+							maxLength={128}
 							className="editor-title mb-2 w-full resize-none overflow-hidden border-0 bg-transparent p-0 text-3xl font-semibold tracking-tight outline-none placeholder:text-muted-foreground/40 lg:text-4xl"
 						/>
 
