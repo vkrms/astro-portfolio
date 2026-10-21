@@ -63,6 +63,7 @@
    same inline gutter as BlockNote's side menu. */
 .editor-surface {
 	--editor-gutter: 54px;
+	padding-top: 40px;
 }
 
 .editor-surface .bn-editor {
