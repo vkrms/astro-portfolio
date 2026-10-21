@@ -28,6 +28,9 @@ export default defineConfig({
 					PROJECTS_DIR: 'tmp/e2e-projects',
 					UPLOADS_DIR: 'tmp/e2e-uploads',
 					SETTINGS_DIR: 'tmp/e2e-settings',
+					// Own dependency cache, so this server and `npm run dev` do not
+					// overwrite each other's optimized deps (see astro.config.mjs).
+					VITE_CACHE_DIR: 'node_modules/.vite-e2e',
 					// Keep canonical and OG URLs on the test server.
 					SITE_URL: 'http://localhost:1893',
 				},

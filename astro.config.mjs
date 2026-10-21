@@ -113,6 +113,11 @@ export default defineConfig({
 		layout: 'constrained',
 	},
 	vite: {
+		// Each dev server needs its own dependency cache. Servers that share
+		// node_modules/.vite overwrite each other's optimized deps, and the
+		// older one then fails with "504 Outdated Optimize Dep" and React hook
+		// errors. The e2e server sets this to stay clear of `npm run dev`.
+		cacheDir: process.env.VITE_CACHE_DIR,
 		plugins: [
 			tailwindcss(),
 			projectContentRefresh(),
