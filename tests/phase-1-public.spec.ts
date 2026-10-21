@@ -96,7 +96,8 @@ test.describe('phase 1 - public site', () => {
 		await expect(card.locator('img')).toHaveCount(0);
 	});
 
-	test('the header menu button opens the nav on every screen size', async ({ page }) => {
+	// The hamburger menu is commented out in Header.astro. Re-enable with it.
+	test.fixme('the header menu button opens the nav on every screen size', async ({ page }) => {
 		for (const width of [1280, 390]) {
 			await page.setViewportSize({ width, height: 700 });
 			await page.goto('/');
