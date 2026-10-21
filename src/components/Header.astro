@@ -21,10 +21,10 @@ const contactLinks = (config?.contactLinks ?? []).filter(item => item !== null);
 			aria-label="Toggle navigation menu"
 			aria-controls="menu-panel"
 			aria-expanded="false"
-			class="inline-flex size-9 cursor-pointer items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent focus-visible:ring-ring/50 focus-visible:ring-[3px] outline-none"
+			class="inline-flex size-11 cursor-pointer items-center justify-center rounded-md text-foreground transition-colors hover:bg-accent focus-visible:ring-ring/50 focus-visible:ring-[3px] outline-none"
 		>
-			<Icon name="lucide:hamburger" class="icon-open size-5" />
-			<Icon name="lucide:x" class="icon-close size-5" />
+			<Icon name="lucide:hamburger" class="icon-open size-8" />
+			<Icon name="lucide:x" class="icon-close size-8" />
 		</button>
 		<div class="hidden items-center gap-3 lg:flex">
 			{contactLinks.map((link) => (

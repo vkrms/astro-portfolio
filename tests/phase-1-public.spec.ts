@@ -175,6 +175,10 @@ test.describe('phase 1 - public site', () => {
 		await expect(page.getByRole('heading', { level: 1 })).toHaveText('Newer Project');
 		await expect(page.getByText('Newer summary.')).toBeVisible();
 		await expect(page.getByText('Jun 1, 2026')).toBeVisible();
+		await expect(page.getByRole('link', { name: 'Back to projects' })).toHaveAttribute(
+			'href',
+			'/projects',
+		);
 		await expect(page.getByRole('link', { name: 'Live site' })).toHaveAttribute(
 			'href',
 			'https://example.com',
