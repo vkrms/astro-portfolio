@@ -291,7 +291,7 @@ test.describe('phase 0b - BlockNote spike', () => {
 		expect(reordered[0]).not.toBe(firstSlide);
 
 		await page.getByRole('button', { name: 'Save' }).click();
-		await expect(page).toHaveURL('/admin');
+		await expect(page.getByText('Saved.')).toBeVisible();
 
 		const saved = JSON.parse(await readFile(join(PROJECTS_DIR, `${slug}.json`), 'utf8'));
 		const items = JSON.parse(saved.body[0].props.items) as CarouselItem[];
@@ -312,7 +312,7 @@ test.describe('phase 0b - BlockNote spike', () => {
 		// Remove the old slide, then save and load the public page.
 		await page.getByRole('button', { name: 'Remove' }).nth(1).click();
 		await page.getByRole('button', { name: 'Save' }).click();
-		await expect(page).toHaveURL('/admin');
+		await expect(page.getByText('Saved.')).toBeVisible();
 
 		const trimmed = JSON.parse(await readFile(join(PROJECTS_DIR, `${slug}.json`), 'utf8'));
 		const remaining = JSON.parse(trimmed.body[0].props.items) as CarouselItem[];

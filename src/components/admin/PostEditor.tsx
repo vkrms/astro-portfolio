@@ -134,7 +134,12 @@ export default function PostEditor({ slug, post }: Props) {
 				return;
 			}
 
-			window.location.href = '/admin';
+			// Stay on the editor. A new post (or a changed slug) now has a real
+			// URL, so point the address bar at it without reloading.
+			const { post: saved } = (await response.json()) as { post: { slug: string } };
+			setPageSlug(saved.slug);
+			window.history.replaceState(null, '', `/admin/edit/${saved.slug}`);
+			toast.success('Saved.');
 		} finally {
 			setSaving(false);
 		}

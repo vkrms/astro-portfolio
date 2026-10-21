@@ -56,7 +56,7 @@ test.describe('phase 1 - image block', () => {
 		await page.getByLabel('Alt text').fill('A test image');
 		await page.getByLabel('Caption').fill('A caption');
 		await page.getByRole('button', { name: 'Save' }).click();
-		await expect(page).toHaveURL('/admin');
+		await expect(page.getByText('Saved.')).toBeVisible();
 
 		const saved = JSON.parse(await readFile(join(PROJECTS_DIR, `${slug}.json`), 'utf8'));
 		const image = saved.body.find((block: any) => block.type === 'image');
@@ -99,7 +99,7 @@ test.describe('phase 1 - image block', () => {
 		await expect(page.locator('.bn-editor[contenteditable="true"]')).toBeVisible();
 
 		await page.getByRole('button', { name: 'Save' }).click();
-		await expect(page).toHaveURL('/admin');
+		await expect(page.getByText('Saved.')).toBeVisible();
 
 		const saved = JSON.parse(await readFile(join(PROJECTS_DIR, `${slug}.json`), 'utf8'));
 		expect(saved.body[0].props.alt).toBe('');

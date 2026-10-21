@@ -274,7 +274,11 @@ test.describe('phase 1 - admin', () => {
 		await page.getByLabel('Draft').check();
 		await page.getByRole('button', { name: 'Save' }).click();
 
-		await expect(page).toHaveURL('/admin');
+		await expect(page.getByText('Saved.')).toBeVisible();
+		await expect(page).toHaveURL('/admin/edit/hello-world');
+		await expect(page.getByLabel('Slug')).toHaveValue('hello-world');
+
+		await page.goto('/admin');
 		await expect(page.getByRole('table').getByText('hello-world')).toBeVisible();
 
 		const raw = await readFile(join(PROJECTS_DIR, 'hello-world.json'), 'utf8');

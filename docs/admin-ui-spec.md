@@ -27,7 +27,9 @@ a right sidebar.
 - **Sidebar, Post settings:** Excerpt (the stored `summary`), Slug and Date.
 - **Mobile:** the sidebar stacks below the body.
 - The preview opens in a centered dialog and initializes the carousel script.
-- Save errors from the server show as a toast. The embed-title check shows
+- Save keeps you on the editor and shows a **Saved.** toast. A new post (or a
+  changed slug) updates the address bar to `/admin/edit/<slug>`. Save errors
+  from the server show as a toast. The embed-title check shows
   inline, next to Save.
 
 ## Layout
