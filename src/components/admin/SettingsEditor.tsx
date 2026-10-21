@@ -1,8 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState } from 'react';
 import { useCreateBlockNote } from '@blocknote/react';
 import { BlockNoteView } from '@blocknote/shadcn';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/shadcn/style.css';
+import { toast } from 'sonner';
+import { Button } from '@admin/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@admin/components/ui/card';
+import { Checkbox } from '@admin/components/ui/checkbox';
+import { Input } from '@admin/components/ui/input';
+import { Label } from '@admin/components/ui/label';
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from '@admin/components/ui/select';
+import { Textarea } from '@admin/components/ui/textarea';
+import { useDarkMode } from '@admin/hooks/use-dark-mode';
 import { normalizeBlocks } from '../../blocks/shared';
 import { schema } from '../../blocks/schema';
 import { uploadImage } from '../../lib/upload';
@@ -21,8 +36,6 @@ interface Props {
 	posts: PostOption[];
 }
 
-const inputClass = 'rounded-md border bg-background px-3 py-2 text-sm';
-
 export default function SettingsEditor({ site: initialSite, home: initialHome, about, posts }: Props) {
 	const [site, setSite] = useState(initialSite);
 	const [intro, setIntro] = useState(initialHome.intro);
@@ -31,9 +44,7 @@ export default function SettingsEditor({ site: initialSite, home: initialHome, a
 	const [portraitAlt, setPortraitAlt] = useState(about.portraitAlt ?? '');
 	const [toAdd, setToAdd] = useState('');
 	const [saving, setSaving] = useState(false);
-	const [error, setError] = useState<string | null>(null);
-	const [saved, setSaved] = useState(false);
-	const [dark, setDark] = useState(false);
+	const dark = useDarkMode();
 	const portraitRef = useRef<HTMLInputElement>(null);
 
 	const editor = useCreateBlockNote({
@@ -41,15 +52,10 @@ export default function SettingsEditor({ site: initialSite, home: initialHome, a
 		initialContent: about.body.length ? (normalizeBlocks(about.body) as any) : undefined,
 	});
 
-	useEffect(() => {
-		setDark(document.documentElement.classList.contains('dark'));
-	}, []);
-
 	const available = posts.filter((post) => !post.draft && !featured.includes(post.slug));
 
 	function updateSite(patch: Partial<SiteSettings>) {
 		setSite((current) => ({ ...current, ...patch }));
-		setSaved(false);
 	}
 
 	function updateNav(index: number, patch: { title?: string; link?: string }) {
@@ -69,7 +75,6 @@ export default function SettingsEditor({ site: initialSite, home: initialHome, a
 		const next = [...featured];
 		[next[index], next[target]] = [next[target], next[index]];
 		setFeatured(next);
-		setSaved(false);
 	}
 
 	async function addPortrait(files: FileList | null) {
@@ -77,17 +82,12 @@ export default function SettingsEditor({ site: initialSite, home: initialHome, a
 		if (!file) return;
 
 		const path = await uploadImage(file, 'settings');
-		if (path) {
-			setPortrait(path);
-			setSaved(false);
-		}
+		if (path) setPortrait(path);
 		if (portraitRef.current) portraitRef.current.value = '';
 	}
 
 	async function save() {
 		setSaving(true);
-		setError(null);
-		setSaved(false);
 
 		try {
 			const response = await fetch('/api/settings', {
@@ -106,15 +106,21 @@ export default function SettingsEditor({ site: initialSite, home: initialHome, a
 
 			if (!response.ok) {
 				const payload = (await response.json().catch(() => null)) as { error?: string } | null;
-				setError(payload?.error ?? 'Could not save settings.');
+				toast.error(payload?.error ?? 'Could not save settings.');
 				return;
 			}
 
-			setSaved(true);
+			toast.success('Saved.');
 		} finally {
 			setSaving(false);
 		}
 	}
+
+	const saveButton = (
+		<Button type="submit" disabled={saving}>
+			{saving ? 'Saving…' : 'Save settings'}
+		</Button>
+	);
 
 	return (
 		<form
@@ -124,312 +130,304 @@ export default function SettingsEditor({ site: initialSite, home: initialHome, a
 			}}
 			className="grid gap-6"
 		>
-			<div className="flex flex-wrap items-center gap-3">
-				<button
-					type="submit"
-					disabled={saving}
-					className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-50"
-				>
-					{saving ? 'Saving…' : 'Save settings'}
-				</button>
-				{saved && <span className="text-sm text-muted-foreground">Saved.</span>}
-				{error && (
-					<span role="alert" className="text-sm text-destructive">
-						{error}
-					</span>
-				)}
-			</div>
+			<div>{saveButton}</div>
 
-			<section className="grid gap-4 rounded-xl border bg-card p-4">
-				<h2 className="text-sm font-semibold">Site</h2>
-
-				<div className="grid gap-3 sm:grid-cols-2">
-					<label className="grid gap-1.5">
-						<span className="text-sm font-medium">Site title</span>
-						<input
-							value={site.seo.title}
-							onChange={(event) => updateSite({ seo: { ...site.seo, title: event.target.value } })}
-							required
-							className={inputClass}
-						/>
-					</label>
-
-					<label className="grid gap-1.5">
-						<span className="text-sm font-medium">Site owner</span>
-						<input
-							value={site.seo.siteOwner ?? ''}
-							onChange={(event) =>
-								updateSite({ seo: { ...site.seo, siteOwner: event.target.value } })
-							}
-							className={inputClass}
-						/>
-					</label>
-				</div>
-
-				<label className="grid gap-1.5">
-					<span className="text-sm font-medium">Description</span>
-					<textarea
-						value={site.seo.description}
-						onChange={(event) =>
-							updateSite({ seo: { ...site.seo, description: event.target.value } })
-						}
-						rows={2}
-						className={inputClass}
-					/>
-				</label>
-
-				<label className="grid gap-1.5">
-					<span className="text-sm font-medium">Logo</span>
-					<input
-						value={site.seo.logo ?? ''}
-						onChange={(event) => updateSite({ seo: { ...site.seo, logo: event.target.value } })}
-						placeholder="/favicon.svg"
-						className={inputClass}
-					/>
-				</label>
-
-				<label className="flex items-center gap-2 text-sm">
-					<input
-						type="checkbox"
-						checked={site.footerStarfield !== false}
-						onChange={(event) => updateSite({ footerStarfield: event.target.checked })}
-						className="size-4"
-					/>
-					<span>Footer starfield</span>
-				</label>
-
-				<div className="grid gap-2">
-					<span className="text-sm font-medium">Navigation</span>
-					{site.nav.map((item, index) => (
-						<div key={index} className="flex flex-wrap gap-2">
-							<input
-								aria-label={`Nav item ${index + 1} title`}
-								value={item.title}
-								onChange={(event) => updateNav(index, { title: event.target.value })}
-								placeholder="Title"
-								className={`${inputClass} min-w-32 flex-1`}
+			<Card className="gap-4 py-4">
+				<CardHeader className="px-4">
+					<CardTitle className="text-sm">Site</CardTitle>
+				</CardHeader>
+				<CardContent className="grid gap-4 px-4">
+					<div className="grid gap-3 sm:grid-cols-2">
+						<div className="grid gap-1.5">
+							<Label htmlFor="site-title">Site title</Label>
+							<Input
+								id="site-title"
+								value={site.seo.title}
+								onChange={(event) => updateSite({ seo: { ...site.seo, title: event.target.value } })}
+								required
 							/>
-							<input
-								aria-label={`Nav item ${index + 1} link`}
-								value={item.link}
-								onChange={(event) => updateNav(index, { link: event.target.value })}
-								placeholder="/projects"
-								className={`${inputClass} min-w-32 flex-1`}
-							/>
-							<button
-								type="button"
-								onClick={() => updateSite({ nav: site.nav.filter((_, i) => i !== index) })}
-								className="rounded border px-2 py-1 text-xs text-destructive"
-							>
-								Remove
-							</button>
 						</div>
-					))}
-					<button
-						type="button"
-						onClick={() => updateSite({ nav: [...site.nav, { title: '', link: '' }] })}
-						className="w-fit rounded-md border px-3 py-1 text-sm"
-					>
-						Add nav item
-					</button>
-				</div>
 
-				<div className="grid gap-2">
-					<span className="text-sm font-medium">Contact links</span>
-					{site.contactLinks.map((item, index) => (
-						<div key={index} className="flex flex-wrap gap-2">
-							<input
-								aria-label={`Contact link ${index + 1} title`}
-								value={item.title}
-								onChange={(event) => updateContact(index, { title: event.target.value })}
-								placeholder="GitHub"
-								className={`${inputClass} min-w-24 flex-1`}
-							/>
-							<input
-								aria-label={`Contact link ${index + 1} URL`}
-								value={item.link}
-								onChange={(event) => updateContact(index, { link: event.target.value })}
-								placeholder="https://github.com/…"
-								className={`${inputClass} min-w-32 flex-1`}
-							/>
-							<input
-								aria-label={`Contact link ${index + 1} icon`}
-								value={item.icon}
-								onChange={(event) => updateContact(index, { icon: event.target.value })}
-								placeholder="tabler:brand-github"
-								className={`${inputClass} min-w-32 flex-1`}
-							/>
-							<button
-								type="button"
-								onClick={() =>
-									updateSite({
-										contactLinks: site.contactLinks.filter((_, i) => i !== index),
-									})
+						<div className="grid gap-1.5">
+							<Label htmlFor="site-owner">Site owner</Label>
+							<Input
+								id="site-owner"
+								value={site.seo.siteOwner ?? ''}
+								onChange={(event) =>
+									updateSite({ seo: { ...site.seo, siteOwner: event.target.value } })
 								}
-								className="rounded border px-2 py-1 text-xs text-destructive"
-							>
-								Remove
-							</button>
-						</div>
-					))}
-					<button
-						type="button"
-						onClick={() =>
-							updateSite({
-								contactLinks: [...site.contactLinks, { title: '', link: '', icon: '' }],
-							})
-						}
-						className="w-fit rounded-md border px-3 py-1 text-sm"
-					>
-						Add contact link
-					</button>
-				</div>
-			</section>
-
-			<section className="grid gap-4 rounded-xl border bg-card p-4">
-				<h2 className="text-sm font-semibold">Home</h2>
-
-				<label className="grid gap-1.5">
-					<span className="text-sm font-medium">Intro</span>
-					<textarea
-						value={intro}
-						onChange={(event) => {
-							setIntro(event.target.value);
-							setSaved(false);
-						}}
-						rows={4}
-						className={inputClass}
-					/>
-				</label>
-
-				<div className="grid gap-2">
-					<span className="text-sm font-medium">Featured projects</span>
-
-					{featured.map((slug, index) => {
-						const post = posts.find((item) => item.slug === slug);
-						return (
-							<div key={slug} className="flex flex-wrap items-center gap-2 rounded-md border p-2 text-sm">
-								<span className="min-w-0 flex-1 truncate">
-									{post?.title ?? slug}
-									<span className="ml-2 text-xs text-muted-foreground">{slug}</span>
-								</span>
-								<button type="button" onClick={() => moveFeatured(index, -1)} className="rounded border px-2 py-1 text-xs">
-									Up
-								</button>
-								<button type="button" onClick={() => moveFeatured(index, 1)} className="rounded border px-2 py-1 text-xs">
-									Down
-								</button>
-								<button
-									type="button"
-									onClick={() => {
-										setFeatured(featured.filter((_, i) => i !== index));
-										setSaved(false);
-									}}
-									className="rounded border px-2 py-1 text-xs text-destructive"
-								>
-									Remove
-								</button>
-							</div>
-						);
-					})}
-
-					<div className="flex flex-wrap gap-2">
-						<select
-							aria-label="Add featured project"
-							value={toAdd}
-							onChange={(event) => setToAdd(event.target.value)}
-							className={inputClass}
-						>
-							<option value="">Choose a published post…</option>
-							{available.map((post) => (
-								<option key={post.slug} value={post.slug}>
-									{post.title}
-								</option>
-							))}
-						</select>
-						<button
-							type="button"
-							disabled={!toAdd}
-							onClick={() => {
-								setFeatured([...featured, toAdd]);
-								setToAdd('');
-								setSaved(false);
-							}}
-							className="rounded-md border px-3 py-1 text-sm disabled:opacity-50"
-						>
-							Add
-						</button>
-					</div>
-				</div>
-			</section>
-
-			<section className="grid gap-4 rounded-xl border bg-card p-4">
-				<h2 className="text-sm font-semibold">About</h2>
-
-				<div className="grid gap-2">
-					<span className="text-sm font-medium">Portrait</span>
-					{portrait ? (
-						<>
-							<img src={portrait} alt={portraitAlt} className="max-h-64 w-fit rounded-md border object-cover" />
-							<input
-								aria-label="Portrait alt text"
-								value={portraitAlt}
-								onChange={(event) => {
-									setPortraitAlt(event.target.value);
-									setSaved(false);
-								}}
-								placeholder="Portrait alt text"
-								className={inputClass}
 							/>
-							<div className="flex gap-2 text-xs">
-								<button type="button" onClick={() => portraitRef.current?.click()} className="rounded border px-2 py-1">
-									Replace
-								</button>
-								<button
+						</div>
+					</div>
+
+					<div className="grid gap-1.5">
+						<Label htmlFor="site-description">Description</Label>
+						<Textarea
+							id="site-description"
+							value={site.seo.description}
+							onChange={(event) =>
+								updateSite({ seo: { ...site.seo, description: event.target.value } })
+							}
+							rows={2}
+						/>
+					</div>
+
+					<div className="grid gap-1.5">
+						<Label htmlFor="site-logo">Logo</Label>
+						<Input
+							id="site-logo"
+							value={site.seo.logo ?? ''}
+							onChange={(event) => updateSite({ seo: { ...site.seo, logo: event.target.value } })}
+							placeholder="/favicon.svg"
+						/>
+					</div>
+
+					<div className="flex items-center gap-2">
+						<Checkbox
+							id="footer-starfield"
+							checked={site.footerStarfield !== false}
+							onCheckedChange={(checked) => updateSite({ footerStarfield: checked === true })}
+						/>
+						<Label htmlFor="footer-starfield">Footer starfield</Label>
+					</div>
+
+					<div className="grid gap-2">
+						<span className="text-sm font-medium">Navigation</span>
+						{site.nav.map((item, index) => (
+							<div key={index} className="flex flex-wrap gap-2">
+								<Input
+									aria-label={`Nav item ${index + 1} title`}
+									value={item.title}
+									onChange={(event) => updateNav(index, { title: event.target.value })}
+									placeholder="Title"
+									className="min-w-32 flex-1"
+								/>
+								<Input
+									aria-label={`Nav item ${index + 1} link`}
+									value={item.link}
+									onChange={(event) => updateNav(index, { link: event.target.value })}
+									placeholder="/projects"
+									className="min-w-32 flex-1"
+								/>
+								<Button
 									type="button"
-									onClick={() => {
-										setPortrait('');
-										setPortraitAlt('');
-										setSaved(false);
-									}}
-									className="rounded border px-2 py-1 text-destructive"
+									variant="ghost"
+									size="sm"
+									className="text-destructive"
+									onClick={() => updateSite({ nav: site.nav.filter((_, i) => i !== index) })}
 								>
 									Remove
-								</button>
+								</Button>
 							</div>
-						</>
-					) : (
-						<button
+						))}
+						<Button
 							type="button"
-							onClick={() => portraitRef.current?.click()}
-							className="w-fit rounded-md border px-3 py-1.5 text-sm"
+							variant="outline"
+							size="sm"
+							className="w-fit"
+							onClick={() => updateSite({ nav: [...site.nav, { title: '', link: '' }] })}
 						>
-							Add portrait
-						</button>
-					)}
-					<input
-						ref={portraitRef}
-						type="file"
-						accept="image/*"
-						onChange={(event) => addPortrait(event.target.files)}
-						className="hidden"
-					/>
-				</div>
+							Add nav item
+						</Button>
+					</div>
 
-				<div className="min-h-[30vh] rounded-md border p-3">
-					<BlockNoteView editor={editor} theme={dark ? 'dark' : 'light'} />
-				</div>
-			</section>
+					<div className="grid gap-2">
+						<span className="text-sm font-medium">Contact links</span>
+						{site.contactLinks.map((item, index) => (
+							<div key={index} className="flex flex-wrap gap-2">
+								<Input
+									aria-label={`Contact link ${index + 1} title`}
+									value={item.title}
+									onChange={(event) => updateContact(index, { title: event.target.value })}
+									placeholder="GitHub"
+									className="min-w-24 flex-1"
+								/>
+								<Input
+									aria-label={`Contact link ${index + 1} URL`}
+									value={item.link}
+									onChange={(event) => updateContact(index, { link: event.target.value })}
+									placeholder="https://github.com/…"
+									className="min-w-32 flex-1"
+								/>
+								<Input
+									aria-label={`Contact link ${index + 1} icon`}
+									value={item.icon}
+									onChange={(event) => updateContact(index, { icon: event.target.value })}
+									placeholder="tabler:brand-github"
+									className="min-w-32 flex-1"
+								/>
+								<Button
+									type="button"
+									variant="ghost"
+									size="sm"
+									className="text-destructive"
+									onClick={() =>
+										updateSite({
+											contactLinks: site.contactLinks.filter((_, i) => i !== index),
+										})
+									}
+								>
+									Remove
+								</Button>
+							</div>
+						))}
+						<Button
+							type="button"
+							variant="outline"
+							size="sm"
+							className="w-fit"
+							onClick={() =>
+								updateSite({
+									contactLinks: [...site.contactLinks, { title: '', link: '', icon: '' }],
+								})
+							}
+						>
+							Add contact link
+						</Button>
+					</div>
+				</CardContent>
+			</Card>
 
-			<div>
-				<button
-					type="submit"
-					disabled={saving}
-					className="inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-50"
-				>
-					{saving ? 'Saving…' : 'Save settings'}
-				</button>
-			</div>
+			<Card className="gap-4 py-4">
+				<CardHeader className="px-4">
+					<CardTitle className="text-sm">Home</CardTitle>
+				</CardHeader>
+				<CardContent className="grid gap-4 px-4">
+					<div className="grid gap-1.5">
+						<Label htmlFor="home-intro">Intro</Label>
+						<Textarea
+							id="home-intro"
+							value={intro}
+							onChange={(event) => setIntro(event.target.value)}
+							rows={4}
+						/>
+					</div>
+
+					<div className="grid gap-2">
+						<span className="text-sm font-medium">Featured projects</span>
+
+						{featured.map((slug, index) => {
+							const post = posts.find((item) => item.slug === slug);
+							return (
+								<div key={slug} className="flex flex-wrap items-center gap-2 rounded-md border p-2 text-sm">
+									<span className="min-w-0 flex-1 truncate">
+										{post?.title ?? slug}
+										<span className="ml-2 text-xs text-muted-foreground">{slug}</span>
+									</span>
+									<Button type="button" variant="outline" size="sm" onClick={() => moveFeatured(index, -1)}>
+										Up
+									</Button>
+									<Button type="button" variant="outline" size="sm" onClick={() => moveFeatured(index, 1)}>
+										Down
+									</Button>
+									<Button
+										type="button"
+										variant="ghost"
+										size="sm"
+										className="text-destructive"
+										onClick={() => setFeatured(featured.filter((_, i) => i !== index))}
+									>
+										Remove
+									</Button>
+								</div>
+							);
+						})}
+
+						<div className="flex flex-wrap gap-2">
+							<Select value={toAdd} onValueChange={setToAdd}>
+								<SelectTrigger aria-label="Add featured project" className="min-w-64">
+									<SelectValue placeholder="Choose a published post…" />
+								</SelectTrigger>
+								<SelectContent>
+									{available.map((post) => (
+										<SelectItem key={post.slug} value={post.slug}>
+											{post.title}
+										</SelectItem>
+									))}
+								</SelectContent>
+							</Select>
+							<Button
+								type="button"
+								variant="outline"
+								disabled={!toAdd}
+								onClick={() => {
+									setFeatured([...featured, toAdd]);
+									setToAdd('');
+								}}
+							>
+								Add
+							</Button>
+						</div>
+					</div>
+				</CardContent>
+			</Card>
+
+			<Card className="gap-4 py-4">
+				<CardHeader className="px-4">
+					<CardTitle className="text-sm">About</CardTitle>
+				</CardHeader>
+				<CardContent className="grid gap-4 px-4">
+					<div className="grid gap-2">
+						<span className="text-sm font-medium">Portrait</span>
+						{portrait ? (
+							<>
+								<img src={portrait} alt={portraitAlt} className="max-h-64 w-fit rounded-md border object-cover" />
+								<Input
+									aria-label="Portrait alt text"
+									value={portraitAlt}
+									onChange={(event) => setPortraitAlt(event.target.value)}
+									placeholder="Portrait alt text"
+								/>
+								<div className="flex gap-2">
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										onClick={() => portraitRef.current?.click()}
+									>
+										Replace
+									</Button>
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										className="text-destructive"
+										onClick={() => {
+											setPortrait('');
+											setPortraitAlt('');
+										}}
+									>
+										Remove
+									</Button>
+								</div>
+							</>
+						) : (
+							<Button
+								type="button"
+								variant="outline"
+								size="sm"
+								className="w-fit"
+								onClick={() => portraitRef.current?.click()}
+							>
+								Add portrait
+							</Button>
+						)}
+						<input
+							ref={portraitRef}
+							type="file"
+							accept="image/*"
+							onChange={(event) => addPortrait(event.target.files)}
+							className="hidden"
+						/>
+					</div>
+
+					<div className="min-h-[30vh] rounded-md border p-3">
+						<BlockNoteView editor={editor} theme={dark ? 'dark' : 'light'} />
+					</div>
+				</CardContent>
+			</Card>
+
+			<div>{saveButton}</div>
 		</form>
 	);
 }

@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { filterSuggestionItems, insertOrUpdateBlockForSlashMenu } from '@blocknote/core';
 import {
 	SuggestionMenuController,
@@ -8,6 +8,15 @@ import {
 import { BlockNoteView } from '@blocknote/shadcn';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/shadcn/style.css';
+import { toast } from 'sonner';
+import { Button } from '@admin/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@admin/components/ui/card';
+import { Checkbox } from '@admin/components/ui/checkbox';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@admin/components/ui/dialog';
+import { Input } from '@admin/components/ui/input';
+import { Label } from '@admin/components/ui/label';
+import { Textarea } from '@admin/components/ui/textarea';
+import { useDarkMode } from '@admin/hooks/use-dark-mode';
 import { SlugContext } from '../../blocks/context';
 import { findEmbedWithoutTitle, normalizeBlocks } from '../../blocks/shared';
 import { schema } from '../../blocks/schema';
@@ -51,18 +60,12 @@ export default function PostEditor({ slug, post }: Props) {
 	const [previewOpen, setPreviewOpen] = useState(false);
 	const [previewLoading, setPreviewLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const [dark, setDark] = useState(false);
-	const dialogRef = useRef<HTMLDialogElement>(null);
-	const previewRef = useRef<HTMLDivElement>(null);
+	const dark = useDarkMode();
 	const titleRef = useRef<HTMLTextAreaElement>(null);
 	const coverRef = useRef<HTMLInputElement>(null);
 
 	const initialContent = post?.body?.length ? (normalizeBlocks(post.body) as any) : undefined;
 	const editor = useCreateBlockNote({ schema, initialContent });
-
-	useEffect(() => {
-		setDark(document.documentElement.classList.contains('dark'));
-	}, []);
 
 	useEffect(() => {
 		const element = titleRef.current;
@@ -72,20 +75,13 @@ export default function PostEditor({ slug, post }: Props) {
 		element.style.height = `${element.scrollHeight}px`;
 	}, [title]);
 
-	useEffect(() => {
-		const dialog = dialogRef.current;
-		if (!dialog) return;
-
-		if (previewOpen && !dialog.open) dialog.showModal();
-		if (!previewOpen && dialog.open) dialog.close();
-	}, [previewOpen]);
-
-	useEffect(() => {
-		if (previewOpen && previewRef.current) {
-			initCarousels(previewRef.current);
-			initEmbeds(previewRef.current);
-		}
-	}, [previewOpen, preview]);
+	// Radix mounts the dialog content on each open; init the preview scripts
+	// once the node exists.
+	const previewMounted = useCallback((node: HTMLDivElement | null) => {
+		if (!node) return;
+		initCarousels(node);
+		initEmbeds(node);
+	}, []);
 
 	async function addCover(files: FileList | null) {
 		const file = files?.[0];
@@ -134,7 +130,7 @@ export default function PostEditor({ slug, post }: Props) {
 			});
 
 			if (!response.ok) {
-				window.alert(await response.text());
+				toast.error(await response.text());
 				return;
 			}
 
@@ -161,10 +157,6 @@ export default function PostEditor({ slug, post }: Props) {
 		} finally {
 			setPreviewLoading(false);
 		}
-	}
-
-	function closePreview() {
-		setPreviewOpen(false);
 	}
 
 	return (
@@ -268,266 +260,259 @@ export default function PostEditor({ slug, post }: Props) {
 				</div>
 
 				<aside className="grid gap-4 lg:sticky lg:top-20">
-					<section className="grid gap-3 rounded-xl border bg-card p-4">
-						<h2 className="text-sm font-semibold">Publish</h2>
-
-						<label className="flex items-center gap-2 text-sm">
-							<input
-								id="draft"
-								name="draft"
-								type="checkbox"
-								checked={draft}
-								onChange={(event) => setDraft(event.target.checked)}
-								className="size-4"
-							/>
-							<span>Draft</span>
-						</label>
-						<p className="text-xs text-muted-foreground">Uncheck to publish.</p>
-
-						<label className="flex items-center gap-2 text-sm">
-							<input
-								id="featured"
-								name="featured"
-								type="checkbox"
-								checked={featured}
-								onChange={(event) => setFeatured(event.target.checked)}
-								className="size-4"
-							/>
-							<span>Featured</span>
-						</label>
-						<p className="text-xs text-muted-foreground">Show on the home page.</p>
-
-						{error && (
-							<p role="alert" className="text-sm text-destructive">
-								{error}
-							</p>
-						)}
-
-						<button
-							type="submit"
-							disabled={saving}
-							className="inline-flex h-9 w-full items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground disabled:opacity-50"
-						>
-							{saving ? 'Saving…' : 'Save'}
-						</button>
-						<button
-							type="button"
-							onClick={openPreview}
-							disabled={previewLoading}
-							className="inline-flex h-9 w-full items-center justify-center rounded-md border px-4 text-sm font-medium disabled:opacity-50"
-						>
-							{previewLoading ? 'Loading…' : 'Preview'}
-						</button>
-					</section>
-
-					<section className="grid gap-4 rounded-xl border bg-card p-4">
-						<h2 className="text-sm font-semibold">Post settings</h2>
-
-						<div className="grid gap-1.5">
-							<label htmlFor="summary" className="text-sm font-medium">
-								Excerpt
-							</label>
-							<textarea
-								id="summary"
-								name="summary"
-								value={summary}
-								onChange={(event) => setSummary(event.target.value)}
-								required
-								maxLength={280}
-								rows={4}
-								className="rounded-md border bg-background px-3 py-2 text-sm"
-							/>
-							<span className="text-xs text-muted-foreground">
-								Used on cards and as the meta description.
-							</span>
-						</div>
-
-						<label className="grid gap-1.5">
-							<span className="text-sm font-medium">Slug</span>
-							<input
-								id="slug"
-								name="slug"
-								value={pageSlug}
-								onChange={(event) => setPageSlug(event.target.value)}
-								placeholder="auto from title"
-								className="rounded-md border bg-background px-3 py-2 text-sm"
-							/>
-						</label>
-
-						<label className="grid gap-1.5">
-							<span className="text-sm font-medium">Date</span>
-							<input
-								id="date"
-								name="date"
-								type="date"
-								value={date}
-								onChange={(event) => setDate(event.target.value)}
-								required
-								className="rounded-md border bg-background px-3 py-2 text-sm"
-							/>
-						</label>
-
-						<label className="grid gap-1.5">
-							<span className="text-sm font-medium">Tags</span>
-							<input
-								id="tags"
-								name="tags"
-								value={tags}
-								onChange={(event) => setTags(event.target.value)}
-								placeholder="design, astro"
-								className="rounded-md border bg-background px-3 py-2 text-sm"
-							/>
-							<span className="text-xs text-muted-foreground">
-								Comma separated. Drives the /projects filter.
-							</span>
-						</label>
-
-						<label className="grid gap-1.5">
-							<span className="text-sm font-medium">Role</span>
-							<input
-								id="role"
-								name="role"
-								value={role}
-								onChange={(event) => setRole(event.target.value)}
-								placeholder="Design and front end"
-								className="rounded-md border bg-background px-3 py-2 text-sm"
-							/>
-						</label>
-
-						<label className="grid gap-1.5">
-							<span className="text-sm font-medium">Client</span>
-							<input
-								id="client"
-								name="client"
-								value={client}
-								onChange={(event) => setClient(event.target.value)}
-								className="rounded-md border bg-background px-3 py-2 text-sm"
-							/>
-						</label>
-
-						<div className="grid gap-2">
-							<span className="text-sm font-medium">Cover</span>
-							{cover ? (
-								<>
-									<img
-										src={cover}
-										alt={coverAlt}
-										className="aspect-[16/9] w-full rounded-md border object-cover"
+					<Card className="gap-4 py-4">
+						<CardHeader className="px-4">
+							<CardTitle className="text-sm">Publish</CardTitle>
+						</CardHeader>
+						<CardContent className="grid gap-3 px-4">
+							<div className="grid gap-1">
+								<div className="flex items-center gap-2">
+									<Checkbox
+										id="draft"
+										name="draft"
+										checked={draft}
+										onCheckedChange={(checked) => setDraft(checked === true)}
 									/>
-									<input
-										aria-label="Cover alt text"
-										value={coverAlt}
-										onChange={(event) => setCoverAlt(event.target.value)}
-										placeholder="Cover alt text"
-										className="rounded-md border bg-background px-3 py-2 text-sm"
+									<Label htmlFor="draft">Draft</Label>
+								</div>
+								<p className="text-xs text-muted-foreground">Uncheck to publish.</p>
+							</div>
+
+							<div className="grid gap-1">
+								<div className="flex items-center gap-2">
+									<Checkbox
+										id="featured"
+										name="featured"
+										checked={featured}
+										onCheckedChange={(checked) => setFeatured(checked === true)}
 									/>
-									<div className="flex gap-2 text-xs">
-										<button
+									<Label htmlFor="featured">Featured</Label>
+								</div>
+								<p className="text-xs text-muted-foreground">Show on the home page.</p>
+							</div>
+
+							{error && (
+								<p role="alert" className="text-sm text-destructive">
+									{error}
+								</p>
+							)}
+
+							<Button type="submit" disabled={saving} className="w-full">
+								{saving ? 'Saving…' : 'Save'}
+							</Button>
+							<Button
+								type="button"
+								variant="outline"
+								onClick={openPreview}
+								disabled={previewLoading}
+								className="w-full"
+							>
+								{previewLoading ? 'Loading…' : 'Preview'}
+							</Button>
+						</CardContent>
+					</Card>
+
+					<Card className="gap-4 py-4">
+						<CardHeader className="px-4">
+							<CardTitle className="text-sm">Post settings</CardTitle>
+						</CardHeader>
+						<CardContent className="grid gap-4 px-4">
+							<div className="grid gap-1.5">
+								<Label htmlFor="summary">Excerpt</Label>
+								<Textarea
+									id="summary"
+									name="summary"
+									value={summary}
+									onChange={(event) => setSummary(event.target.value)}
+									required
+									maxLength={280}
+									rows={4}
+								/>
+								<span className="text-xs text-muted-foreground">
+									Used on cards and as the meta description.
+								</span>
+							</div>
+
+							<div className="grid gap-1.5">
+								<Label htmlFor="slug">Slug</Label>
+								<Input
+									id="slug"
+									name="slug"
+									value={pageSlug}
+									onChange={(event) => setPageSlug(event.target.value)}
+									placeholder="auto from title"
+								/>
+							</div>
+
+							<div className="grid gap-1.5">
+								<Label htmlFor="date">Date</Label>
+								<Input
+									id="date"
+									name="date"
+									type="date"
+									value={date}
+									onChange={(event) => setDate(event.target.value)}
+									required
+								/>
+							</div>
+
+							<div className="grid gap-1.5">
+								<Label htmlFor="tags">Tags</Label>
+								<Input
+									id="tags"
+									name="tags"
+									value={tags}
+									onChange={(event) => setTags(event.target.value)}
+									placeholder="design, astro"
+								/>
+								<span className="text-xs text-muted-foreground">
+									Comma separated. Drives the /projects filter.
+								</span>
+							</div>
+
+							<div className="grid gap-1.5">
+								<Label htmlFor="role">Role</Label>
+								<Input
+									id="role"
+									name="role"
+									value={role}
+									onChange={(event) => setRole(event.target.value)}
+									placeholder="Design and front end"
+								/>
+							</div>
+
+							<div className="grid gap-1.5">
+								<Label htmlFor="client">Client</Label>
+								<Input
+									id="client"
+									name="client"
+									value={client}
+									onChange={(event) => setClient(event.target.value)}
+								/>
+							</div>
+
+							<div className="grid gap-2">
+								<span className="text-sm font-medium">Cover</span>
+								{cover ? (
+									<>
+										<img
+											src={cover}
+											alt={coverAlt}
+											className="aspect-[16/9] w-full rounded-md border object-cover"
+										/>
+										<Input
+											aria-label="Cover alt text"
+											value={coverAlt}
+											onChange={(event) => setCoverAlt(event.target.value)}
+											placeholder="Cover alt text"
+										/>
+										<div className="flex gap-2">
+											<Button
+												type="button"
+												variant="outline"
+												size="sm"
+												onClick={() => coverRef.current?.click()}
+											>
+												Replace
+											</Button>
+											<Button
+												type="button"
+												variant="outline"
+												size="sm"
+												className="text-destructive"
+												onClick={() => {
+													setCover('');
+													setCoverAlt('');
+												}}
+											>
+												Remove
+											</Button>
+										</div>
+									</>
+								) : (
+									<Button
+										type="button"
+										variant="outline"
+										size="sm"
+										className="w-fit"
+										onClick={() => coverRef.current?.click()}
+									>
+										Add cover image
+									</Button>
+								)}
+								<input
+									ref={coverRef}
+									type="file"
+									accept="image/*"
+									onChange={(event) => addCover(event.target.files)}
+									className="hidden"
+								/>
+								<span className="text-xs text-muted-foreground">
+									Used at the top of the post and as the OG image.
+								</span>
+							</div>
+
+							<div className="grid gap-2">
+								<span className="text-sm font-medium">Links</span>
+								{links.map((link, index) => (
+									<div key={index} className="grid gap-2 rounded-md border p-2">
+										<Input
+											aria-label={`Link ${index + 1} label`}
+											value={link.label}
+											onChange={(event) => updateLink(index, { label: event.target.value })}
+											placeholder="Label"
+										/>
+										<Input
+											aria-label={`Link ${index + 1} URL`}
+											value={link.url}
+											onChange={(event) => updateLink(index, { url: event.target.value })}
+											placeholder="https://…"
+										/>
+										<Button
 											type="button"
-											onClick={() => coverRef.current?.click()}
-											className="rounded border px-2 py-1"
-										>
-											Replace
-										</button>
-										<button
-											type="button"
-											onClick={() => {
-												setCover('');
-												setCoverAlt('');
-											}}
-											className="rounded border px-2 py-1 text-destructive"
+											variant="ghost"
+											size="sm"
+											className="w-fit text-destructive"
+											onClick={() => setLinks(links.filter((_, i) => i !== index))}
 										>
 											Remove
-										</button>
+										</Button>
 									</div>
-								</>
-							) : (
-								<button
+								))}
+								<Button
 									type="button"
-									onClick={() => coverRef.current?.click()}
-									className="w-fit rounded-md border px-3 py-1.5 text-sm"
+									variant="outline"
+									size="sm"
+									className="w-fit"
+									onClick={() => setLinks([...links, { label: '', url: '' }])}
 								>
-									Add cover image
-								</button>
-							)}
-							<input
-								ref={coverRef}
-								type="file"
-								accept="image/*"
-								onChange={(event) => addCover(event.target.files)}
-								className="hidden"
-							/>
-							<span className="text-xs text-muted-foreground">
-								Used at the top of the post and as the OG image.
-							</span>
-						</div>
-
-						<div className="grid gap-2">
-							<span className="text-sm font-medium">Links</span>
-							{links.map((link, index) => (
-								<div key={index} className="grid gap-2 rounded-md border p-2">
-									<input
-										aria-label={`Link ${index + 1} label`}
-										value={link.label}
-										onChange={(event) => updateLink(index, { label: event.target.value })}
-										placeholder="Label"
-										className="rounded border px-2 py-1 text-sm"
-									/>
-									<input
-										aria-label={`Link ${index + 1} URL`}
-										value={link.url}
-										onChange={(event) => updateLink(index, { url: event.target.value })}
-										placeholder="https://…"
-										className="rounded border px-2 py-1 text-sm"
-									/>
-									<button
-										type="button"
-										onClick={() => setLinks(links.filter((_, i) => i !== index))}
-										className="w-fit text-xs text-destructive"
-									>
-										Remove
-									</button>
-								</div>
-							))}
-							<button
-								type="button"
-								onClick={() => setLinks([...links, { label: '', url: '' }])}
-								className="w-fit rounded-md border px-3 py-1 text-sm"
-							>
-								Add link
-							</button>
-						</div>
-					</section>
+									Add link
+								</Button>
+							</div>
+						</CardContent>
+					</Card>
 				</aside>
 			</form>
 
-			<dialog
-				ref={dialogRef}
-				aria-label="Preview"
-				onClose={() => setPreviewOpen(false)}
-				onClick={(event) => {
-					if (event.target === dialogRef.current) closePreview();
-				}}
-				className="m-auto w-[min(48rem,92vw)] max-w-none rounded-xl border bg-background p-0 text-foreground shadow-xl backdrop:bg-black/50"
-			>
-				<div className="flex max-h-[85vh] flex-col">
-					<header className="flex items-center justify-between gap-4 border-b px-5 py-3">
-						<h2 className="text-sm font-semibold">Preview</h2>
-						<button
-							type="button"
-							onClick={closePreview}
-							className="rounded-md border px-3 py-1 text-sm"
-						>
+			<Dialog open={previewOpen} onOpenChange={setPreviewOpen}>
+				<DialogContent
+					showCloseButton={false}
+					aria-describedby={undefined}
+					className="flex max-h-[85vh] w-[min(48rem,92vw)] max-w-none flex-col gap-0 p-0 sm:max-w-none"
+				>
+					<DialogHeader className="flex-row items-center justify-between gap-4 border-b px-5 py-3">
+						<DialogTitle className="text-sm">Preview</DialogTitle>
+						<Button type="button" variant="outline" size="sm" onClick={() => setPreviewOpen(false)}>
 							Close
-						</button>
-					</header>
+						</Button>
+					</DialogHeader>
 					<div
-						ref={previewRef}
+						ref={previewMounted}
 						className="prose max-w-none overflow-y-auto p-6"
 						dangerouslySetInnerHTML={{ __html: preview ?? '' }}
 					/>
-				</div>
-			</dialog>
+				</DialogContent>
+			</Dialog>
 		</SlugContext.Provider>
 	);
 }
