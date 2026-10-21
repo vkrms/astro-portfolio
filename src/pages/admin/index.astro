@@ -1,7 +1,6 @@
 ---
 import Admin from '../../layouts/Admin.astro';
-import FormattedDate from '../../components/FormattedDate.astro';
-import PostActions from '../../components/admin/PostActions.astro';
+import PostsTable from '../../admin/features/posts/posts-table';
 import { listPosts } from '../../lib/storage';
 
 export const prerender = false;
@@ -22,11 +21,6 @@ const filters = [
 	},
 	{ label: 'Drafts', href: '/admin?status=draft', count: drafts.length, active: status === 'draft' },
 ];
-
-const statusClass = (draft: boolean) =>
-	draft
-		? 'inline-flex rounded-full bg-secondary px-2 py-0.5 text-xs text-secondary-foreground'
-		: 'inline-flex rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary';
 ---
 
 <Admin title="Posts" action={{ label: 'New post', href: '/admin/edit/new' }}>
@@ -74,68 +68,10 @@ const statusClass = (draft: boolean) =>
 					</a>
 				</div>
 			) : (
-				<>
-					<table class="mt-8 hidden w-full border-collapse text-left text-sm md:table">
-						<caption class="sr-only">Posts</caption>
-						<thead>
-							<tr class="border-b text-xs uppercase tracking-wide text-muted-foreground">
-								<th scope="col" class="px-3 py-2">Title</th>
-								<th scope="col" class="px-3 py-2">Status</th>
-								<th scope="col" class="px-3 py-2">Date</th>
-								<th scope="col" class="px-3 py-2">Actions</th>
-							</tr>
-						</thead>
-						<tbody>
-							{posts.map((post) => (
-								<tr class="border-b align-top last:border-b-0">
-									<td class="px-3 py-3">
-										<a href={`/admin/edit/${post.slug}`} class="font-medium hover:underline">
-											{post.title}
-										</a>
-										<p class="text-xs text-muted-foreground">{post.slug}</p>
-									</td>
-									<td class="px-3 py-3">
-										<span class={statusClass(post.draft)}>
-											{post.draft ? 'Draft' : 'Published'}
-										</span>
-									</td>
-									<td class="px-3 py-3 text-muted-foreground">
-										{post.date && <FormattedDate date={new Date(post.date)} />}
-									</td>
-									<td class="px-3 py-3">
-										<PostActions post={post} />
-									</td>
-								</tr>
-							))}
-						</tbody>
-					</table>
-
-					<ul aria-label="Posts" class="mt-8 grid list-none gap-4 p-0 md:hidden">
-						{posts.map((post) => (
-							<li class="rounded-xl border bg-card p-4">
-								<div class="flex items-start justify-between gap-3">
-									<div class="min-w-0">
-										<a href={`/admin/edit/${post.slug}`} class="font-medium hover:underline">
-											{post.title}
-										</a>
-										<p class="truncate text-xs text-muted-foreground">{post.slug}</p>
-									</div>
-									<span class={statusClass(post.draft)}>
-										{post.draft ? 'Draft' : 'Published'}
-									</span>
-								</div>
-								{post.date && (
-									<p class="mt-3 text-sm text-muted-foreground">
-										<FormattedDate date={new Date(post.date)} />
-									</p>
-								)}
-								<div class="mt-4">
-									<PostActions post={post} />
-								</div>
-							</li>
-						))}
-					</ul>
-				</>
+				<PostsTable
+					client:load
+					posts={posts.map(({ slug, title, date, draft }) => ({ slug, title, date, draft }))}
+				/>
 			)
 		}
 	</div>

@@ -1,7 +1,14 @@
 import { expect, test, type APIRequestContext } from '@playwright/test';
 import { readFile } from 'node:fs/promises';
 import { join } from 'node:path';
-import { PROJECTS_DIR, resetProjects, resetSettings, SETTINGS_DIR } from './helpers/projects';
+import {
+	openPostActions,
+	PROJECTS_DIR,
+	resetProjects,
+	resetSettings,
+	SETTINGS_DIR,
+	waitForHydration,
+} from './helpers/projects';
 
 async function createPost(request: APIRequestContext, data: Record<string, unknown>) {
 	await request.post('/api/save', { data });
@@ -76,15 +83,22 @@ test.describe('phase 1 - admin', () => {
 			'href',
 			'/admin/edit/newer-project',
 		);
-		await expect(rows.nth(1).getByRole('link', { name: 'View' })).toHaveAttribute(
+
+		let menu = await openPostActions(page, 'Newer Project');
+		await expect(menu.getByRole('menuitem', { name: 'View' })).toHaveAttribute(
 			'href',
 			'/projects/newer-project',
 		);
-		await expect(rows.nth(0).getByRole('link', { name: 'View' })).toHaveCount(0);
+		await page.keyboard.press('Escape');
 
-		await expect(rows.nth(0).getByRole('link', { name: 'Edit' })).toBeVisible();
-		await expect(rows.nth(0).getByRole('button', { name: 'Duplicate' })).toBeVisible();
-		await expect(rows.nth(0).getByRole('button', { name: 'Delete' })).toBeVisible();
+		menu = await openPostActions(page, 'Draft Project');
+		await expect(menu.getByRole('menuitem', { name: 'View' })).toHaveCount(0);
+		await expect(menu.getByRole('menuitem', { name: 'Edit' })).toHaveAttribute(
+			'href',
+			'/admin/edit/draft-project',
+		);
+		await expect(menu.getByRole('menuitem', { name: 'Duplicate' })).toBeVisible();
+		await expect(menu.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
 	});
 
 	test('filters posts by status', async ({ page, request }) => {
@@ -149,12 +163,8 @@ test.describe('phase 1 - admin', () => {
 		});
 
 		await page.goto('/admin');
-		await page
-			.getByRole('table')
-			.locator('tbody tr')
-			.first()
-			.getByRole('button', { name: 'Duplicate' })
-			.click();
+		const menu = await openPostActions(page, 'Original Project');
+		await menu.getByRole('menuitem', { name: 'Duplicate' }).click();
 
 		await expect(page).toHaveURL('/admin');
 		await expect(page.getByRole('table').locator('tbody tr')).toHaveCount(2);
@@ -170,13 +180,9 @@ test.describe('phase 1 - admin', () => {
 		});
 
 		await page.goto('/admin');
-		page.once('dialog', (dialog) => dialog.accept());
-		await page
-			.getByRole('table')
-			.locator('tbody tr')
-			.first()
-			.getByRole('button', { name: 'Delete' })
-			.click();
+		const menu = await openPostActions(page, 'Delete Me');
+		await menu.getByRole('menuitem', { name: 'Delete' }).click();
+		await page.getByRole('alertdialog').getByRole('button', { name: 'Delete' }).click();
 
 		await expect(page).toHaveURL('/admin');
 		await expect(page.getByText('No posts yet')).toBeVisible();
@@ -199,17 +205,63 @@ test.describe('phase 1 - admin', () => {
 		await expect(cards.getByRole('listitem')).toHaveCount(1);
 		await expect(cards).toContainText('Mobile Project');
 
-		const menu = page.getByRole('banner').getByRole('button', { name: 'Menu' });
+		await waitForHydration(page);
+		const menu = page.getByRole('banner').getByRole('button', { name: 'Toggle Sidebar' });
 		const nav = page.getByRole('navigation', { name: 'Admin' });
 		await expect(nav).toBeHidden();
 
+		await expect(menu).toHaveAttribute('aria-expanded', 'false');
 		await menu.click();
-		await expect(menu).toHaveAttribute('aria-expanded', 'true');
-		await expect(nav).toBeVisible();
+		// The sidebar opens as a modal sheet; the rest of the page is inert.
+		await expect(page.getByRole('dialog').getByRole('navigation', { name: 'Admin' })).toBeVisible();
 
 		await page.keyboard.press('Escape');
-		await expect(menu).toHaveAttribute('aria-expanded', 'false');
 		await expect(nav).toBeHidden();
+		await expect(menu).toHaveAttribute('aria-expanded', 'false');
+		await expect(menu).toBeFocused();
+	});
+
+	test('collapses the desktop sidebar and keeps it collapsed', async ({ page }) => {
+		await page.goto('/admin');
+		await waitForHydration(page);
+
+		const toggle = page.getByRole('banner').getByRole('button', { name: 'Toggle Sidebar' });
+		const sidebar = page.locator('[data-slot="sidebar"][data-state]');
+		await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+		await expect(sidebar).toHaveAttribute('data-state', 'expanded');
+
+		await toggle.click();
+		await expect(sidebar).toHaveAttribute('data-state', 'collapsed');
+		await expect(sidebar).toHaveAttribute('data-collapsible', 'icon');
+
+		await page.reload();
+		await expect(sidebar).toHaveAttribute('data-state', 'collapsed');
+
+		await waitForHydration(page);
+		await toggle.click();
+		await expect(sidebar).toHaveAttribute('data-state', 'expanded');
+	});
+
+	test('lists the shadcn-admin demo pages under Demo', async ({ page }) => {
+		await page.goto('/admin');
+		await waitForHydration(page);
+
+		const nav = page.getByRole('navigation', { name: 'Admin' });
+		await nav.getByRole('button', { name: 'Demo' }).click();
+		for (const name of ['Dashboard', 'Tasks', 'Users', 'Chats', 'Apps']) {
+			await expect(nav.getByRole('link', { name })).toHaveAttribute(
+				'href',
+				`/admin/demo/${name.toLowerCase()}`,
+			);
+		}
+
+		await nav.getByRole('link', { name: 'Dashboard' }).click();
+		await expect(page).toHaveURL('/admin/demo/dashboard');
+		await expect(page.getByRole('heading', { level: 1 })).toHaveText('Dashboard (demo)');
+		await expect(page.getByRole('tab', { name: 'Overview' })).toBeVisible();
+
+		const response = await page.goto('/admin/demo/unknown');
+		expect(response?.status()).toBe(404);
 	});
 
 	test('creates a draft post and writes JSON', async ({ page }) => {

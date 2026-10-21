@@ -1,4 +1,4 @@
-import { expect, type APIRequestContext } from '@playwright/test';
+import { expect, type APIRequestContext, type Page } from '@playwright/test';
 import { mkdir, rm } from 'node:fs/promises';
 
 export const PROJECTS_DIR = 'tmp/e2e-projects';
@@ -48,4 +48,16 @@ export async function waitForProject(request: APIRequestContext, slug: string) {
 			timeout: 5000,
 		})
 		.toBe(200);
+}
+
+/** Waits until every server-rendered Astro island on the page has hydrated. */
+export async function waitForHydration(page: Page) {
+	await page.waitForFunction(() => !document.querySelector('astro-island[ssr]'));
+}
+
+/** Opens the row actions menu for a post in the Posts table. */
+export async function openPostActions(page: Page, title: string) {
+	await waitForHydration(page);
+	await page.getByRole('table').getByRole('button', { name: `Actions for ${title}` }).click();
+	return page.getByRole('menu');
 }
