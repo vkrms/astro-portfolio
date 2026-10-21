@@ -55,15 +55,8 @@ export const homeSettingsSchema = z.object({
 	featured: z.array(z.string().min(1)).default([]),
 });
 
-export const aboutSettingsSchema = z.object({
-	body: z.array(z.unknown()).default([]),
-	portrait: z.string().optional(),
-	portraitAlt: z.string().optional(),
-});
-
 export type SiteSettings = z.infer<typeof siteSettingsSchema>;
 export type HomeSettings = z.infer<typeof homeSettingsSchema>;
-export type AboutSettings = z.infer<typeof aboutSettingsSchema>;
 
 export function formatZodError(error: z.ZodError): string {
 	return error.issues

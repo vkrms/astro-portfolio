@@ -227,24 +227,6 @@ test.describe('phase 1 - public site', () => {
 		);
 	});
 
-	test('about page shows the body and portrait', async ({ page, request }) => {
-		const portrait = await uploadImage(request, 'settings', 'portrait.png');
-
-		await updateSettings(request, {
-			about: {
-				body: [paragraph('About body.')],
-				portrait,
-				portraitAlt: 'Portrait alt',
-			},
-		});
-
-		await page.goto('/about');
-
-		await expect(page.getByRole('heading', { level: 1 })).toHaveText('About');
-		await expect(page.getByText('About body.')).toBeVisible();
-		await expect(page.locator('img[alt="Portrait alt"]')).toBeVisible();
-	});
-
 	test('serves the feed and 404', async ({ page, request }) => {
 		await request.post('/api/save', {
 			data: {

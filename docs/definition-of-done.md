@@ -40,7 +40,7 @@ Deferred to Phase 1: Vercel preview.
 - [x] The media picker resizes an image to <= 3000 px and <= 3.5 MB before upload (phase 0b).
 - [x] The preview modal matches the production page, including an operable carousel.
 - [x] Images can be saved without alt text; the alt field stays available and renders when filled.
-- [x] `site`, `home` and `about` are editable at `/admin/settings`.
+- [x] `site` and `home` are editable at `/admin/settings`.
 - [x] Posts have tags; at least one published post is tagged `real deal`.
 
 ### Public site
@@ -49,7 +49,6 @@ Deferred to Phase 1: Vercel preview.
 - [x] `/projects` lists published projects newest first and filters by tag.
 - [x] `/projects/[slug]` shows header, cover, block body, links and previous/next.
 - [x] `cover` is the OG image; `summary` is the meta description.
-- [x] `/about` shows the about body and portrait.
 - [x] `/rss.xml`, `/sitemap-index.xml` and `/404` respond.
 - [x] Drafts are excluded from the production build.
 - [x] Public pages have no framework hydration; total JS stays under 40 KB gzipped per page (measured ~6.6 KB on a project page).

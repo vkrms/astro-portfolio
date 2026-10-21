@@ -9,7 +9,6 @@ How to review: run `npm run dev`, then open each URL at desktop (>= 1024 px) and
 - [ ] **Home** `/` - header, hero, intro, featured project cards, empty state, footer.
 - [ ] **Projects** `/projects` - cards, tag chips, active tag, no-results state, cover thumbnails. Check that the `real deal` chip filters to the published post.
 - [ ] **Project** `/projects/[slug]` - header, cover, byline, links, body blocks, previous/next, footer. Body coverage: paragraph, H2/H3, lists, code, image, gallery, carousel, embed, quote, media + text.
-- [ ] **About** `/about` - heading, portrait, body, footer.
 - [ ] **404** `/does-not-exist` - message and a way back.
 
 ## Visitor-facing overlays and interactions

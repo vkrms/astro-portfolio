@@ -493,27 +493,22 @@ test.describe('phase 1 - admin', () => {
 		await page.goto('/admin/edit/new');
 	});
 
-	test('edits the site, home and about singletons', async ({ page }) => {
+	test('edits the site and home singletons', async ({ page }) => {
 		await resetSettings();
 		await page.goto('/admin/settings');
-		await expect(page.locator('.bn-editor[contenteditable="true"]')).toBeVisible();
+		await waitForHydration(page);
 
 		await page.getByLabel('Site title').fill('Studio');
 		await page.getByLabel('Intro').fill('Custom intro.');
-
-		await page.locator('.bn-editor').click();
-		await page.keyboard.press('End');
-		await page.keyboard.type(' Updated.');
 
 		await page.getByRole('button', { name: 'Save settings' }).first().click();
 		await expect(page.getByText('Saved.')).toBeVisible();
 
 		const site = JSON.parse(await readFile(join(SETTINGS_DIR, 'site.json'), 'utf8'));
 		const home = JSON.parse(await readFile(join(SETTINGS_DIR, 'home.json'), 'utf8'));
-		const about = JSON.parse(await readFile(join(SETTINGS_DIR, 'about.json'), 'utf8'));
 
 		expect(site.seo.title).toBe('Studio');
 		expect(home.intro).toBe('Custom intro.');
-		expect(JSON.stringify(about.body)).toContain('Updated.');
+		await expect(readFile(join(SETTINGS_DIR, 'about.json'), 'utf8')).rejects.toThrow();
 	});
 });

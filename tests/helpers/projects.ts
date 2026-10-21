@@ -20,15 +20,14 @@ export async function resetSettings() {
 	await mkdir(SETTINGS_DIR, { recursive: true });
 }
 
-/** Updates one settings singleton, keeping the other two from the server. */
+/** Updates one settings singleton, keeping the other from the server. */
 export async function updateSettings(
 	request: APIRequestContext,
-	patch: { site?: unknown; home?: unknown; about?: unknown },
+	patch: { site?: unknown; home?: unknown },
 ) {
 	const current = (await (await request.get('/api/settings')).json()) as {
 		site: unknown;
 		home: unknown;
-		about: unknown;
 	};
 
 	const response = await request.post('/api/settings', {

@@ -1,15 +1,14 @@
 ---
 import Admin from '../../layouts/Admin.astro';
 import SettingsEditor from '../../components/admin/SettingsEditor';
-import { readAboutSettings, readHomeSettings, readSiteSettings } from '../../lib/settings';
+import { readHomeSettings, readSiteSettings } from '../../lib/settings';
 import { listPosts } from '../../lib/storage';
 
 export const prerender = false;
 
-const [site, home, about, posts] = await Promise.all([
+const [site, home, posts] = await Promise.all([
 	readSiteSettings(),
 	readHomeSettings(),
-	readAboutSettings(),
 	listPosts(),
 ]);
 ---
@@ -20,7 +19,6 @@ const [site, home, about, posts] = await Promise.all([
 			client:only="react"
 			site={site}
 			home={home}
-			about={about}
 			posts={posts.map((post) => ({ slug: post.slug, title: post.title, draft: post.draft }))}
 		/>
 	</div>

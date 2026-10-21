@@ -1,8 +1,4 @@
-import { useRef, useState } from 'react';
-import { useCreateBlockNote } from '@blocknote/react';
-import { BlockNoteView } from '@blocknote/shadcn';
-import '@blocknote/core/fonts/inter.css';
-import '@blocknote/shadcn/style.css';
+import { useState } from 'react';
 import { toast } from 'sonner';
 import { Button } from '@admin/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@admin/components/ui/card';
@@ -17,11 +13,7 @@ import {
 	SelectValue,
 } from '@admin/components/ui/select';
 import { Textarea } from '@admin/components/ui/textarea';
-import { useDarkMode } from '@admin/hooks/use-dark-mode';
-import { normalizeBlocks } from '../../blocks/shared';
-import { schema } from '../../blocks/schema';
-import { uploadImage } from '../../lib/upload';
-import type { AboutSettings, HomeSettings, SiteSettings } from '../../lib/schema';
+import type { HomeSettings, SiteSettings } from '../../lib/schema';
 
 interface PostOption {
 	slug: string;
@@ -32,25 +24,15 @@ interface PostOption {
 interface Props {
 	site: SiteSettings;
 	home: HomeSettings;
-	about: AboutSettings;
 	posts: PostOption[];
 }
 
-export default function SettingsEditor({ site: initialSite, home: initialHome, about, posts }: Props) {
+export default function SettingsEditor({ site: initialSite, home: initialHome, posts }: Props) {
 	const [site, setSite] = useState(initialSite);
 	const [intro, setIntro] = useState(initialHome.intro);
 	const [featured, setFeatured] = useState(initialHome.featured);
-	const [portrait, setPortrait] = useState(about.portrait ?? '');
-	const [portraitAlt, setPortraitAlt] = useState(about.portraitAlt ?? '');
 	const [toAdd, setToAdd] = useState('');
 	const [saving, setSaving] = useState(false);
-	const dark = useDarkMode();
-	const portraitRef = useRef<HTMLInputElement>(null);
-
-	const editor = useCreateBlockNote({
-		schema,
-		initialContent: about.body.length ? (normalizeBlocks(about.body) as any) : undefined,
-	});
 
 	const available = posts.filter((post) => !post.draft && !featured.includes(post.slug));
 
@@ -77,15 +59,6 @@ export default function SettingsEditor({ site: initialSite, home: initialHome, a
 		setFeatured(next);
 	}
 
-	async function addPortrait(files: FileList | null) {
-		const file = files?.[0];
-		if (!file) return;
-
-		const path = await uploadImage(file, 'settings');
-		if (path) setPortrait(path);
-		if (portraitRef.current) portraitRef.current.value = '';
-	}
-
 	async function save() {
 		setSaving(true);
 
@@ -96,11 +69,6 @@ export default function SettingsEditor({ site: initialSite, home: initialHome, a
 				body: JSON.stringify({
 					site,
 					home: { intro, featured },
-					about: {
-						body: editor.document,
-						portrait: portrait || undefined,
-						portraitAlt: portraitAlt || undefined,
-					},
 				}),
 			});
 
@@ -358,71 +326,6 @@ export default function SettingsEditor({ site: initialSite, home: initialHome, a
 								Add
 							</Button>
 						</div>
-					</div>
-				</CardContent>
-			</Card>
-
-			<Card className="gap-4 py-4">
-				<CardHeader className="px-4">
-					<CardTitle className="text-sm">About</CardTitle>
-				</CardHeader>
-				<CardContent className="grid gap-4 px-4">
-					<div className="grid gap-2">
-						<span className="text-sm font-medium">Portrait</span>
-						{portrait ? (
-							<>
-								<img src={portrait} alt={portraitAlt} className="max-h-64 w-fit rounded-md border object-cover" />
-								<Input
-									aria-label="Portrait alt text"
-									value={portraitAlt}
-									onChange={(event) => setPortraitAlt(event.target.value)}
-									placeholder="Portrait alt text"
-								/>
-								<div className="flex gap-2">
-									<Button
-										type="button"
-										variant="outline"
-										size="sm"
-										onClick={() => portraitRef.current?.click()}
-									>
-										Replace
-									</Button>
-									<Button
-										type="button"
-										variant="outline"
-										size="sm"
-										className="text-destructive"
-										onClick={() => {
-											setPortrait('');
-											setPortraitAlt('');
-										}}
-									>
-										Remove
-									</Button>
-								</div>
-							</>
-						) : (
-							<Button
-								type="button"
-								variant="outline"
-								size="sm"
-								className="w-fit"
-								onClick={() => portraitRef.current?.click()}
-							>
-								Add portrait
-							</Button>
-						)}
-						<input
-							ref={portraitRef}
-							type="file"
-							accept="image/*"
-							onChange={(event) => addPortrait(event.target.files)}
-							className="hidden"
-						/>
-					</div>
-
-					<div className="min-h-[30vh] rounded-md border p-3">
-						<BlockNoteView editor={editor} theme={dark ? 'dark' : 'light'} />
 					</div>
 				</CardContent>
 			</Card>

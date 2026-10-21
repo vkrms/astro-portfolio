@@ -170,7 +170,7 @@ one at a time.
 | `/admin/edit/[slug]` | `readPost(slug)` | Editing a post; later slice |
 | `POST /api/duplicate` | `duplicatePost(slug)` | Copy as a draft |
 | `POST /api/delete` | `deletePost(slug)` | Remove the JSON file |
-| `/admin/settings` | settings singletons | Site, home, about |
+| `/admin/settings` | settings singletons | Site, home |
 | `/admin/demo/[page]` | demo JSON | shadcn-admin examples; 404 for unknown pages |
 | `/admin/media` | none | Later slice |
 

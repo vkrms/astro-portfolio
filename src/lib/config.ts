@@ -40,7 +40,6 @@ export const defaultSiteConfig: SiteConfig = {
 	nav: [
 		{ title: 'Home', link: '/' },
 		{ title: 'Projects', link: '/projects' },
-		{ title: 'About', link: '/about' },
 	],
 	contactLinks: [],
 };

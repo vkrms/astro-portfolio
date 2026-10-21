@@ -78,7 +78,7 @@ One JSON file per post in `src/content/projects`, plus three settings singletons
 | `body` | BlockNote block array | Validated against the shared block schema |
 | `schemaVersion` | number | Bumped if the block format changes, so old posts can be migrated |
 
-**Singletons** (JSON in `src/content/settings/`): `site` (name, tagline, social links, SEO defaults), `home` (intro text, ordered featured list), `about` (BlockNote body, portrait image). The admin edits these with the same tools.
+**Singletons** (JSON in `src/content/settings/`): `site` (name, tagline, social links, SEO defaults), `home` (intro text, ordered featured list). The admin edits these with the same tools.
 
 **File layout**
 
@@ -95,7 +95,7 @@ src/
     projects/
       my-project.json
     settings/
-      site.json  home.json  about.json
+      site.json  home.json
   assets/
     uploads/
       my-project/
@@ -165,11 +165,10 @@ All public pages are prerendered. The admin pages and API routes run on demand a
 | `/` | Intro, featured projects grid | Static |
 | `/projects` | All published projects, newest first, tag filter | Static |
 | `/projects/[slug]` | Project post: header, cover, block body, links, next/previous | Static |
-| `/about` | About text and portrait | Static |
 | `/rss.xml`, `/sitemap-index.xml`, `/404` | Feed, sitemap, not-found page | Static |
 | `/admin` | Post list with draft/published state | Local only |
 | `/admin/edit/[slug]` | Fields panel, BlockNote body, preview modal | Local only |
-| `/admin/settings` | Site, home and about singletons | Local only |
+| `/admin/settings` | Site and home singletons | Local only |
 | `GET /api/posts`, `GET /api/posts/[slug]` | Read posts from disk | Local only |
 | `POST /api/save` | Validate, then write post JSON + images | Local only |
 | `POST /api/media` | Store an image under `src/assets/uploads/` | Local only |
@@ -254,8 +253,8 @@ The admin is local-only. Deployed builds serve static pages only.
 - A custom Image block on the same media pipeline, with alt and caption fields; alt text is optional and renders when provided.
 - Every Phase 1 block is implemented: paragraph, H2/H3, lists, code, image, gallery, carousel, embed, quote and media + text. The slash menu puts the media blocks first and hides anything the renderer cannot draw.
 - Gallery, quote, media + text and embed blocks share one item/image editor pattern; carousel slides, gallery images and media + text images expose alt fields, and embeds require a title.
-- `site`, `home` and `about` settings singletons are editable at `/admin/settings`, including the about BlockNote body and portrait.
-- Public home shows the configured intro and featured projects; `/about` renders the settings body and portrait; `/rss.xml` is generated.
+- `site` and `home` settings singletons are editable at `/admin/settings`.
+- Public home shows the configured intro and featured projects; `/rss.xml` is generated.
 - Posts carry tags; `/projects` filters by them client-side (static pages cannot read a query string at build time), including multi-word tags. The published `this-is-a-post` is tagged `real deal`.
 - Post covers render on `/projects/[slug]` and produce a 1200x630 OG image; canonical and meta description come from the route and `summary`.
 - Storage validates posts on read and write with Zod, so a malformed JSON file fails the build with the field name.

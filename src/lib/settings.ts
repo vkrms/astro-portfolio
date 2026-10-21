@@ -1,17 +1,15 @@
 /**
- * Settings singletons. Three JSON files under src/content/settings hold the
- * site shell, the home intro/featured list and the about page. Missing files
+ * Settings singletons. Two JSON files under src/content/settings hold the
+ * site shell and the home intro/featured list. Missing files
  * fall back to defaults; malformed files throw so the build fails loudly.
  */
 import { mkdir, readFile, writeFile } from 'node:fs/promises';
 import { join } from 'node:path';
 import { defaultSiteConfig, type SiteConfig } from './config';
 import {
-	aboutSettingsSchema,
 	formatZodError,
 	homeSettingsSchema,
 	siteSettingsSchema,
-	type AboutSettings,
 	type HomeSettings,
 	type SiteSettings,
 } from './schema';
@@ -21,12 +19,6 @@ export const SETTINGS_DIR = 'src/content/settings';
 export const defaultHomeSettings: HomeSettings = {
 	intro: 'Selected work and experiments in design and engineering.',
 	featured: [],
-};
-
-export const defaultAboutSettings: AboutSettings = {
-	body: [],
-	portrait: undefined,
-	portraitAlt: undefined,
 };
 
 function settingsDir(): string {
@@ -80,20 +72,4 @@ export async function writeHomeSettings(value: unknown): Promise<HomeSettings> {
 	return result.data;
 }
 
-export async function readAboutSettings(): Promise<AboutSettings> {
-	const data = await readJson('about');
-	if (data === null) return defaultAboutSettings;
-
-	const result = aboutSettingsSchema.safeParse(data);
-	if (!result.success) throw new Error(`Invalid about settings: ${formatZodError(result.error)}`);
-	return result.data;
-}
-
-export async function writeAboutSettings(value: unknown): Promise<AboutSettings> {
-	const result = aboutSettingsSchema.safeParse(value);
-	if (!result.success) throw new Error(formatZodError(result.error));
-	await writeJson('about', result.data);
-	return result.data;
-}
-
-export type { AboutSettings, HomeSettings, SiteConfig, SiteSettings };
+export type { HomeSettings, SiteConfig, SiteSettings };
