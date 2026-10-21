@@ -73,6 +73,53 @@ test.describe('phase 1 - public site', () => {
 		await expect(card.locator('img')).toHaveCount(0);
 	});
 
+	test('the header menu button opens the nav on every screen size', async ({ page }) => {
+		for (const width of [1280, 390]) {
+			await page.setViewportSize({ width, height: 700 });
+			await page.goto('/');
+
+			const header = page.getByRole('banner');
+			const toggle = header.getByRole('button', { name: 'Toggle navigation menu' });
+			const panel = page.locator('#menu-panel');
+
+			await expect(toggle).toHaveAttribute('aria-expanded', 'false');
+			await expect(panel).toBeHidden();
+
+			await toggle.click();
+			await expect(toggle).toHaveAttribute('aria-expanded', 'true');
+			await expect(panel.getByRole('link', { name: 'Projects' })).toBeVisible();
+
+			await page.keyboard.press('Escape');
+			await expect(panel).toBeHidden();
+
+			await toggle.click();
+			await panel.getByRole('link', { name: 'Projects' }).click();
+			await expect(page).toHaveURL('/projects');
+		}
+	});
+
+	test('the header scrolls away with the page', async ({ page, request }) => {
+		await request.post('/api/save', {
+			data: {
+				title: 'Long Post',
+				summary: 'Summary.',
+				date: '2026-01-01',
+				draft: false,
+				body: Array.from({ length: 40 }, (_, i) => paragraph(`Paragraph ${i + 1}.`)),
+			},
+		});
+		await waitForProject(request, 'long-post');
+
+		await page.setViewportSize({ width: 1280, height: 600 });
+		await page.goto('/projects/long-post');
+
+		const header = page.getByRole('banner');
+		await expect(header).toBeInViewport();
+
+		await page.evaluate(() => window.scrollTo(0, 800));
+		await expect(header).not.toBeInViewport();
+	});
+
 	test('filters projects by tag', async ({ page, request }) => {
 		await request.post('/api/save', {
 			data: {
