@@ -290,6 +290,27 @@ test.describe('phase 1 - admin', () => {
 		});
 	});
 
+	test('links to the public page once a published post is saved', async ({ page, request }) => {
+		await createPost(request, {
+			title: 'Draft Post',
+			summary: 'Summary.',
+			date: '2026-01-01',
+			draft: true,
+		});
+		await page.goto('/admin/edit/draft-post');
+		await waitForHydration(page);
+
+		await expect(page.getByRole('link', { name: 'View on site' })).toHaveCount(0);
+
+		await page.getByLabel('Draft').uncheck();
+		await page.getByRole('button', { name: 'Save' }).click();
+		await expect(page.getByText('Saved.')).toBeVisible();
+
+		const link = page.getByRole('link', { name: 'View on site' });
+		await expect(link).toHaveAttribute('href', '/projects/draft-post');
+		await expect(link).toHaveAttribute('target', '_blank');
+	});
+
 	test('serves an empty post list from /api/posts', async ({ request }) => {
 		const response = await request.get('/api/posts');
 		expect(response.status()).toBe(200);

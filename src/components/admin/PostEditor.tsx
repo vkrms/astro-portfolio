@@ -8,6 +8,7 @@ import {
 import { BlockNoteView } from '@blocknote/shadcn';
 import '@blocknote/core/fonts/inter.css';
 import '@blocknote/shadcn/style.css';
+import { ExternalLink } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@admin/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@admin/components/ui/card';
@@ -55,6 +56,8 @@ export default function PostEditor({ slug, post }: Props) {
 	const [role, setRole] = useState(post?.role ?? '');
 	const [client, setClient] = useState(post?.client ?? '');
 	const [links, setLinks] = useState<PostLink[]>(post?.links ?? []);
+	// What is on disk. The public page only exists for a saved, published post.
+	const [saved, setSaved] = useState(post ? { slug: post.slug, draft: post.draft } : null);
 	const [saving, setSaving] = useState(false);
 	const [preview, setPreview] = useState<string | null>(null);
 	const [previewOpen, setPreviewOpen] = useState(false);
@@ -136,9 +139,12 @@ export default function PostEditor({ slug, post }: Props) {
 
 			// Stay on the editor. A new post (or a changed slug) now has a real
 			// URL, so point the address bar at it without reloading.
-			const { post: saved } = (await response.json()) as { post: { slug: string } };
-			setPageSlug(saved.slug);
-			window.history.replaceState(null, '', `/admin/edit/${saved.slug}`);
+			const { post: record } = (await response.json()) as {
+				post: { slug: string; draft: boolean };
+			};
+			setSaved({ slug: record.slug, draft: record.draft });
+			setPageSlug(record.slug);
+			window.history.replaceState(null, '', `/admin/edit/${record.slug}`);
 			toast.success('Saved.');
 		} finally {
 			setSaving(false);
@@ -314,6 +320,18 @@ export default function PostEditor({ slug, post }: Props) {
 							>
 								{previewLoading ? 'Loading…' : 'Preview'}
 							</Button>
+							{saved && !saved.draft ? (
+								<Button type="button" variant="outline" asChild className="w-full">
+									<a href={`/projects/${saved.slug}`} target="_blank" rel="noopener">
+										View on site
+										<ExternalLink aria-hidden="true" />
+									</a>
+								</Button>
+							) : (
+								<p className="text-xs text-muted-foreground">
+									Save a published post (Draft unchecked) to view it on the site.
+								</p>
+							)}
 						</CardContent>
 					</Card>
 

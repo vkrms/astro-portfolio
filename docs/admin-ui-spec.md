@@ -23,7 +23,9 @@ a right sidebar.
   Enter does not add a newline. Placeholder: **Add title**.
 - **Body:** BlockNote fills the main column and has a minimum height of about
   60% of the viewport.
-- **Sidebar, Publish:** Draft and Featured checkboxes, Save, Preview.
+- **Sidebar, Publish:** Draft and Featured checkboxes, Save, Preview, and
+  **View on site** (`/projects/<slug>`, new tab). The link shows only when the
+  saved post is published; drafts have no public page.
 - **Sidebar, Post settings:** Excerpt (the stored `summary`), Slug and Date.
 - **Mobile:** the sidebar stacks below the body.
 - The preview opens in a centered dialog and initializes the carousel script.
