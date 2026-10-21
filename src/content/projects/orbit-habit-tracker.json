@@ -1,0 +1,273 @@
+{
+	"title": "Orbit, a habit tracker that forgives a missed day",
+	"summary": "A mobile app that replaces streak guilt with a gentle weekly rhythm. Design, prototype and a shipped React Native build.",
+	"date": "2026-09-28",
+	"draft": false,
+	"cover": "/uploads/orbit-habit-tracker/cover.jpg",
+	"coverAlt": "Orbit app artwork with concentric rings",
+	"tags": [
+		"product design",
+		"mobile"
+	],
+	"role": "Product design and front end",
+	"client": "Personal project",
+	"links": [
+		{
+			"label": "Prototype",
+			"url": "https://example.com/orbit"
+		}
+	],
+	"featured": false,
+	"body": [
+		{
+			"id": "fca15474-a4e3-4a56-9c19-29f47950b4ff",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Most habit apps measure you by your longest streak. One missed day and the number goes to zero, which is exactly when people quit. ",
+					"styles": {}
+				},
+				{
+					"type": "text",
+					"text": "Orbit",
+					"styles": {
+						"bold": true
+					}
+				},
+				{
+					"type": "text",
+					"text": " tries the opposite: ",
+					"styles": {}
+				},
+				{
+					"type": "text",
+					"text": "progress is a shape that is hard to break",
+					"styles": {
+						"italic": true
+					}
+				},
+				{
+					"type": "text",
+					"text": ".",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "dbb07b4d-ba0e-4be7-87aa-108789a5ea2a",
+			"type": "heading",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left",
+				"level": 2,
+				"isToggleable": false
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "The problem",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "562d60f6-61d4-453b-862b-aa562091431f",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "In interviews, eight of ten people who abandoned a tracker said the same thing: they missed a day, felt bad, and stopped opening the app.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "0cc272a7-7fff-4e1a-a928-1a01b36fb217",
+			"type": "image",
+			"props": {
+				"src": "/uploads/orbit-habit-tracker/figure-1.jpg",
+				"alt": "Home screen with five concentric rings",
+				"caption": "Rings fill through the week. A missed day dims a ring.",
+				"width": "wide"
+			},
+			"children": []
+		},
+		{
+			"id": "dca83e6f-b96a-407f-a2b3-942a8fc0f387",
+			"type": "heading",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left",
+				"level": 2,
+				"isToggleable": false
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "The approach",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "c0f5f142-79b4-4705-81f9-2257395bdff3",
+			"type": "bulletListItem",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Weekly rhythm",
+					"styles": {
+						"bold": true
+					}
+				},
+				{
+					"type": "text",
+					"text": " instead of daily streaks.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "70f54d3e-333a-4af5-8361-baa54ce21b98",
+			"type": "bulletListItem",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Soft misses",
+					"styles": {
+						"bold": true
+					}
+				},
+				{
+					"type": "text",
+					"text": ": a skipped day dims, it does not reset.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "c4668a4e-3f51-4cd5-a480-70409d01dad1",
+			"type": "bulletListItem",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "One suggestion",
+					"styles": {
+						"bold": true
+					}
+				},
+				{
+					"type": "text",
+					"text": " per week, written like a note from a friend.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "cb88a11a-cee0-4bfa-ac0b-5fc3bce6f2dd",
+			"type": "carousel",
+			"props": {
+				"items": "[{\"src\":\"/uploads/orbit-habit-tracker/slide-1.jpg\",\"alt\":\"Onboarding screen of Orbit\",\"caption\":\"Use the arrows or swipe to move through the slides.\"},{\"src\":\"/uploads/orbit-habit-tracker/slide-2.jpg\",\"alt\":\"Today screen of Orbit\",\"caption\":\"\"},{\"src\":\"/uploads/orbit-habit-tracker/slide-3.jpg\",\"alt\":\"Week view screen of Orbit\",\"caption\":\"\"},{\"src\":\"/uploads/orbit-habit-tracker/slide-4.jpg\",\"alt\":\"Insights screen of Orbit\",\"caption\":\"\"}]",
+				"aspect": "16/9"
+			},
+			"children": []
+		},
+		{
+			"id": "ae9cf03f-0198-46e7-92c8-70b33793c70a",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "The prototype was tested with twelve people over three weeks. Retention at week three went from 31% (streak version) to 58%.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "69d4ae29-9e54-4086-812f-dd587939d211",
+			"type": "image",
+			"props": {
+				"src": "/uploads/orbit-habit-tracker/figure-2.jpg",
+				"alt": "Weekly review screen",
+				"caption": "The Sunday review.",
+				"width": "inline"
+			},
+			"children": []
+		},
+		{
+			"id": "7d40051b-9395-493c-8225-6939e7ff8f18",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Read the ",
+					"styles": {}
+				},
+				{
+					"type": "link",
+					"href": "https://example.com/orbit",
+					"content": [
+						{
+							"type": "text",
+							"text": "full case study notes",
+							"styles": {}
+						}
+					]
+				},
+				{
+					"type": "text",
+					"text": " or try the prototype.",
+					"styles": {}
+				}
+			],
+			"children": []
+		}
+	],
+	"schemaVersion": 1
+}

@@ -1,0 +1,213 @@
+{
+	"title": "Lumen, a dashboard for a smart lighting fleet",
+	"summary": "An operations dashboard for facility teams managing thousands of connected lights. Dense data, calm interface.",
+	"date": "2026-06-30",
+	"draft": false,
+	"cover": "/uploads/lumen-lighting-dashboard/cover.jpg",
+	"coverAlt": "Grid of glowing tiles in teal and amber",
+	"tags": [
+		"dashboard",
+		"real deal"
+	],
+	"role": "Design lead",
+	"client": "Lumen Systems",
+	"featured": true,
+	"body": [
+		{
+			"id": "6c2f1b32-24a9-41a2-b827-b8277c092438",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Facility teams watch thousands of lights across dozens of buildings. The old tool showed all of them, all the time. ",
+					"styles": {}
+				},
+				{
+					"type": "text",
+					"text": "Lumen",
+					"styles": {
+						"bold": true
+					}
+				},
+				{
+					"type": "text",
+					"text": " shows the ones that need a person.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "5dc21593-1d5f-4025-9133-c40d36e8d295",
+			"type": "heading",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left",
+				"level": 2,
+				"isToggleable": false
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Quiet by default",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "d056dbfd-8d73-4894-8bbf-a7e0426cff78",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Healthy zones collapse into a single line. A fault expands its zone, shows the likely cause and offers the two fixes that work most often.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "835b952c-c586-4cd6-adc9-ac34b9818d35",
+			"type": "image",
+			"props": {
+				"src": "/uploads/lumen-lighting-dashboard/figure-1.jpg",
+				"alt": "Floor plan with lights colored by status",
+				"caption": "Fleet map: faults first.",
+				"width": "full"
+			},
+			"children": []
+		},
+		{
+			"id": "5c6b80a2-9776-4723-afa1-2a126d85f7cb",
+			"type": "heading",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left",
+				"level": 2,
+				"isToggleable": false
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Designed with the people who use it",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "8ec2fb1c-4b41-4969-91a5-ff2630585c95",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "We shadowed three night-shift teams. Their biggest request was not more data, it was ",
+					"styles": {}
+				},
+				{
+					"type": "text",
+					"text": "fewer false alarms",
+					"styles": {
+						"italic": true
+					}
+				},
+				{
+					"type": "text",
+					"text": ". The alert model was rewritten around that.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "b4fb5923-2f24-4ffe-98a7-5f44057f8cdc",
+			"type": "carousel",
+			"props": {
+				"items": "[{\"src\":\"/uploads/lumen-lighting-dashboard/slide-1.jpg\",\"alt\":\"Overview screen of Lumen\",\"caption\":\"Use the arrows or swipe to move through the slides.\"},{\"src\":\"/uploads/lumen-lighting-dashboard/slide-2.jpg\",\"alt\":\"Zone detail screen of Lumen\",\"caption\":\"\"},{\"src\":\"/uploads/lumen-lighting-dashboard/slide-3.jpg\",\"alt\":\"Alerts screen of Lumen\",\"caption\":\"\"},{\"src\":\"/uploads/lumen-lighting-dashboard/slide-4.jpg\",\"alt\":\"Energy screen of Lumen\",\"caption\":\"\"},{\"src\":\"/uploads/lumen-lighting-dashboard/slide-5.jpg\",\"alt\":\"Settings screen of Lumen\",\"caption\":\"\"}]",
+				"aspect": "16/9"
+			},
+			"children": []
+		},
+		{
+			"id": "374bb6cf-ddb8-4d9e-99df-8533f1ea5b52",
+			"type": "bulletListItem",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Alert volume down 64% in the pilot.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "8785b4a2-9fd4-4170-9ea8-6db8cf16f639",
+			"type": "bulletListItem",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Median time to resolve a fault: 41 minutes to 12.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "ec49ec64-6025-462b-bce3-84fc62137ece",
+			"type": "bulletListItem",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Built on a shared component library, so new views take days.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "31783411-ee49-422c-bd0e-8fed8b22cc20",
+			"type": "image",
+			"props": {
+				"src": "/uploads/lumen-lighting-dashboard/figure-2.jpg",
+				"alt": "Weekly energy report",
+				"caption": "The weekly energy report.",
+				"width": "wide"
+			},
+			"children": []
+		}
+	],
+	"schemaVersion": 1
+}

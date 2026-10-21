@@ -1,0 +1,156 @@
+{
+	"title": "Paper Planes, a searchable archive for a zine collective",
+	"summary": "Twenty years of photocopied zines, scanned, tagged and made browsable. An editorial site with a very small build.",
+	"date": "2026-02-03",
+	"draft": false,
+	"cover": "/uploads/paper-planes-zine-archive/cover.jpg",
+	"coverAlt": "Colorful paper-cut triangles",
+	"tags": [
+		"editorial",
+		"illustration"
+	],
+	"role": "Design and development",
+	"client": "Paper Planes Collective",
+	"links": [
+		{
+			"label": "The archive",
+			"url": "https://example.com/paper-planes"
+		}
+	],
+	"featured": false,
+	"body": [
+		{
+			"id": "9aab2f9e-9843-4598-83eb-5c9c4b493185",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Paper Planes has made zines since 2006: photocopied, stapled, passed around. Most issues exist in one shoebox. This site is the shoebox, with a search box.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "fa65b06c-ce4a-41fd-9962-c153468f1cb1",
+			"type": "heading",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left",
+				"level": 2,
+				"isToggleable": false
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Scan, tag, publish",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "1aaba430-eba7-482a-b4d3-c539f57424a5",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Volunteers scanned 212 issues. Each got a title, a date and tags. The site is static, so hosting costs almost nothing, and the archive can outlive its maintainers.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "85885667-fd62-42bd-98a4-e90cd1b811d5",
+			"type": "image",
+			"props": {
+				"src": "/uploads/paper-planes-zine-archive/figure-1.jpg",
+				"alt": "A zine issue page with paper texture",
+				"caption": "An issue page, with the paper left in.",
+				"width": "wide"
+			},
+			"children": []
+		},
+		{
+			"id": "f1309215-9511-45ba-9fb7-cf8caade9799",
+			"type": "carousel",
+			"props": {
+				"items": "[{\"src\":\"/uploads/paper-planes-zine-archive/slide-1.jpg\",\"alt\":\"Cover wall screen of Paper Planes\",\"caption\":\"Use the arrows or swipe to move through the slides.\"},{\"src\":\"/uploads/paper-planes-zine-archive/slide-2.jpg\",\"alt\":\"Spread screen of Paper Planes\",\"caption\":\"\"},{\"src\":\"/uploads/paper-planes-zine-archive/slide-3.jpg\",\"alt\":\"Detail screen of Paper Planes\",\"caption\":\"\"},{\"src\":\"/uploads/paper-planes-zine-archive/slide-4.jpg\",\"alt\":\"Back page screen of Paper Planes\",\"caption\":\"\"}]",
+				"aspect": "1/1"
+			},
+			"children": []
+		},
+		{
+			"id": "ad03d4ce-deda-4b3a-bd53-de52b8a663d9",
+			"type": "heading",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left",
+				"level": 2,
+				"isToggleable": false
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Feels like a zine",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "35b1cb00-8620-40bc-82ae-65897ff40c83",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Type is set big and a little crooked. Tags are hand drawn. Nothing animates unless you ask it to, and ",
+					"styles": {}
+				},
+				{
+					"type": "text",
+					"text": "everything works without JavaScript",
+					"styles": {
+						"italic": true
+					}
+				},
+				{
+					"type": "text",
+					"text": " except search.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "e946e310-826e-42a2-a44b-a80464b06afd",
+			"type": "image",
+			"props": {
+				"src": "/uploads/paper-planes-zine-archive/figure-2.jpg",
+				"alt": "Hand-drawn tag index",
+				"caption": "Hand-drawn tags.",
+				"width": "full"
+			},
+			"children": []
+		}
+	],
+	"schemaVersion": 1
+}

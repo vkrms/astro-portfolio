@@ -1,0 +1,207 @@
+{
+	"title": "Field Notes Studio, a brand identity built from margins",
+	"summary": "Identity, stationery and signage for a small architecture studio that wanted to look like a well-used notebook.",
+	"date": "2026-08-14",
+	"draft": false,
+	"cover": "/uploads/field-notes-studio-identity/cover.jpg",
+	"coverAlt": "Cream and red stripes brand artwork",
+	"tags": [
+		"branding",
+		"print"
+	],
+	"role": "Art direction and design",
+	"client": "Field Notes Studio",
+	"links": [
+		{
+			"label": "Studio site",
+			"url": "https://example.com/field-notes"
+		}
+	],
+	"featured": false,
+	"body": [
+		{
+			"id": "48f36560-f238-4065-82e8-222111a465b5",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Field Notes Studio draws houses by hand and builds them with a small crew. Their old logo looked like every other architecture firm. The brief: ",
+					"styles": {}
+				},
+				{
+					"type": "text",
+					"text": "look like the notebook on the site visit",
+					"styles": {
+						"italic": true
+					}
+				},
+				{
+					"type": "text",
+					"text": ".",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "47f17180-3b47-415e-b6a9-d5af000fcc60",
+			"type": "heading",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left",
+				"level": 2,
+				"isToggleable": false
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "A system made of margins",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "f3978de3-51d9-4c37-8947-9697d8523b7f",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Every layout starts with a ruled margin and a note beside it. The identity is a set of rules for that margin, so new material is easy to make in-house.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "88d92fdf-7a4f-4032-ae8f-5dfc5b03031b",
+			"type": "image",
+			"props": {
+				"src": "/uploads/field-notes-studio-identity/figure-1.jpg",
+				"alt": "Logo made from a single line and a margin note",
+				"caption": "The mark, in red and in ink.",
+				"width": "wide"
+			},
+			"children": []
+		},
+		{
+			"id": "5652e038-19d5-4711-967a-010f16e424d8",
+			"type": "carousel",
+			"props": {
+				"items": "[{\"src\":\"/uploads/field-notes-studio-identity/slide-1.jpg\",\"alt\":\"Logo system screen of Field Notes Studio\",\"caption\":\"Use the arrows or swipe to move through the slides.\"},{\"src\":\"/uploads/field-notes-studio-identity/slide-2.jpg\",\"alt\":\"Stationery screen of Field Notes Studio\",\"caption\":\"\"},{\"src\":\"/uploads/field-notes-studio-identity/slide-3.jpg\",\"alt\":\"Site signage screen of Field Notes Studio\",\"caption\":\"\"}]",
+				"aspect": "3/2"
+			},
+			"children": []
+		},
+		{
+			"id": "8747035a-595b-4b89-958d-cef59d8980e0",
+			"type": "heading",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left",
+				"level": 2,
+				"isToggleable": false
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Print and signage",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "eaaf2b44-7aaa-4ca5-879a-cd08044f4cd9",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Cards were printed letterpress on cotton stock. Site signage uses the same grid at a larger scale, so a board on a fence reads like a page.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "a015c72f-dc89-44f8-905a-67d4c0d535be",
+			"type": "image",
+			"props": {
+				"src": "/uploads/field-notes-studio-identity/figure-2.jpg",
+				"alt": "Letterpress business cards on a desk",
+				"caption": "Cards, two inks.",
+				"width": "full"
+			},
+			"children": []
+		},
+		{
+			"id": "c2ec25d2-bc74-42b6-8843-24c54632a599",
+			"type": "bulletListItem",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Three paper stocks, one ink pair.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "fdece436-e08d-41d6-9fff-288d30de33ef",
+			"type": "bulletListItem",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "A type pairing that works in Word without installing anything.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "b2db9b92-1cc8-460a-9a35-aa85f828eaef",
+			"type": "bulletListItem",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "A one-page guide the studio actually uses.",
+					"styles": {}
+				}
+			],
+			"children": []
+		}
+	],
+	"schemaVersion": 1
+}

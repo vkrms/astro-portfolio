@@ -1,0 +1,206 @@
+{
+	"title": "Tidepool, making ocean sensor data readable",
+	"summary": "An interactive data visualisation of coastal sensor readings, built for a marine research group and the public.",
+	"date": "2026-04-12",
+	"draft": false,
+	"cover": "/uploads/tidepool-ocean-sensor-viz/cover.jpg",
+	"coverAlt": "Layered blue wave lines",
+	"tags": [
+		"data viz",
+		"front end"
+	],
+	"role": "Front end and data design",
+	"client": "Coastal Research Group",
+	"links": [
+		{
+			"label": "Live visualisation",
+			"url": "https://example.com/tidepool"
+		},
+		{
+			"label": "Source",
+			"url": "https://example.com/tidepool-src"
+		}
+	],
+	"featured": false,
+	"body": [
+		{
+			"id": "4966a602-72f1-4c39-9c0b-1c31d0cd0534",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "The research group collects a reading every ten minutes from forty sensors. Researchers used spreadsheets; the public saw nothing. ",
+					"styles": {}
+				},
+				{
+					"type": "text",
+					"text": "Tidepool",
+					"styles": {
+						"bold": true
+					}
+				},
+				{
+					"type": "text",
+					"text": " is one view for both.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "714020c2-99bb-4aad-965e-380c9ef8a23b",
+			"type": "heading",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left",
+				"level": 2,
+				"isToggleable": false
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Layers, not lines",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "8b879d55-38e9-41ac-a8b8-cfdf2f1cce4c",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "A line chart with forty lines is unreadable. Bands, stacked by depth, show the shape of a season at a glance, and a brush lets you zoom into a single storm.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "1e77865b-a07b-4076-a319-042b7ee805e5",
+			"type": "image",
+			"props": {
+				"src": "/uploads/tidepool-ocean-sensor-viz/figure-1.jpg",
+				"alt": "Layered temperature bands over twelve months",
+				"caption": "Twelve months, three depths.",
+				"width": "full"
+			},
+			"children": []
+		},
+		{
+			"id": "488117f5-4fcc-40b9-aa06-a884d3b455bb",
+			"type": "carousel",
+			"props": {
+				"items": "[{\"src\":\"/uploads/tidepool-ocean-sensor-viz/slide-1.jpg\",\"alt\":\"Surface screen of Tidepool\",\"caption\":\"Use the arrows or swipe to move through the slides.\"},{\"src\":\"/uploads/tidepool-ocean-sensor-viz/slide-2.jpg\",\"alt\":\"Mid depth screen of Tidepool\",\"caption\":\"\"},{\"src\":\"/uploads/tidepool-ocean-sensor-viz/slide-3.jpg\",\"alt\":\"Deep screen of Tidepool\",\"caption\":\"\"}]",
+				"aspect": "4/3"
+			},
+			"children": []
+		},
+		{
+			"id": "bcba9a96-f603-4abe-8ca7-62826b81bae8",
+			"type": "heading",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left",
+				"level": 2,
+				"isToggleable": false
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Built to be fast",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "a2e95f74-250f-458e-94fa-c4d3c992348d",
+			"type": "paragraph",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "The page loads a downsampled series first and streams detail on demand. On a mid-range phone, first interaction is under two seconds, with ",
+					"styles": {}
+				},
+				{
+					"type": "text",
+					"text": "canvas",
+					"styles": {
+						"code": true
+					}
+				},
+				{
+					"type": "text",
+					"text": " drawing instead of thousands of SVG nodes.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "cfd6a981-ccf1-459b-b3eb-abb85b340480",
+			"type": "image",
+			"props": {
+				"src": "/uploads/tidepool-ocean-sensor-viz/figure-2.jpg",
+				"alt": "Tooltip showing a sensor reading",
+				"caption": "Hover for the reading and a plain-language note.",
+				"width": "inline"
+			},
+			"children": []
+		},
+		{
+			"id": "4617e825-fe09-4687-b016-70591d88f3eb",
+			"type": "bulletListItem",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Open data, downloadable as CSV.",
+					"styles": {}
+				}
+			],
+			"children": []
+		},
+		{
+			"id": "5b6d0605-c843-490b-b4b6-5129bba1ed34",
+			"type": "bulletListItem",
+			"props": {
+				"backgroundColor": "default",
+				"textColor": "default",
+				"textAlignment": "left"
+			},
+			"content": [
+				{
+					"type": "text",
+					"text": "Keyboard and screen reader friendly tooltips.",
+					"styles": {}
+				}
+			],
+			"children": []
+		}
+	],
+	"schemaVersion": 1
+}
