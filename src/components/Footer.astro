@@ -15,7 +15,7 @@ const contactLinks = (config?.contactLinks ?? []).filter(
 const today = new Date();
 ---
 <footer class="border-t bg-background py-12 text-center text-sm text-muted-foreground relative overflow-hidden">
-	{config?.footerStarfield !== false && <Starfield count={50} class="text-foreground/15" />}
+	<!-- {config?.footerStarfield !== false && <Starfield count={50} class="text-foreground/15" />} -->
 	<div class="relative flex flex-col items-center gap-6">
 		{contactLinks.length > 0 && (
 			<div class="flex justify-center gap-4">
@@ -28,9 +28,9 @@ const today = new Date();
 				))}
 			</div>
 		)}
-		<p>
+		<!-- <p>
 			&copy; {today.getFullYear()}
 			{seo?.siteOwner && <> {seo.siteOwner}</>}. All rights reserved.
-		</p>
+		</p> -->
 	</div>
 </footer>
