@@ -126,7 +126,7 @@ export default function PostsTable({ posts }: { posts: PostRow[] }) {
         <DataTableColumnHeader column={column} title='Title' />
       ),
       cell: ({ row }) => (
-        <div className='min-w-0'>
+        <div className='max-w-[320px] min-w-0 break-words'>
           <a
             href={`/admin/edit/${row.original.slug}`}
             className='font-medium hover:underline'

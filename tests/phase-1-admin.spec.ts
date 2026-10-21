@@ -101,6 +101,20 @@ test.describe('phase 1 - admin', () => {
 		await expect(menu.getByRole('menuitem', { name: 'Delete' })).toBeVisible();
 	});
 
+	test('caps the title width in the posts table', async ({ page, request }) => {
+		await createPost(request, {
+			title: 'A very long post title that keeps going and going well past any sensible column width',
+			summary: 'Summary.',
+			date: '2026-01-01',
+			draft: false,
+		});
+
+		await page.goto('/admin');
+		const title = page.getByRole('table').getByRole('link').first();
+		const box = await title.locator('xpath=..').boundingBox();
+		expect(box?.width).toBeLessThanOrEqual(320);
+	});
+
 	test('filters posts by status', async ({ page, request }) => {
 		await createPost(request, {
 			title: 'Draft Project',
