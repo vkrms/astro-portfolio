@@ -40,7 +40,7 @@ test.describe('phase 1 - public site', () => {
 		await resetSettings();
 	});
 
-	test('projects lists published posts newest first', async ({ page, request }) => {
+	test('home lists published projects newest first', async ({ page, request }) => {
 		await request.post('/api/save', {
 			data: { title: 'Older Project', summary: 'Older summary.', date: '2026-01-01', draft: false },
 		});
@@ -51,13 +51,36 @@ test.describe('phase 1 - public site', () => {
 			data: { title: 'Draft Project', summary: 'Draft summary.', date: '2026-07-01', draft: true },
 		});
 
-		await page.goto('/projects');
+		await page.goto('/');
 
-		const items = page.getByRole('listitem');
+		const items = page.locator('[data-project-card]');
 		await expect(items).toHaveCount(2);
 		await expect(items.nth(0)).toContainText('Newer Project');
 		await expect(items.nth(1)).toContainText('Older Project');
 		await expect(page.getByText('Draft Project')).toHaveCount(0);
+	});
+
+	test('home pins featured projects first and /projects redirects home', async ({ page, request }) => {
+		for (const [title, date, featured] of [
+			['Oldest Pinned', '2026-01-01', true],
+			['Newest Plain', '2026-07-01', false],
+			['Middle Plain', '2026-04-01', false],
+		] as const) {
+			await request.post('/api/save', {
+				data: { title, summary: 'Summary.', date, draft: false, featured },
+			});
+		}
+
+		await page.goto('/');
+
+		const cards = page.locator('[data-project-card]');
+		await expect(cards).toHaveCount(3);
+		await expect(cards.nth(0)).toContainText('Oldest Pinned');
+		await expect(cards.nth(1)).toContainText('Newest Plain');
+		await expect(cards.nth(2)).toContainText('Middle Plain');
+
+		await page.goto('/projects');
+		await expect(page).toHaveURL('/');
 	});
 
 	test('project cards without a cover show a placeholder', async ({ page, request }) => {
@@ -66,7 +89,7 @@ test.describe('phase 1 - public site', () => {
 		});
 		await waitForProject(request, 'no-cover');
 
-		await page.goto('/projects');
+		await page.goto('/');
 
 		const card = page.locator('[data-project-card]', { hasText: 'No Cover' });
 		await expect(card.locator('[data-cover-placeholder]')).toBeVisible();
@@ -94,7 +117,7 @@ test.describe('phase 1 - public site', () => {
 
 			await toggle.click();
 			await panel.getByRole('link', { name: 'Projects' }).click();
-			await expect(page).toHaveURL('/projects');
+			await expect(page).toHaveURL('/#work');
 		}
 	});
 
@@ -140,7 +163,7 @@ test.describe('phase 1 - public site', () => {
 			},
 		});
 
-		await page.goto('/projects');
+		await page.goto('/');
 		await page.getByRole('button', { name: 'real deal', exact: true }).click();
 
 		await expect(page).toHaveURL(/tag=real[+%20]deal/);
@@ -177,13 +200,51 @@ test.describe('phase 1 - public site', () => {
 		await expect(page.getByText('Jun 1, 2026')).toBeVisible();
 		await expect(page.getByRole('link', { name: 'Back to projects' })).toHaveAttribute(
 			'href',
-			'/projects',
+			'/#work',
 		);
 		await expect(page.getByRole('link', { name: 'Live site' })).toHaveAttribute(
 			'href',
 			'https://example.com',
 		);
 		await expect(page.getByRole('link', { name: /Older Project/ })).toBeVisible();
+	});
+
+	test('card tags are hashtag links that filter the list', async ({ page, request }) => {
+		await request.post('/api/save', {
+			data: { title: 'Design Project', summary: 'S.', date: '2026-06-01', draft: false, tags: ['real deal'] },
+		});
+		await request.post('/api/save', {
+			data: { title: 'Code Project', summary: 'S.', date: '2026-05-01', draft: false, tags: ['code'] },
+		});
+
+		await page.goto('/');
+
+		const card = page.locator('[data-project-card]', { hasText: 'Design Project' });
+		const tag = card.getByRole('link', { name: '#real deal' });
+		await expect(tag).toHaveAttribute('href', '/?tag=real%20deal#work');
+
+		// Tags share one colour token with the filter chips.
+		const colours = await page.evaluate(() => {
+			const probe = document.createElement('span');
+			probe.style.color = 'var(--tag)';
+			document.body.append(probe);
+			const token = getComputedStyle(probe).color;
+			probe.remove();
+			return {
+				token,
+				link: getComputedStyle(document.querySelector('[data-tag-link]')!).color,
+			};
+		});
+		expect(colours.link).toBe(colours.token);
+
+		await tag.click();
+		await expect(page).toHaveURL(/\?tag=real\+deal|\?tag=real%20deal/);
+		await expect(page.getByRole('button', { name: 'real deal', exact: true })).toHaveAttribute(
+			'aria-pressed',
+			'true',
+		);
+		await expect(page.locator('[data-project-card]:visible')).toHaveCount(1);
+		await expect(page.locator('[data-project-card]:visible')).toContainText('Design Project');
 	});
 
 	test('shows an edit shortcut on the post page', async ({ page, request }) => {
@@ -231,9 +292,70 @@ test.describe('phase 1 - public site', () => {
 
 		await page.goto('/');
 
+		// With no headline set, the heading falls back to the site title.
 		await expect(page.getByRole('heading', { level: 1 })).toHaveText('Portfolio');
 		await expect(page.getByText('Custom intro.')).toBeVisible();
 		await expect(page.getByRole('link', { name: 'Featured Project' })).toBeVisible();
+	});
+
+	test('home hero shows eyebrow, two-tone heading, paragraphs and button', async ({
+		page,
+		request,
+	}) => {
+		await updateSettings(request, {
+			home: {
+				eyebrow: "Hey, I'm Sam",
+				headline: 'A designer',
+				highlight: 'making things clear.',
+				intro: 'First paragraph.\n\nSecond paragraph.',
+				ctaLabel: 'See selected work',
+				ctaLink: '#work',
+				featured: [],
+			},
+		});
+
+		await page.goto('/');
+
+		await expect(page.getByText("Hey, I'm Sam")).toBeVisible();
+		const heading = page.getByRole('heading', { level: 1 });
+		await expect(heading).toHaveText('A designer making things clear.');
+		await expect(heading.locator('span')).toHaveText('making things clear.');
+		await expect(page.getByText('First paragraph.')).toBeVisible();
+		await expect(page.getByText('Second paragraph.')).toBeVisible();
+		await expect(page.getByRole('link', { name: /See selected work/ })).toHaveAttribute('href', '#work');
+	});
+
+	test('home heading and paragraphs share a 56ch column', async ({ page, request }) => {
+		await updateSettings(request, {
+			home: {
+				headline: 'A designer and front-end engineer',
+				highlight: 'making complex products feel calm and clear for the people who use them every day.',
+				intro: Array.from({ length: 3 }, () => 'Words '.repeat(60).trim()).join('\n\n'),
+				featured: [],
+			},
+		});
+
+		await page.setViewportSize({ width: 1280, height: 900 });
+		await page.goto('/');
+
+		const widths = await page.evaluate(() => {
+			const heading = document.querySelector('h1')!;
+			const paragraph = heading.parentElement!.querySelector('p')!;
+			const probe = document.createElement('div');
+			probe.style.width = '56ch';
+			paragraph.append(probe);
+			const cap = probe.getBoundingClientRect().width;
+			probe.remove();
+			return {
+				cap,
+				heading: heading.getBoundingClientRect().width,
+				paragraph: paragraph.getBoundingClientRect().width,
+			};
+		});
+
+		expect(widths.paragraph).toBeLessThanOrEqual(widths.cap + 1);
+		expect(widths.heading).toBeLessThanOrEqual(widths.cap + 1);
+		expect(widths.heading).toBeCloseTo(widths.paragraph, 0);
 	});
 
 	test('project page shows the cover and body', async ({ page, request }) => {
@@ -379,6 +501,64 @@ test.describe('phase 1 - public site', () => {
 		await expect(current).toHaveText('2');
 		await page.keyboard.press('ArrowLeft');
 		await expect(current).toHaveText('1');
+	});
+
+	test('carousel bleeds past the column with the current slide inside it', async ({ page, request }) => {
+		await request.post('/api/save', {
+			data: {
+				slug: 'bleed-project',
+				title: 'Bleed Project',
+				summary: 'Slides.',
+				date: '2026-06-01',
+				draft: false,
+				body: [
+					{
+						type: 'carousel',
+						props: {
+							items: JSON.stringify([
+								{ src: '/uploads/bleed-project/a.jpg', alt: 'One', caption: '' },
+								{ src: '/uploads/bleed-project/b.jpg', alt: 'Two', caption: '' },
+							]),
+							aspect: '16/9',
+						},
+					},
+				],
+			},
+		});
+
+		await waitForProject(request, 'bleed-project');
+
+		for (const width of [1280, 390]) {
+			await page.setViewportSize({ width, height: 800 });
+			await page.goto('/projects/bleed-project');
+
+			const figure = (await page.locator('figure.carousel').boundingBox())!;
+			const track = (await page.locator('.carousel-track').boundingBox())!;
+			const slide = (await page.locator('.carousel-frame').first().boundingBox())!;
+
+			// The track extends 24px past the column on both sides and fades there.
+			expect(figure.x - track.x).toBeCloseTo(24, 0);
+			expect(track.x + track.width - (figure.x + figure.width)).toBeCloseTo(24, 0);
+			expect(await page.locator('.carousel-track').evaluate((el) => getComputedStyle(el).maskImage)).not.toBe('none');
+
+			// The current slide still fills the column exactly.
+			expect(slide.x).toBeCloseTo(figure.x, 0);
+			expect(slide.width).toBeCloseTo(figure.width, 0);
+
+			// No sideways page scroll from the bleed.
+			expect(await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+		}
+
+		// Next slide lands in the column, not offset by the padding.
+		await page.getByRole('button', { name: 'Next slide' }).click();
+		await expect(page.locator('[data-carousel] [data-current]')).toHaveText('2');
+		await expect
+			.poll(async () => {
+				const figure = (await page.locator('figure.carousel').boundingBox())!;
+				const slide = (await page.locator('.carousel-frame').nth(1).boundingBox())!;
+				return Math.round(slide.x - figure.x);
+			})
+			.toBe(0);
 	});
 
 	test('renders image alt text and embed titles', async ({ page, request }) => {

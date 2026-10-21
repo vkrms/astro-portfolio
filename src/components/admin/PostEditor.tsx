@@ -389,7 +389,7 @@ export default function PostEditor({ slug, post }: Props) {
 									placeholder="design, astro"
 								/>
 								<span className="text-xs text-muted-foreground">
-									Comma separated. Drives the /projects filter.
+									Comma separated. Drives the project filter on the home page.
 								</span>
 							</div>
 

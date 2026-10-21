@@ -45,8 +45,8 @@ Deferred to Phase 1: Vercel preview.
 
 ### Public site
 
-- [x] `/` shows the intro and the featured projects.
-- [x] `/projects` lists published projects newest first and filters by tag.
+- [x] `/` shows the hero and lists published projects (featured first, then newest first) with a tag filter.
+- [x] `/projects` redirects to `/`.
 - [x] `/projects/[slug]` shows header, cover, block body, links and previous/next.
 - [x] `cover` is the OG image; `summary` is the meta description.
 - [x] `/rss.xml`, `/sitemap-index.xml` and `/404` respond.

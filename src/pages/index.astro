@@ -1,8 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
-import Starfield from '../components/space/Starfield.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import ProjectCover from '../components/media/ProjectCover.astro';
+import TagLink from '../components/TagLink.astro';
 import { readHomeSettings, readSiteSettings } from '../lib/settings';
 import { listPosts } from '../lib/storage';
 
@@ -13,63 +13,156 @@ const [site, home, posts] = await Promise.all([
 ]);
 
 const bySlug = new Map(posts.map((post) => [post.slug, post]));
-const chosen = home.featured
-	.map((slug) => bySlug.get(slug))
-	.filter((post): post is NonNullable<typeof post> => Boolean(post));
-const featured = chosen.length > 0 ? chosen : posts.filter((post) => post.featured);
-const projects = (featured.length > 0 ? featured : posts).slice(0, 3);
-const heading = featured.length > 0 ? 'Featured projects' : 'Recent projects';
+// Pinned projects come first: the Home settings list in its order, then posts
+// flagged as featured. Everything else follows, newest first.
+const pinned = [
+	...home.featured.map((slug) => bySlug.get(slug)),
+	...posts.filter((post) => post.featured && !home.featured.includes(post.slug)),
+].filter((post): post is NonNullable<typeof post> => Boolean(post));
+const projects = [...pinned, ...posts.filter((post) => !pinned.includes(post))];
+const tags = [...new Set(projects.flatMap((post) => post.tags ?? []))].sort((a, b) =>
+	a.localeCompare(b),
+);
+
+const chip = (active: boolean) =>
+	[
+		'rounded-full border px-3 py-1 transition-colors',
+		active
+			? 'border-tag bg-tag text-tag-foreground'
+			: 'text-tag hover:border-tag',
+	].join(' ');
+
+const paragraphs = home.intro
+	.split(/\n\s*\n/)
+	.map((paragraph) => paragraph.trim())
+	.filter(Boolean);
+const hasHeadline = Boolean(home.headline || home.highlight);
+// Arrow hints where the button goes: down the page, out of the site, or on.
+const ctaArrow = home.ctaLink.startsWith('#')
+	? '↓'
+	: /^(https?:|mailto:)/.test(home.ctaLink)
+		? '↗'
+		: '→';
 ---
 
 <Base title={site.seo.title} description={site.seo.description}>
-	<section class="relative flex min-h-[70vh] items-center justify-center overflow-hidden px-6 text-center">
-		<Starfield count={90} class="text-foreground/20" />
-		<div class="relative flex max-w-xl flex-col items-center">
-			<p class="text-sm font-medium tracking-widest text-primary uppercase">Portfolio</p>
-			<h1 class="mt-2 text-4xl font-semibold tracking-tight lg:text-5xl">{site.seo.title}</h1>
-			{home.intro && <p class="mx-auto mt-4 max-w-md text-muted-foreground">{home.intro}</p>}
-			<a
-				href="/projects"
-				class="mt-8 inline-flex h-10 items-center justify-center rounded-md bg-primary px-5 text-sm font-medium text-primary-foreground"
-			>
-				View projects
-			</a>
+	<section class="mx-auto max-w-5xl px-6 pt-16 pb-20 sm:pt-24">
+		{/* One 56ch column, so the heading and paragraphs share the same width. */}
+		<div class="max-w-[56ch]">
+			{
+				home.eyebrow && (
+					<p class="text-sm font-medium tracking-widest text-muted-foreground uppercase">
+						{home.eyebrow}
+					</p>
+				)
+			}
+			<h1 class="mt-8 text-3xl leading-tight font-normal tracking-tight text-foreground/80 sm:text-4xl">
+				{
+					hasHeadline ? (
+						<>
+							{home.headline}
+							{home.headline && home.highlight && ' '}
+							{home.highlight && <span class="text-primary">{home.highlight}</span>}
+						</>
+					) : (
+						site.seo.title
+					)
+				}
+			</h1>
+			{
+				paragraphs.length > 0 && (
+					<div class="mt-12 grid gap-6 leading-7 text-foreground/80">
+						{paragraphs.map((paragraph) => (
+							<p>{paragraph}</p>
+						))}
+					</div>
+				)
+			}
+			{
+				home.ctaLabel && home.ctaLink && (
+					<a
+						href={home.ctaLink}
+						class="mt-12 inline-flex items-center gap-2 border-b-2 border-primary pb-1 text-lg text-primary transition-opacity hover:opacity-80"
+					>
+						{home.ctaLabel}
+						<span aria-hidden="true">{ctaArrow}</span>
+					</a>
+				)
+			}
 		</div>
 	</section>
 
-	{
-		projects.length > 0 && (
-			<section class="mx-auto max-w-5xl px-6 pb-20">
-				<div class="flex items-end justify-between gap-4">
-					<h2 class="text-2xl font-semibold tracking-tight">{heading}</h2>
-					<a href="/projects" class="text-sm text-muted-foreground hover:text-foreground">
-						All projects →
-					</a>
-				</div>
+	<section id="work" class="mx-auto max-w-5xl scroll-mt-8 px-6 pb-24">
+		<h2 class="text-2xl font-semibold tracking-tight">Projects</h2>
 
-				<ul class="mt-8 grid list-none gap-6 p-0 sm:grid-cols-2 lg:grid-cols-3">
-					{projects.map((post) => (
-						<li class="overflow-hidden rounded-xl border bg-card">
-							<ProjectCover cover={post.cover} alt={post.coverAlt} width={800} />
-							<div class="p-5">
-								{post.date && (
-									<p class="text-sm text-muted-foreground">
-										<FormattedDate date={new Date(post.date)} />
-									</p>
-								)}
-								<h3 class="mt-2 text-lg font-semibold">
-									<a href={`/projects/${post.slug}`} class="hover:underline">
-										{post.title}
-									</a>
-								</h3>
-								{post.summary && (
-									<p class="mt-2 text-sm text-muted-foreground">{post.summary}</p>
-								)}
-							</div>
-						</li>
+		{
+			tags.length > 0 && (
+				<nav aria-label="Filter by tag" class="mt-6 flex flex-wrap gap-2 text-sm">
+					<button type="button" data-tag-filter="" aria-pressed="true" class={chip(true)}>
+						All
+					</button>
+					{tags.map((item) => (
+						<button
+							type="button"
+							data-tag-filter={item}
+							aria-pressed="false"
+							class={chip(false)}
+						>
+							{item}
+						</button>
 					))}
-				</ul>
-			</section>
-		)
-	}
+				</nav>
+			)
+		}
+
+		{
+			projects.length === 0 ? (
+				<p class="mt-6 text-muted-foreground">No projects yet.</p>
+			) : (
+				<>
+					<ul class="mt-10 grid list-none gap-6 p-0 sm:grid-cols-2">
+						{projects.map((post) => (
+							<li
+								class="overflow-hidden rounded-xl border bg-card"
+								data-project-card
+								data-tags={JSON.stringify(post.tags ?? [])}
+							>
+								<ProjectCover cover={post.cover} alt={post.coverAlt} width={900} />
+								<div class="p-6">
+									{post.date && (
+										<p class="text-sm text-muted-foreground">
+											<FormattedDate date={new Date(post.date)} />
+										</p>
+									)}
+									<h3 class="mt-2 text-xl font-semibold">
+										<a href={`/projects/${post.slug}`} class="hover:underline">
+											{post.title}
+										</a>
+									</h3>
+									{post.summary && <p class="mt-2 text-muted-foreground">{post.summary}</p>}
+									{post.tags && post.tags.length > 0 && (
+										<ul class="mt-4 flex list-none flex-wrap gap-x-3 gap-y-1 p-0 text-sm">
+											{post.tags.map((item) => (
+												<li>
+													<TagLink tag={item} />
+												</li>
+											))}
+										</ul>
+									)}
+								</div>
+							</li>
+						))}
+					</ul>
+
+					<p data-tag-empty hidden class="mt-6 text-muted-foreground">
+						No projects match this tag.
+					</p>
+				</>
+			)
+		}
+	</section>
 </Base>
+
+<script>
+	import '../scripts/tag-filter';
+</script>

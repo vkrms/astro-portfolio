@@ -69,7 +69,7 @@ One JSON file per post in `src/content/projects`, plus three settings singletons
 | `date` | ISO date | Required; sorts the list |
 | `cover` | image path | Optional; also the OG image when set |
 | `coverAlt` | string | Optional; used when `cover` is set |
-| `tags` | string\[\] | Optional; shown on cards and used by the `/projects` filter. The MVP publishes one post tagged `real deal`. |
+| `tags` | string\[\] | Optional; shown on cards and used by the home page filter. The MVP publishes one post tagged `real deal`. |
 | `role` | string | Optional, e.g. "Design and front end" |
 | `client` | string | Optional |
 | `links` | {label, url}\[\] | Optional: live site, repo, case study |
@@ -78,7 +78,7 @@ One JSON file per post in `src/content/projects`, plus three settings singletons
 | `body` | BlockNote block array | Validated against the shared block schema |
 | `schemaVersion` | number | Bumped if the block format changes, so old posts can be migrated |
 
-**Singletons** (JSON in `src/content/settings/`): `site` (name, tagline, social links, SEO defaults), `home` (intro text, ordered featured list). The admin edits these with the same tools.
+**Singletons** (JSON in `src/content/settings/`): `site` (name, tagline, social links, SEO defaults), `home` (eyebrow, two-tone headline, intro paragraphs, button, ordered featured list). The admin edits these with the same tools.
 
 **File layout**
 
@@ -162,8 +162,8 @@ All public pages are prerendered. The admin pages and API routes run on demand a
 
 | Route | Content | Rendering |
 | --- | --- | --- |
-| `/` | Intro, featured projects grid | Static |
-| `/projects` | All published projects, newest first, tag filter | Static |
+| `/` | Hero (eyebrow, headline, intro, button), then all published projects with a tag filter; featured projects first, the rest newest first | Static |
+| `/projects` | Redirects to `/` | Redirect |
 | `/projects/[slug]` | Project post: header, cover, block body, links, next/previous | Static |
 | `/rss.xml`, `/sitemap-index.xml`, `/404` | Feed, sitemap, not-found page | Static |
 | `/admin` | Post list with draft/published state | Local only |
@@ -254,8 +254,8 @@ The admin is local-only. Deployed builds serve static pages only.
 - Every Phase 1 block is implemented: paragraph, H2/H3, lists, code, image, gallery, carousel, embed, quote and media + text. The slash menu puts the media blocks first and hides anything the renderer cannot draw.
 - Gallery, quote, media + text and embed blocks share one item/image editor pattern; carousel slides, gallery images and media + text images expose alt fields, and embeds require a title.
 - `site` and `home` settings singletons are editable at `/admin/settings`.
-- Public home shows the configured intro and featured projects; `/rss.xml` is generated.
-- Posts carry tags; `/projects` filters by them client-side (static pages cannot read a query string at build time), including multi-word tags. The published `this-is-a-post` is tagged `real deal`.
+- Public home shows the configured hero and all published projects, featured first; `/projects` redirects to it; `/rss.xml` is generated.
+- Posts carry tags; the home page filters by them client-side (static pages cannot read a query string at build time), including multi-word tags. The published `this-is-a-post` is tagged `real deal`.
 - Post covers render on `/projects/[slug]` and produce a 1200x630 OG image; canonical and meta description come from the route and `summary`.
 - Storage validates posts on read and write with Zod, so a malformed JSON file fails the build with the field name.
 - The generated sitemap excludes `/admin`, `/api`, `/uploads` and the `/home` redirect.

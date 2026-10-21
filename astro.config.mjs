@@ -87,7 +87,8 @@ export default defineConfig({
 	output: 'static',
 	adapter: await getAdapter(),
 	server: { port: 1892 },
-	redirects: { '/home': '/' },
+	// The project list lives on the home page; keep old /projects links working.
+	redirects: { '/home': '/', '/projects': '/' },
 	integrations: [
 		mdx(),
 		// The admin is local-only. Never advertise it (or its APIs/uploads) in
@@ -95,7 +96,7 @@ export default defineConfig({
 		sitemap({
 			filter: (page) => {
 				const path = new URL(page).pathname;
-				return !/^\/(admin|api|uploads)(\/|$)/.test(path) && path !== '/home';
+				return !/^\/(admin|api|uploads)(\/|$)/.test(path) && !['/home', '/home/', '/projects', '/projects/'].includes(path);
 			},
 		}),
 		icon(),
