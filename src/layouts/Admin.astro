@@ -1,25 +1,32 @@
 ---
 import '../styles/admin.css';
-import { Icon } from 'astro-icon/components';
-import ThemeToggle from '../components/ThemeToggle.astro';
+import AdminShell from '../admin/components/layout/admin-shell';
+import ThemeScript from '../components/ThemeScript.astro';
 import DevInspector from '../components/DevInspector.astro';
 import { readSiteSettings } from '../lib/settings';
 
 interface Props {
 	title: string;
 	action?: { label: string; href: string };
+	/** The page renders its own shadcn <Main> (demo pages). */
+	bare?: boolean;
 }
 
-const { title, action } = Astro.props;
+const { title, action, bare } = Astro.props;
 const siteTitle = (await readSiteSettings()).seo.title;
-const pathname = Astro.url.pathname;
-const postsActive = pathname === '/admin' || pathname.startsWith('/admin/edit');
-const settingsActive = pathname === '/admin/settings';
+
+// Layout state the shell saves in cookies; read here so the server render
+// matches the client and the sidebar does not jump on load.
+const cookies = Astro.cookies;
+const sidebarOpen = cookies.get('sidebar_state')?.value !== 'false';
+const collapsible = cookies.get('layout_collapsible')?.value;
+const variant = cookies.get('layout_variant')?.value;
 ---
 
 <!doctype html>
 <html lang="en">
 	<head>
+		<ThemeScript />
 		<meta charset="utf-8" />
 		<meta
 			name="viewport"
@@ -28,141 +35,20 @@ const settingsActive = pathname === '/admin/settings';
 		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 		<title>{title} · Admin</title>
 	</head>
-	<body class="min-h-screen bg-background pt-0 text-foreground">
-		<a
-			href="#main"
-			class="sr-only focus:not-sr-only focus:fixed focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-card focus:px-4 focus:py-2 focus:text-sm focus:shadow"
+	<body class="bg-background pt-0 text-foreground">
+		<AdminShell
+			client:load
+			title={title}
+			action={action}
+			siteTitle={siteTitle}
+			href={Astro.url.pathname + Astro.url.search}
+			sidebarOpen={sidebarOpen}
+			collapsible={collapsible}
+			variant={variant}
+			bare={bare}
 		>
-			Skip to content
-		</a>
-
-		<div class="flex min-h-screen">
-			<aside
-				id="admin-sidebar"
-				class="fixed inset-y-0 left-0 z-30 hidden w-60 border-r bg-card lg:static lg:z-auto lg:block"
-			>
-				<div class="flex h-full flex-col px-4 py-5">
-					<a href="/admin" class="text-sm font-semibold">{siteTitle}</a>
-
-					<nav aria-label="Admin" class="mt-6 flex flex-1 flex-col">
-						<ul class="grid list-none gap-1 p-0">
-							<li>
-								<a
-									href="/admin"
-									aria-current={postsActive ? 'page' : undefined}
-									class:list={[
-										'block rounded-md px-3 py-2 text-sm transition-colors',
-										postsActive
-											? 'bg-accent text-foreground'
-											: 'text-muted-foreground hover:bg-accent hover:text-foreground',
-									]}
-								>
-									Posts
-								</a>
-							</li>
-							<li>
-								<a
-									href="/admin/settings"
-									aria-current={settingsActive ? 'page' : undefined}
-									class:list={[
-										'block rounded-md px-3 py-2 text-sm transition-colors',
-										settingsActive
-											? 'bg-accent text-foreground'
-											: 'text-muted-foreground hover:bg-accent hover:text-foreground',
-									]}
-								>
-									Settings
-								</a>
-							</li>
-						</ul>
-
-						<div class="mt-auto grid gap-1 pt-6">
-							<a
-								href="/"
-								class="rounded-md px-3 py-2 text-sm text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
-							>
-								View site
-							</a>
-							<div class="px-2 py-1">
-								<ThemeToggle />
-							</div>
-						</div>
-					</nav>
-				</div>
-			</aside>
-
-			<div id="admin-backdrop" hidden class="fixed inset-0 z-20 bg-black/40 lg:hidden"></div>
-
-			<div class="flex min-w-0 flex-1 flex-col">
-				<header class="flex items-center gap-3 border-b px-4 py-3 sm:px-6">
-					<button
-						id="admin-menu-toggle"
-						type="button"
-						aria-controls="admin-sidebar"
-						aria-expanded="false"
-						class="inline-flex size-9 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-accent hover:text-foreground outline-none focus-visible:ring-ring/50 focus-visible:ring-[3px] lg:hidden"
-					>
-						<span class="sr-only">Menu</span>
-						<Icon name="tabler:menu-2" class="size-5" />
-					</button>
-
-					<h1 class="text-xl font-semibold">{title}</h1>
-
-					{action && (
-						<a
-							href={action.href}
-							class="ml-auto inline-flex h-9 items-center justify-center rounded-md bg-primary px-4 text-sm font-medium text-primary-foreground shadow-xs transition-colors hover:bg-primary/90"
-						>
-							{action.label}
-						</a>
-					)}
-				</header>
-
-				<main id="main" class="flex-1 px-4 py-6 sm:px-6">
-					<slot />
-				</main>
-			</div>
-		</div>
-
-		<script is:inline>
-			if (!window.__adminMenuBound) {
-				window.__adminMenuBound = true;
-
-				const toggle = document.getElementById('admin-menu-toggle');
-				const sidebar = document.getElementById('admin-sidebar');
-				const backdrop = document.getElementById('admin-backdrop');
-
-				const setOpen = (open) => {
-					if (!toggle || !sidebar || !backdrop) return;
-					toggle.setAttribute('aria-expanded', open ? 'true' : 'false');
-					sidebar.classList.toggle('hidden', !open);
-					backdrop.classList.toggle('hidden', !open);
-					if (open) {
-						sidebar.querySelector('a')?.focus();
-					} else {
-						toggle.focus();
-					}
-				};
-
-				toggle?.addEventListener('click', () => {
-					setOpen(toggle.getAttribute('aria-expanded') !== 'true');
-				});
-				backdrop?.addEventListener('click', () => setOpen(false));
-				document.addEventListener('keydown', (event) => {
-					if (event.key === 'Escape' && toggle?.getAttribute('aria-expanded') === 'true') {
-						setOpen(false);
-					}
-				});
-				document.addEventListener('submit', (event) => {
-					const target = event.target;
-					const form =
-						target instanceof Element ? target.closest('form[data-confirm]') : null;
-					if (form && !window.confirm(form.getAttribute('data-confirm'))) {
-						event.preventDefault();
-					}
-				});
-			}
-		</script>
+			<slot />
+		</AdminShell>
 		<DevInspector />
 	</body>
 </html>
