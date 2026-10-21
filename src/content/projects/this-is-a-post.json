@@ -1,9 +1,12 @@
 {
-	"title": "Why would someone want a post title this long. Isn't it werid? But I've seen wei",
-	"summary": "Lorem ipsum right?",
+	"title": "Note to self: I am doing this to flex with my past works to get some future works.",
+	"summary": "This is an excerpt and at the same time a subheading, or what's the name of this thing in real world publishing?",
 	"date": "2026-10-17",
 	"draft": false,
-	"tags": ["real deal"],
+	"tags": [
+		"real deal"
+	],
+	"featured": false,
 	"body": [
 		{
 			"id": "ffc25a02-6561-497e-a41a-6fcf2abc1ad4",
@@ -16,7 +19,7 @@
 			"content": [
 				{
 					"type": "text",
-					"text": "Wow wow this is the block note block, right?",
+					"text": "Some words I want to send to past self and the current self needs it too, honestly:",
 					"styles": {}
 				}
 			],
@@ -30,16 +33,25 @@
 				"textColor": "default",
 				"textAlignment": "left"
 			},
-			"content": [],
+			"content": [
+				{
+					"type": "text",
+					"text": "\"Attempt difficult things with easy mind, don't panic, don't go too hard on yourself, take your time and you will succeed. You are not bad, some things require more time, some things are harder for you, some are easier. You can't have it all at the same time. but you can have most of it by the end of your life.\"",
+					"styles": {
+						"bold": true
+					}
+				}
+			],
 			"children": []
 		},
 		{
 			"id": "1062dd97-f4c7-4525-979b-c83cd9dbfb62",
 			"type": "image",
 			"props": {
-				"src": "https://images.unsplash.com/photo-1770306924697-6a7f2065d967?w=900&auto=format&fit=crop&q=60&ixlib=rb-4.1.0&ixid=NHwxMjA3fDA%3D",
-				"alt": "Covered wooden porch with timber walls and ceiling, a pendant globe light, and a bench beside a dark-framed window.",
-				"caption": ""
+				"src": "/uploads/this-is-a-post/1792551989331-t1rfv9.jpg",
+				"alt": "orange motorcycle",
+				"caption": "",
+				"width": "wide"
 			},
 			"children": []
 		},
