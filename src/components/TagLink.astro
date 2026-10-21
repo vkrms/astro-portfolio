@@ -1,0 +1,17 @@
+---
+/**
+ * A tag as a hashtag link. It points at the home page filter, which works
+ * without JavaScript; tag-filter.ts applies it in place when scripts run.
+ */
+interface Props {
+	tag: string;
+}
+
+const { tag } = Astro.props;
+---
+
+<a
+	href={`/?tag=${encodeURIComponent(tag)}#work`}
+	data-tag-link={tag}
+	class="text-tag outline-none hover:underline focus-visible:underline focus-visible:ring-ring/50 focus-visible:ring-[3px] rounded-sm"
+>#{tag}</a>

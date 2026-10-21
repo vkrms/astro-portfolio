@@ -1,5 +1,5 @@
 /**
- * Client-side tag filter for the static /projects page. A prerendered page
+ * Client-side tag filter for the project list on the static home page. A prerendered page
  * cannot read ?tag= on the server, so the cards carry their tags and this
  * script hides the ones that do not match. No framework, no network.
  */
@@ -44,10 +44,19 @@ if (!flags.__tagFilterBound) {
 	flags.__tagFilterBound = true;
 
 	document.addEventListener('click', (event) => {
-		const button = (event.target as Element).closest<HTMLElement>('[data-tag-filter]');
-		if (!button) return;
+		const target = event.target as Element;
+		const button = target.closest<HTMLElement>('[data-tag-filter]');
+		const link = target.closest<HTMLElement>('[data-tag-link]');
+		if (!button && !link) return;
 
-		const tag = button.dataset.tagFilter ?? '';
+		// A tag link on a card filters in place and brings the filter bar into view.
+		// Without JavaScript it is a plain link to /?tag=…#work.
+		if (link) {
+			event.preventDefault();
+			document.getElementById('work')?.scrollIntoView({ behavior: 'smooth' });
+		}
+
+		const tag = (button ?? link)!.dataset.tagFilter ?? link?.dataset.tagLink ?? '';
 		applyTag(tag);
 
 		const url = new URL(window.location.href);

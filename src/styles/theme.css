@@ -43,6 +43,8 @@
 	--color-border: var(--border);
 	--color-input: var(--input);
 	--color-ring: var(--ring);
+	--color-tag: var(--tag);
+	--color-tag-foreground: var(--tag-foreground);
 	--color-chart-1: var(--chart-1);
 	--color-chart-2: var(--chart-2);
 	--color-chart-3: var(--chart-3);
@@ -70,6 +72,9 @@
 	--border: oklch(0.90 0.012 285);
 	--input: oklch(0.90 0.012 285);
 	--ring: oklch(0.57 0.198 37);
+	/* Tags and hashtag links, everywhere they appear: text-tag, bg-tag. */
+	--tag: oklch(0.52 0.14 235);
+	--tag-foreground: oklch(0.99 0.005 285);
 	--chart-1: oklch(0.646 0.222 41.116);
 	--chart-2: oklch(0.6 0.118 184.704);
 	--chart-3: oklch(0.398 0.07 227.392);
@@ -96,6 +101,8 @@
 	--border: oklch(0.95 0.01 285 / 12%);
 	--input: oklch(0.95 0.01 285 / 15%);
 	--ring: oklch(0.70 0.18 40);
+	--tag: oklch(0.78 0.12 225);
+	--tag-foreground: oklch(0.16 0.02 285);
 }
 
 @layer base {
