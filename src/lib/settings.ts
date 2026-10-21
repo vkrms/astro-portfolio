@@ -17,6 +17,11 @@ import {
 export const SETTINGS_DIR = 'src/content/settings';
 
 export const defaultHomeSettings: HomeSettings = {
+	eyebrow: '',
+	headline: '',
+	highlight: '',
+	ctaLabel: '',
+	ctaLink: '',
 	intro: 'Selected work and experiments in design and engineering.',
 	featured: [],
 };

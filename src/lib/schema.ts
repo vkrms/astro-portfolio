@@ -51,7 +51,15 @@ export const siteSettingsSchema = z.object({
 });
 
 export const homeSettingsSchema = z.object({
+	/** Small uppercase line above the heading. */
+	eyebrow: z.string().default(''),
+	/** Heading text, followed by `highlight` in the accent colour. */
+	headline: z.string().default(''),
+	highlight: z.string().default(''),
+	/** Paragraphs, separated by a blank line. */
 	intro: z.string().default(''),
+	ctaLabel: z.string().default(''),
+	ctaLink: z.string().default(''),
 	featured: z.array(z.string().min(1)).default([]),
 });
 

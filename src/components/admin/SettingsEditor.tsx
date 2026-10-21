@@ -29,7 +29,7 @@ interface Props {
 
 export default function SettingsEditor({ site: initialSite, home: initialHome, posts }: Props) {
 	const [site, setSite] = useState(initialSite);
-	const [intro, setIntro] = useState(initialHome.intro);
+	const [home, setHome] = useState(initialHome);
 	const [featured, setFeatured] = useState(initialHome.featured);
 	const [toAdd, setToAdd] = useState('');
 	const [saving, setSaving] = useState(false);
@@ -38,6 +38,10 @@ export default function SettingsEditor({ site: initialSite, home: initialHome, p
 
 	function updateSite(patch: Partial<SiteSettings>) {
 		setSite((current) => ({ ...current, ...patch }));
+	}
+
+	function updateHome(patch: Partial<HomeSettings>) {
+		setHome((current) => ({ ...current, ...patch }));
 	}
 
 	function updateNav(index: number, patch: { title?: string; link?: string }) {
@@ -68,7 +72,7 @@ export default function SettingsEditor({ site: initialSite, home: initialHome, p
 				headers: { 'content-type': 'application/json' },
 				body: JSON.stringify({
 					site,
-					home: { intro, featured },
+					home: { ...home, featured },
 				}),
 			});
 
@@ -174,7 +178,7 @@ export default function SettingsEditor({ site: initialSite, home: initialHome, p
 									aria-label={`Nav item ${index + 1} link`}
 									value={item.link}
 									onChange={(event) => updateNav(index, { link: event.target.value })}
-									placeholder="/projects"
+									placeholder="/#work"
 									className="min-w-32 flex-1"
 								/>
 								<Button
@@ -262,13 +266,67 @@ export default function SettingsEditor({ site: initialSite, home: initialHome, p
 				</CardHeader>
 				<CardContent className="grid gap-4 px-4">
 					<div className="grid gap-1.5">
+						<Label htmlFor="home-eyebrow">Eyebrow</Label>
+						<Input
+							id="home-eyebrow"
+							value={home.eyebrow}
+							onChange={(event) => updateHome({ eyebrow: event.target.value })}
+							placeholder="Hey, I'm …"
+						/>
+					</div>
+
+					<div className="grid gap-3 sm:grid-cols-2">
+						<div className="grid gap-1.5">
+							<Label htmlFor="home-headline">Headline</Label>
+							<Input
+								id="home-headline"
+								value={home.headline}
+								onChange={(event) => updateHome({ headline: event.target.value })}
+							/>
+						</div>
+						<div className="grid gap-1.5">
+							<Label htmlFor="home-highlight">Highlighted headline</Label>
+							<Input
+								id="home-highlight"
+								value={home.highlight}
+								onChange={(event) => updateHome({ highlight: event.target.value })}
+							/>
+						</div>
+					</div>
+					<p className="-mt-2 text-xs text-muted-foreground">
+						The highlighted part follows the headline in the accent colour. Leave both empty to show the site
+						title.
+					</p>
+
+					<div className="grid gap-1.5">
 						<Label htmlFor="home-intro">Intro</Label>
 						<Textarea
 							id="home-intro"
-							value={intro}
-							onChange={(event) => setIntro(event.target.value)}
-							rows={4}
+							value={home.intro}
+							onChange={(event) => updateHome({ intro: event.target.value })}
+							rows={10}
 						/>
+						<span className="text-xs text-muted-foreground">Separate paragraphs with a blank line.</span>
+					</div>
+
+					<div className="grid gap-3 sm:grid-cols-2">
+						<div className="grid gap-1.5">
+							<Label htmlFor="home-cta-label">Button label</Label>
+							<Input
+								id="home-cta-label"
+								value={home.ctaLabel}
+								onChange={(event) => updateHome({ ctaLabel: event.target.value })}
+							/>
+						</div>
+						<div className="grid gap-1.5">
+							<Label htmlFor="home-cta-link">Button link</Label>
+							<Input
+								id="home-cta-link"
+								value={home.ctaLink}
+								onChange={(event) => updateHome({ ctaLink: event.target.value })}
+								placeholder="#work, /projects or mailto:…"
+							/>
+						</div>
 					</div>
 
 					<div className="grid gap-2">

@@ -1,4 +1,9 @@
 {
-	"intro": "Selected work and experiments in design and engineering.",
+	"eyebrow": "Hey, I'm Pavel",
+	"headline": "A designer and front-end engineer",
+	"highlight": "making complex products feel calm and clear.",
+	"intro": "I design and build web interfaces end to end, from the first sketch to the code that ships. Most of my work sits between product design and front-end engineering, where small details decide whether something feels simple.\n\nLately that has meant dashboards for operations teams, data visualisations for researchers, and mobile apps that are kind to their users. The common thread is turning dense information into something people can act on without thinking twice.\n\nI like small teams, clear constraints and working close to the people who use the product. I prototype early, test with real users, and keep the code plain enough that anyone can pick it up after me.\n\nAway from the screen I collect old zines, ride a bike further than I should on weekends, and tinker with synthesizers. It is another way to play with systems, rhythm and getting the details right.",
+	"ctaLabel": "See selected work",
+	"ctaLink": "#work",
 	"featured": []
 }
