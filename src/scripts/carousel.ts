@@ -10,14 +10,16 @@ export function initCarousels(root: ParentNode = document) {
 		if (!track) return;
 
 		const count = track.children.length;
-		const index = () => Math.round(track.scrollLeft / track.clientWidth);
+		// Slide width, not track width: the track has side padding (see carousel.css).
+		const pitch = () => track.children[0].clientWidth;
+		const index = () => Math.round(track.scrollLeft / pitch());
 		// Track the intended slide so rapid clicks don't read a mid-animation position.
 		let target = 0;
 		let settle: number | undefined;
 		const go = (delta: number) => {
 			target = (target + delta + count) % count;
 			if (current) current.textContent = String(target + 1);
-			track.scrollTo({ left: target * track.clientWidth });
+			track.scrollTo({ left: target * pitch() });
 		};
 
 		carousel.querySelector('[data-prev]')?.addEventListener('click', () => go(-1));
