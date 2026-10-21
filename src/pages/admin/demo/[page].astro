@@ -1,0 +1,15 @@
+---
+import Admin from '../../../layouts/Admin.astro';
+import DemoPage, { demoPageNames, type DemoPageName } from '../../../admin/features/demo-page';
+
+export const prerender = false;
+
+const page = Astro.params.page as DemoPageName;
+if (!demoPageNames.includes(page)) return new Response('Not Found', { status: 404 });
+
+const title = `${page.charAt(0).toUpperCase()}${page.slice(1)} (demo)`;
+---
+
+<Admin title={title} bare>
+	<DemoPage client:only="react" page={page} />
+</Admin>
