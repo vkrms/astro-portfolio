@@ -220,8 +220,20 @@ test.describe('phase 1 - public site', () => {
 		await page.goto('/');
 
 		const card = page.locator('[data-project-card]', { hasText: 'Design Project' });
-		const tag = card.getByRole('link', { name: '#real deal' });
+		const tag = card.getByRole('link', { name: 'real deal' });
 		await expect(tag).toHaveAttribute('href', '/?tag=real%20deal#work');
+
+		// Shown as a hashtag with an underscore; the accessible name keeps the space.
+		await expect(tag).toContainText('#real_deal');
+		const chip = page.getByRole('button', { name: 'real deal', exact: true });
+		await expect(chip).toContainText('#real_deal');
+		await expect(page.getByRole('button', { name: 'All', exact: true })).toHaveText('All');
+
+		// Pointer cursor, and every hover transition is 300ms.
+		expect(await chip.evaluate((el) => getComputedStyle(el).cursor)).toBe('pointer');
+		for (const locator of [chip, tag, page.getByRole('link', { name: 'Design Project' })]) {
+			expect(await locator.evaluate((el) => getComputedStyle(el).transitionDuration)).toMatch(/^0\.3s/);
+		}
 
 		// Tags share one colour token with the filter chips.
 		const colours = await page.evaluate(() => {

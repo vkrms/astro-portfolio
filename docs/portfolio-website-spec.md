@@ -169,6 +169,8 @@ Visitor-facing text follows a two-size scale defined in `src/styles/theme.css`:
 - The subheading has the heading's size in a quieter or accent colour; colours are set where the class is used.
 - Vertical spacing comes from X, the display cap height (`--type-x`): eyebrow to heading is X/2, subheading to body is X.
 - Fine print (captions, filter chips, previous/next links, footer) and the admin keep their own small sizes.
+- Tags show as hashtags in the tag colour, with spaces displayed as underscores (`#real_deal`); screen readers still hear the plain tag. Filter chips and card tag links share this.
+- Every transition is 300 ms (`--default-transition-duration`), and links and buttons ease their colour changes even without a transition class. Buttons show a pointer cursor.
 
 ## Site structure
 

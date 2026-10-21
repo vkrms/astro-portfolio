@@ -2,6 +2,7 @@
 import Base from '../layouts/Base.astro';
 import FormattedDate from '../components/FormattedDate.astro';
 import ProjectCover from '../components/media/ProjectCover.astro';
+import TagLabel from '../components/TagLabel.astro';
 import TagLink from '../components/TagLink.astro';
 import { readHomeSettings, readSiteSettings } from '../lib/settings';
 import { listPosts } from '../lib/storage';
@@ -26,7 +27,7 @@ const tags = [...new Set(projects.flatMap((post) => post.tags ?? []))].sort((a, 
 
 const chip = (active: boolean) =>
 	[
-		'rounded-full border px-3 py-1 transition-colors',
+		'rounded-[6px] border px-3 py-1 transition-colors',
 		active
 			? 'border-tag bg-tag text-tag-foreground'
 			: 'text-tag hover:border-tag',
@@ -46,7 +47,7 @@ const ctaArrow = home.ctaLink.startsWith('#')
 ---
 
 <Base title={site.seo.title} description={site.seo.description}>
-	<section class="mx-auto max-w-5xl px-6 pt-16 pb-20 sm:pt-24">
+	<section class="mx-auto max-w-5xl px-6 pt-16 pb-20 sm:pt-10">
 		{/* One 56ch column, so the heading and paragraphs share the same width. */}
 		<div class="max-w-[56ch]">
 			{
@@ -107,7 +108,7 @@ const ctaArrow = home.ctaLink.startsWith('#')
 							aria-pressed="false"
 							class={chip(false)}
 						>
-							{item}
+							<TagLabel tag={item} />
 						</button>
 					))}
 				</nav>

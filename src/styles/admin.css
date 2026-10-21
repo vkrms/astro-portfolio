@@ -47,10 +47,6 @@
 	astro-slot {
 		display: contents;
 	}
-	button:not(:disabled),
-	[role='button']:not(:disabled) {
-		cursor: pointer;
-	}
 }
 
 /* BlockNote's shadcn theme builds its floating UI from Tailwind utilities that

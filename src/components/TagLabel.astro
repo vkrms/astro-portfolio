@@ -1,0 +1,13 @@
+---
+/**
+ * A tag shown as a hashtag. Spaces display as underscores (#real_deal); the
+ * accessible name stays the plain tag, so screen readers say "real deal".
+ */
+interface Props {
+	tag: string;
+}
+
+const { tag } = Astro.props;
+---
+
+<span aria-hidden="true">#{tag.replace(/\s+/g, '_')}</span><span class="sr-only">{tag}</span>
