@@ -2,7 +2,7 @@
 import Base from '../layouts/Base.astro';
 import Starfield from '../components/space/Starfield.astro';
 import FormattedDate from '../components/FormattedDate.astro';
-import CmsImage from '../components/media/CmsImage.astro';
+import ProjectCover from '../components/media/ProjectCover.astro';
 import { readHomeSettings, readSiteSettings } from '../lib/settings';
 import { listPosts } from '../lib/storage';
 
@@ -50,14 +50,7 @@ const heading = featured.length > 0 ? 'Featured projects' : 'Recent projects';
 				<ul class="mt-8 grid list-none gap-6 p-0 sm:grid-cols-2 lg:grid-cols-3">
 					{projects.map((post) => (
 						<li class="overflow-hidden rounded-xl border bg-card">
-							{post.cover && (
-								<CmsImage
-									src={post.cover}
-									alt={post.coverAlt ?? ''}
-									width={800}
-									class="aspect-[16/9] w-full object-cover"
-								/>
-							)}
+							<ProjectCover cover={post.cover} alt={post.coverAlt} width={800} />
 							<div class="p-5">
 								{post.date && (
 									<p class="text-sm text-muted-foreground">

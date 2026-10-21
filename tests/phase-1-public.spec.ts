@@ -60,6 +60,19 @@ test.describe('phase 1 - public site', () => {
 		await expect(page.getByText('Draft Project')).toHaveCount(0);
 	});
 
+	test('project cards without a cover show a placeholder', async ({ page, request }) => {
+		await request.post('/api/save', {
+			data: { title: 'No Cover', summary: 'Summary.', date: '2026-01-01', draft: false },
+		});
+		await waitForProject(request, 'no-cover');
+
+		await page.goto('/projects');
+
+		const card = page.locator('[data-project-card]', { hasText: 'No Cover' });
+		await expect(card.locator('[data-cover-placeholder]')).toBeVisible();
+		await expect(card.locator('img')).toHaveCount(0);
+	});
+
 	test('filters projects by tag', async ({ page, request }) => {
 		await request.post('/api/save', {
 			data: {

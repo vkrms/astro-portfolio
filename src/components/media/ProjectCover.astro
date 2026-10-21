@@ -1,0 +1,28 @@
+---
+/**
+ * Cover for a project card: the post's image, or a themed gradient when it
+ * has none, so cards in a grid keep the same shape.
+ */
+import CmsImage from './CmsImage.astro';
+
+interface Props {
+	cover?: string | null;
+	alt?: string;
+	/** Rendered width of the image box, used to pick srcset widths. */
+	width?: number;
+}
+
+const { cover, alt = '', width } = Astro.props;
+---
+
+{
+	cover ? (
+		<CmsImage src={cover} alt={alt} width={width} class="aspect-[16/9] w-full object-cover" />
+	) : (
+		<div
+			data-cover-placeholder
+			aria-hidden="true"
+			class="aspect-[16/9] w-full bg-gradient-to-br from-primary/30 via-accent to-secondary"
+		/>
+	)
+}

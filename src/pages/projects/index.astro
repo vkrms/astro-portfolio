@@ -1,7 +1,7 @@
 ---
 import Base from '../../layouts/Base.astro';
 import FormattedDate from '../../components/FormattedDate.astro';
-import CmsImage from '../../components/media/CmsImage.astro';
+import ProjectCover from '../../components/media/ProjectCover.astro';
 import { listPosts } from '../../lib/storage';
 
 const posts = await listPosts({ publishedOnly: true });
@@ -54,14 +54,7 @@ const chip = (active: boolean) =>
 								data-project-card
 								data-tags={JSON.stringify(post.tags ?? [])}
 							>
-								{post.cover && (
-									<CmsImage
-										src={post.cover}
-										alt={post.coverAlt ?? ''}
-										width={900}
-										class="aspect-[16/9] w-full object-cover"
-									/>
-								)}
+								<ProjectCover cover={post.cover} alt={post.coverAlt} width={900} />
 								<div class="p-6">
 									{post.date && (
 										<p class="text-sm text-muted-foreground">
