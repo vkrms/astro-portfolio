@@ -22,7 +22,7 @@ const config = configProp ?? (await readSiteSettings());
 	<head>
 		<BaseHead title={title} description={description} image={image} />
 	</head>
-	<body>
+	<body class="type-body">
 		<Header config={config} />
 		<slot />
 		<Footer config={config} />

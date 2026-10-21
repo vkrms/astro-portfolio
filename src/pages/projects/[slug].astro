@@ -36,21 +36,21 @@ const ogImage = await ogImageUrl(post.cover);
 				<Icon name="lucide:arrow-left" class="size-5" />
 			</a>
 			<div class="flex items-start justify-between gap-4">
-				<p class="text-sm text-muted-foreground">
+				<p class="type-eyebrow text-muted-foreground">
 					{post.date && <FormattedDate date={new Date(post.date)} />}
 				</p>
 				<EditPostLink slug={post.slug} />
 			</div>
-			<h1 class="mt-2 text-4xl font-semibold tracking-tight lg:text-5xl">{post.title}</h1>
-			{byline && <p class="mt-3 text-sm text-muted-foreground">{byline}</p>}
-			{post.summary && <p class="mt-4 text-lg text-muted-foreground">{post.summary}</p>}
+			<h1 class="type-heading mt-[calc(var(--type-x)*0.5)]">{post.title}</h1>
+			{post.summary && <p class="type-subheading mt-1 text-muted-foreground">{post.summary}</p>}
+			{byline && <p class="mt-[var(--type-x)] text-muted-foreground">{byline}</p>}
 			{post.links && post.links.length > 0 && (
 				<ul class="mt-6 flex list-none flex-wrap gap-4 p-0">
 					{post.links.map((link) => (
 						<li>
 							<a
 								href={link.url}
-								class="text-sm font-medium text-primary hover:underline"
+								class="font-medium text-primary hover:underline"
 								rel="noopener"
 								target="_blank"
 							>

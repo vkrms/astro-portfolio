@@ -112,12 +112,16 @@ function levelOf(value: unknown): number {
 			const type = block.type ?? 'paragraph';
 
 			if (type === 'paragraph') {
-				return <p class="my-4 leading-7" set:html={renderInline(block.content)} />;
+				return <p class="my-4" set:html={renderInline(block.content)} />;
 			}
 
 			if (type === 'heading') {
 				const level = levelOf(block.props?.level);
-				const className = 'mt-8 mb-4 font-semibold tracking-tight';
+				// H1 and H2 use the display size; H3 stays at body size.
+				const className =
+					level === 3
+						? 'mt-8 mb-3 font-semibold tracking-tight'
+						: 'type-heading mt-12 mb-4';
 				const html = renderInline(block.content);
 
 				if (level === 1) return <h1 class={className} set:html={html} />;

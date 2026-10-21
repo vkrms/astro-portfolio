@@ -7,9 +7,9 @@ import Button from '../components/ui/Button.astro';
 	<section class="relative flex min-h-[70vh] items-center justify-center overflow-hidden px-6 text-center">
 		<Starfield count={90} class="text-foreground/20" />
 		<div class="relative flex flex-col items-center">
-			<p class="text-sm font-medium tracking-widest text-primary uppercase">Error 404</p>
-			<h1 class="mt-2 text-4xl font-semibold tracking-tight lg:text-5xl">Lost in space</h1>
-			<p class="mx-auto mt-4 max-w-md text-muted-foreground">This page drifted out of orbit. Let's get you back to mission control.</p>
+			<p class="type-eyebrow text-primary">Error 404</p>
+			<h1 class="type-heading mt-[calc(var(--type-x)*0.5)]">Lost in space</h1>
+			<p class="mx-auto mt-[var(--type-x)] max-w-md text-muted-foreground">This page drifted out of orbit. Let's get you back to mission control.</p>
 			<Button href="/" class="mt-8">Back to home</Button>
 		</div>
 	</section>

@@ -156,6 +156,20 @@ R2 wins: 5 GB of egress is roughly 100 plays of a 50 MB clip, which a portfolio 
 - The Video block asks `POST /api/video-upload` for a presigned R2 URL, then uploads the file directly from the browser. Video never passes through a Vercel Function, so the 4.5 MB limit doesn't apply.
 - Encode H.264 MP4 at up to 1080p, ≤ 50 MB per clip, with a poster JPEG. Adaptive streaming would need a paid service and is out of scope.
 
+## Typography
+
+Visitor-facing text follows a two-size scale defined in `src/styles/theme.css`:
+
+| Tier | Size | Used for |
+| --- | --- | --- |
+| Display (`type-heading`, `type-subheading`) | 2B | Home heading and highlighted line, "Projects" heading, project title and summary, 404 heading, H1/H2 in post bodies |
+| Body (`type-eyebrow`, `type-body`) | B, 16 to 18 px fluid | Eyebrow, paragraphs, cards, nav, tags, byline, H3 in post bodies |
+
+- Display lines are set tight (line height 1.08, letter spacing -0.03em, weight 500). Body text uses a line height of 1.4 for reading.
+- The subheading has the heading's size in a quieter or accent colour; colours are set where the class is used.
+- Vertical spacing comes from X, the display cap height (`--type-x`): eyebrow to heading is X/2, subheading to body is X.
+- Fine print (captions, filter chips, previous/next links, footer) and the admin keep their own small sizes.
+
 ## Site structure
 
 All public pages are prerendered. The admin pages and API routes run on demand and are only reachable on localhost.

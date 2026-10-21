@@ -126,6 +126,46 @@
 	}
 }
 
+/* Visitor-facing type scale. Two sizes: body (B) for the eyebrow and all running
+   text, and display (2B) for the heading and subheading. Display and body
+   lines are set tight, and X, the cap height of the display size, drives the
+   vertical spacing: eyebrow to heading is X/2, subheading to body is X.
+   Colours are chosen where the classes are used. */
+:root {
+	--text-body: clamp(1rem, 0.94rem + 0.25vw, 1.125rem);
+	--text-display: calc(var(--text-body) * 2);
+	--type-x: calc(var(--text-display) * 0.72);
+	--leading-display: 1.08;
+	--leading-body: 1.4;
+}
+
+@utility type-eyebrow {
+	font-size: var(--text-body);
+	line-height: var(--leading-display);
+	letter-spacing: -0.01em;
+}
+
+@utility type-heading {
+	font-size: var(--text-display);
+	line-height: var(--leading-display);
+	letter-spacing: -0.03em;
+	font-weight: 500;
+}
+
+/* Same size as the heading; set it in a quieter colour. */
+@utility type-subheading {
+	font-size: var(--text-display);
+	line-height: var(--leading-display);
+	letter-spacing: -0.03em;
+	font-weight: 500;
+}
+
+@utility type-body {
+	font-size: var(--text-body);
+	line-height: var(--leading-body);
+	letter-spacing: -0.005em;
+}
+
 /* Prose (blog body) follows the theme tokens so it inverts in dark mode and
    keeps the indigo tint, rather than the plugin's default zero-chroma grays.
    Unlayered so it overrides the typography plugin's layered variables. */
