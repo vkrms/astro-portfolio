@@ -1,7 +1,6 @@
 ---
 import '../styles/admin.css';
 import AdminShell from '../admin/components/layout/admin-shell';
-import ThemeScript from '../components/ThemeScript.astro';
 import DevInspector from '../components/DevInspector.astro';
 import { readSiteSettings } from '../lib/settings';
 
@@ -26,7 +25,6 @@ const variant = cookies.get('layout_variant')?.value;
 <!doctype html>
 <html lang="en">
 	<head>
-		<ThemeScript />
 		<meta charset="utf-8" />
 		<meta
 			name="viewport"

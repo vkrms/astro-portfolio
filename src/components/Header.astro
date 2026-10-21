@@ -2,7 +2,6 @@
 import { Icon } from 'astro-icon/components';
 import type { SiteConfig } from '../lib/config';
 import IconLink from "./IconLink.astro";
-import ThemeToggle from './ThemeToggle.astro';
 
 interface Props {
 	config?: SiteConfig | null;
@@ -30,7 +29,6 @@ const contactLinks = (config?.contactLinks ?? []).filter(item => item !== null);
 			{contactLinks.map((link) => (
 				<IconLink title={link.title} link={link.link} icon={link.icon} />
 			))}
-			<ThemeToggle />
 		</div>
 	</nav>
 	<div id="menu-panel" hidden class="border-t bg-background">
@@ -43,13 +41,10 @@ const contactLinks = (config?.contactLinks ?? []).filter(item => item !== null);
 					{item.title}
 				</a>
 			))}
-			<div class="mt-4 flex items-center justify-between gap-3 pt-4 lg:hidden">
-				<div class="flex items-center gap-2">
-					{contactLinks.map((link) => (
-						<IconLink title={link.title} link={link.link} icon={link.icon} />
-					))}
-				</div>
-				<ThemeToggle />
+			<div class="mt-4 flex items-center gap-2 pt-4 lg:hidden">
+				{contactLinks.map((link) => (
+					<IconLink title={link.title} link={link.link} icon={link.icon} />
+				))}
 			</div>
 		</div>
 	</div>

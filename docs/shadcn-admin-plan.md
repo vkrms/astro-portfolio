@@ -196,7 +196,7 @@ Where the build differs from the steps above:
   values use TanStack's format; routes pass their zod schema to
   `getRouteApi()`.
 - Demo data was generated once with faker (same seeds) and stored as JSON.
-- `ThemeProvider` uses the public site's `theme` localStorage key. Layout state
+- The dark theme was later switched off (see below). Layout state
   (`sidebar_state`, `layout_collapsible`, `layout_variant` cookies) is read in
   `Admin.astro` and passed to the shell.
 - Demo pages are `client:only` and lazy-loaded per page. Their own `Header` was
@@ -211,3 +211,7 @@ Where the build differs from the steps above:
   button when the mobile sheet closes.
 - Pinned `@tanstack/react-table@8` and `@hookform/resolvers@5` (versions
   shadcn-admin is written for).
+- The dark theme is switched off on the public site and the admin: no toggle,
+  no `ThemeProvider`, and the `.dark` class is never added. The `.dark` tokens
+  and `dark:` variants remain in the CSS but never apply. To bring it back,
+  restore a toggle that sets `.dark` on `<html>`.

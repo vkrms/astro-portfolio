@@ -3,12 +3,10 @@ import { LocationProvider } from '@admin/lib/router'
 import { cn } from '@admin/lib/utils'
 import { LayoutProvider } from '@admin/context/layout-provider'
 import { SearchProvider } from '@admin/context/search-provider'
-import { ThemeProvider } from '@admin/context/theme-provider'
 import { ConfigDrawer } from '@admin/components/config-drawer'
 import { ProfileDropdown } from '@admin/components/profile-dropdown'
 import { Search } from '@admin/components/search'
 import { SkipToMain } from '@admin/components/skip-to-main'
-import { ThemeSwitch } from '@admin/components/theme-switch'
 import { Button } from '@admin/components/ui/button'
 import { SidebarInset, SidebarProvider } from '@admin/components/ui/sidebar'
 import { Toaster } from '@admin/components/ui/sonner'
@@ -50,49 +48,46 @@ export default function AdminShell({
 }: AdminShellProps) {
   return (
     <LocationProvider value={href}>
-      <ThemeProvider>
-        <SearchProvider>
-          <LayoutProvider
-            initialCollapsible={collapsible}
-            initialVariant={variant}
-          >
-            <SidebarProvider defaultOpen={sidebarOpen}>
-              <SkipToMain />
-              <AppSidebar siteTitle={siteTitle} />
-              <SidebarInset
-                className={cn(
-                  '@container/content',
-                  'has-data-[layout=fixed]:h-svh',
-                  'peer-data-[variant=inset]:has-data-[layout=fixed]:h-[calc(100svh-(var(--spacing)*4))]'
-                )}
+      <SearchProvider>
+        <LayoutProvider
+          initialCollapsible={collapsible}
+          initialVariant={variant}
+        >
+          <SidebarProvider defaultOpen={sidebarOpen}>
+            <SkipToMain />
+            <AppSidebar siteTitle={siteTitle} />
+            <SidebarInset
+              className={cn(
+                '@container/content',
+                'has-data-[layout=fixed]:h-svh',
+                'peer-data-[variant=inset]:has-data-[layout=fixed]:h-[calc(100svh-(var(--spacing)*4))]'
+              )}
+            >
+              <Header fixed>
+                <h1 className='truncate text-lg font-semibold'>{title}</h1>
+                <div className='ms-auto flex items-center gap-2'>
+                  <Search className='max-sm:hidden' />
+                  {action && (
+                    <Button asChild size='sm'>
+                      <a href={action.href}>{action.label}</a>
+                    </Button>
+                  )}
+                  <ConfigDrawer />
+                  <ProfileDropdown />
+                </div>
+              </Header>
+              <main
+                id='main'
+                tabIndex={-1}
+                className='flex min-h-0 flex-1 flex-col outline-none'
               >
-                <Header fixed>
-                  <h1 className='truncate text-lg font-semibold'>{title}</h1>
-                  <div className='ms-auto flex items-center gap-2'>
-                    <Search className='max-sm:hidden' />
-                    {action && (
-                      <Button asChild size='sm'>
-                        <a href={action.href}>{action.label}</a>
-                      </Button>
-                    )}
-                    <ThemeSwitch />
-                    <ConfigDrawer />
-                    <ProfileDropdown />
-                  </div>
-                </Header>
-                <main
-                  id='main'
-                  tabIndex={-1}
-                  className='flex min-h-0 flex-1 flex-col outline-none'
-                >
-                  {bare ? children : <Main>{children}</Main>}
-                </main>
-              </SidebarInset>
-              <Toaster />
-            </SidebarProvider>
-          </LayoutProvider>
-        </SearchProvider>
-      </ThemeProvider>
+                {bare ? children : <Main>{children}</Main>}
+              </main>
+            </SidebarInset>
+            <Toaster />
+          </SidebarProvider>
+        </LayoutProvider>
+      </SearchProvider>
     </LocationProvider>
   )
 }

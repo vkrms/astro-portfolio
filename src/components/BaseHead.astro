@@ -3,7 +3,6 @@
 // all pages through the use of the <BaseHead /> component.
 import '../styles/global.css';
 import { ClientRouter } from 'astro:transitions';
-import ThemeScript from './ThemeScript.astro';
 
 interface Props {
 	title: string;
@@ -16,8 +15,6 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 const { title, description, image } = Astro.props;
 const socialImage = image ? new URL(image, Astro.site) : undefined;
 ---
-
-<ThemeScript />
 
 <!-- Global Metadata -->
 <meta charset="utf-8" />

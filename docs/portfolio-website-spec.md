@@ -248,7 +248,7 @@ The admin is local-only. Deployed builds serve static pages only.
 
 - Package manager switched to npm; `package-lock.json` is committed and `allowScripts` covers `esbuild`, `workerd` and `sharp`.
 - Astro is pinned at 6.4.8.
-- The shell carries over: `Header`, `Footer`, `ThemeToggle`, `Base`, `BaseHead`, the `ui/` and `space/` primitives, `CmsImage.astro` and the `Carousel` renderer.
+- The shell carries over: `Header`, `Footer`, `Base`, `BaseHead`, the `ui/` and `space/` primitives, `CmsImage.astro` and the `Carousel` renderer.
 - Phase 0b: BlockNote editor at `/admin/edit/[slug]` with a custom Carousel block (slash menu, media picker, add/reorder/remove, alt, caption, aspect ratio).
 - A custom Image block on the same media pipeline, with alt and caption fields; alt text is optional and renders when provided.
 - Every Phase 1 block is implemented: paragraph, H2/H3, lists, code, image, gallery, carousel, embed, quote and media + text. The slash menu puts the media blocks first and hides anything the renderer cannot draw.

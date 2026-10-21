@@ -89,14 +89,11 @@ Active item: `data-active` styling and `aria-current="page"`.
 - Menu button (toggles the sidebar; `aria-expanded`).
 - The page title as the single `h1`.
 - Right side:
-  - **Search** (`Ctrl/Cmd+K`): command menu with the nav pages and theme
-    commands.
+  - **Search** (`Ctrl/Cmd+K`): command menu with the nav pages.
   - The primary action, if any. On Posts it is **New post** ->
     `/admin/edit/new`.
-  - Theme switch: Light, Dark, System. Uses the same `theme` key in
-    localStorage as the public site.
-  - Settings drawer: theme, sidebar variant (inset, floating, sidebar) and
-    layout (default, compact, full). Stored in cookies, read on the server.
+  - Settings drawer: sidebar variant (inset, floating, sidebar) and layout
+    (default, compact, full). Stored in cookies, read on the server.
   - Profile menu. Demo only: the admin has no accounts.
 
 ## Posts screen (`/admin`)
@@ -208,7 +205,7 @@ one at a time.
       closes it and focus returns to the menu button.
 - [x] Below 768px rows render as stacked cards with the same data and actions.
 - [x] A **Skip to content** link moves focus to the main content.
-- [x] Light and dark themes use the design tokens.
+- [x] The admin is light only and uses the design tokens.
 - [x] The demo pages are listed under **Demo** and render at
       `/admin/demo/<name>`.
 

@@ -17,7 +17,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@admin/compone
 import { Input } from '@admin/components/ui/input';
 import { Label } from '@admin/components/ui/label';
 import { Textarea } from '@admin/components/ui/textarea';
-import { useDarkMode } from '@admin/hooks/use-dark-mode';
 import { SlugContext } from '../../blocks/context';
 import { findEmbedWithoutTitle, normalizeBlocks } from '../../blocks/shared';
 import { schema } from '../../blocks/schema';
@@ -63,7 +62,6 @@ export default function PostEditor({ slug, post }: Props) {
 	const [previewOpen, setPreviewOpen] = useState(false);
 	const [previewLoading, setPreviewLoading] = useState(false);
 	const [error, setError] = useState<string | null>(null);
-	const dark = useDarkMode();
 	const titleRef = useRef<HTMLTextAreaElement>(null);
 	const coverRef = useRef<HTMLInputElement>(null);
 
@@ -201,7 +199,7 @@ export default function PostEditor({ slug, post }: Props) {
 						/>
 
 						<div className="min-h-[40vh] lg:min-h-[60vh]">
-							<BlockNoteView editor={editor} theme={dark ? 'dark' : 'light'} slashMenu={false}>
+							<BlockNoteView editor={editor} theme="light" slashMenu={false}>
 								<SuggestionMenuController
 									triggerCharacter="/"
 									getItems={async (query) =>

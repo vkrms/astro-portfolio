@@ -2,7 +2,7 @@
 
 Status: **pending owner confirmation**. The MVP is not done until every item below is checked.
 
-How to review: run `npm run dev`, then open each URL at desktop (>= 1024 px) and mobile (<= 640 px), in both light and dark themes. For the preview modal, open a post in `/admin` and click **Preview**.
+How to review: run `npm run dev`, then open each URL at desktop (>= 1024 px) and mobile (<= 640 px). The site is light only. For the preview modal, open a post in `/admin` and click **Preview**.
 
 ## Visitor-facing pages
 
@@ -12,8 +12,7 @@ How to review: run `npm run dev`, then open each URL at desktop (>= 1024 px) and
 
 ## Visitor-facing overlays and interactions
 
-- [ ] **Mobile navigation** - open, close, links, theme toggle, Escape.
-- [ ] **Theme toggle** - light/dark switches and persists across pages.
+- [ ] **Mobile navigation** - open, close, links, contact links, Escape.
 - [ ] **Carousel** - previous/next, counter, keyboard arrows, no autoplay.
 - [ ] **Embed** - thumbnail facade, accessible title, click loads the iframe, correct aspect ratio.
 
@@ -25,4 +24,4 @@ How to review: run `npm run dev`, then open each URL at desktop (>= 1024 px) and
 
 - The MVP has no public modal. The mobile navigation is a drawer; the admin preview is the only modal.
 - Phase 3 adds the gallery lightbox; add a review item when it ships.
-- Check every public surface in both light and dark themes.
+- The dark theme is switched off. Check that the site stays light when the OS is set to dark.

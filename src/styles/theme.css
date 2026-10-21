@@ -5,8 +5,14 @@
 @import './carousel.css';
 @plugin '@tailwindcss/typography';
 
-/* Drive the dark: variant from the .dark class (toggled by ThemeToggle),
-   not the prefers-color-scheme media query. */
+/* The dark theme is switched off: nothing adds .dark, so the .dark tokens and
+   dark: variants below never apply. Re-enable it by restoring a toggle that
+   adds the class. Keep native controls light even when the OS is dark. */
+:root {
+	color-scheme: light;
+}
+
+/* Drive the dark: variant from the .dark class, not prefers-color-scheme. */
 @custom-variant dark (&:where(.dark, .dark *));
 
 /* Metric-matched Arial fallback so the Inter swap doesn't reflow text (CLS). */
