@@ -65,6 +65,17 @@ content as children, with `PostEditor` (`client:only`) nested inside.
 - If not: shell stays in `Admin.astro`; only the sidebar and header become
   islands, and the layout uses shadcn sidebar CSS classes around them.
 
+Result (2026-10-20): nested islands work. The shell is one `client:load`
+island wrapping `<slot />`. The inner `PostEditor` hydrated, and the title and
+body kept their values after the shell re-rendered 3 times. No console
+errors. Constraints:
+
+- Page islands are separate React roots, so they cannot read the shell's
+  context (`useSidebar`, etc.). Pass data as props or use module-level stores.
+  `sonner`'s `toast()` should work across roots this way; check it in step 4.
+- The shell must keep `children` at a stable position in its tree. Moving it
+  to a different parent remounts the slot and resets the editor state.
+
 ### 1. Foundation
 
 - Add `@/*` -> `src/*` path alias in `tsconfig.json` (copied files use it).
@@ -115,16 +126,16 @@ content as children, with `PostEditor` (`client:only`) nested inside.
 - Replace inline status messages with `sonner` toasts.
 - Do not touch BlockNote internals.
 
-### 5. Dashboard demo (`/admin/dashboard`)
+### 5. Dashboard demo (`/admin/demo/dashboard`)
 
 Reference only: a sample of what the admin could show later.
 
 - Port `features/dashboard` (overview cards, bar chart, analytics tab, recent
   sales) as `src/components/admin/demo/Dashboard.tsx`, with its demo data.
-- Page `src/pages/admin/dashboard.astro` (`prerender = false`), inside the
+- Page `src/pages/admin/demo/[page].astro` (`prerender = false`), inside the
   admin shell. Header and `Main` from our shell; drop its top nav, search,
   profile dropdown and config drawer.
-- Not in the sidebar nav. Reachable by URL only. Mark the page "Demo" in the
+- Listed under the sidebar's Demo group (see Decisions). Mark the page "demo" in the
   title so it is not mistaken for real data.
 - Covered by `middleware.ts` like the rest of `/admin`.
 - `recharts` is imported only here, so it loads only on this page.
@@ -149,7 +160,7 @@ Reference only: a sample of what the admin could show later.
     `window.confirm`.
   - Drawer test: target the `Sheet` trigger and dialog role.
   - New: collapse the desktop sidebar, reload, it stays collapsed.
-  - New: `/admin/dashboard` renders and is not linked from the nav.
+  - New: the demo pages are listed under Demo and render.
 - Run `npm run test:unit`, `npm run test:e2e`, `npm run build` after each step.
 
 ## Commits
@@ -168,5 +179,35 @@ One commit per step, for example:
 - Admin area only; public site unchanged.
 - Row actions: dropdown menu.
 - Desktop sidebar: collapsible to icons.
-- Dashboard: shadcn-admin demo kept at `/admin/dashboard`, unlinked, as
-  reference. Posts stays the admin landing page.
+- Keep the demo pages (dashboard, tasks, users, chats, apps) under
+  `/admin/demo/*`, listed in a collapsible **Demo** group in the sidebar.
+- Keep command menu, search, top nav, config drawer and profile dropdown.
+- Drop the font and direction providers.
+
+## Implementation notes
+
+Where the build differs from the steps above:
+
+- Code lives in `src/admin/` (not `src/components/admin/ui/`) with the alias
+  `@admin/*`. Copied files keep their shadcn-admin paths; only `@/` became
+  `@admin/`. The editors stay in `src/components/admin/`.
+- `src/admin/lib/router.tsx` replaces TanStack Router: `Link` is an `<a>`, a
+  path change is a full page load, a search-only change uses `history`. Search
+  values use TanStack's format; routes pass their zod schema to
+  `getRouteApi()`.
+- Demo data was generated once with faker (same seeds) and stored as JSON.
+- `ThemeProvider` uses the public site's `theme` localStorage key. Layout state
+  (`sidebar_state`, `layout_collapsible`, `layout_variant` cookies) is read in
+  `Admin.astro` and passed to the shell.
+- Demo pages are `client:only` and lazy-loaded per page. Their own `Header` was
+  removed (the shell has one), and `Main` renders a `<div>`, so the shell owns
+  the single `<main>`.
+- CSS: `theme.css` holds the shared tokens. `global.css` excludes `src/admin`
+  and `src/components/admin` from Tailwind's scan; `admin.css` includes them.
+  Without this, admin utilities were inlined into every public page (public
+  inline CSS went from 114 KB with the leak to 45 KB).
+- Fixes to shadcn code: sidebar tooltips render only when collapsed (a hidden
+  tooltip swallowed Escape in the mobile sheet), and focus returns to the menu
+  button when the mobile sheet closes.
+- Pinned `@tanstack/react-table@8` and `@hookform/resolvers@5` (versions
+  shadcn-admin is written for).

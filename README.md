@@ -36,18 +36,29 @@ a local production build).
 
 ```
 src/
+  admin/         admin UI from shadcn-admin (import as @admin/*)
   blocks/        block schema and the Blocks.astro renderer
   components/
     ui/ space/   design-system primitives
     media/       CmsImage — resolves repo uploads to astro:assets
     mdx/         Carousel renderer
-    admin/       admin editor island and shell components
+    admin/       post and settings editor islands
   layouts/       Base layout and Admin layout
   pages/         routes (public pages, admin, API)
   lib/           shared helpers
   scripts/       shared client scripts (carousel)
-  styles/        Tailwind v4 entry
+  styles/        Tailwind v4 entries: global.css (public), admin.css (admin),
+                 theme.css (shared tokens)
 ```
+
+## Admin UI
+
+The admin shell, UI primitives and data table come from
+[shadcn-admin](https://github.com/satnaing/shadcn-admin) by Sat Naing (MIT),
+adapted to Astro routes. A small shim in `src/admin/lib/router.tsx` replaces
+TanStack Router. The original example pages (dashboard, tasks, users, chats,
+apps) are kept under `/admin/demo/*` as reference. Add more shadcn components
+with `npx shadcn add <name>`; `components.json` points them at `src/admin`.
 
 ## Environment
 
